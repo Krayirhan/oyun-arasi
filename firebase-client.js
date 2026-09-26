@@ -25,8 +25,8 @@ import {
   setDoc,
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
-import { firebaseConfig } from './firebase-config.js';
-import { decodeState, encodeState } from './firestore-codec.js';
+import { firebaseConfig } from './firebase-config.js?v=202609262217';
+import { decodeState, encodeState } from './firestore-codec.js?v=202609262217';
 
 const existingApp = getApps().find(candidate => candidate.name === '[DEFAULT]');
 export const app = existingApp || initializeApp(firebaseConfig);

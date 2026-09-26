@@ -1,4 +1,4 @@
-import { db, EMPTY_GAME_STATS, listenToAuth, sendPasswordReset, signIn, signOutUser, signUp } from '../../firebase-client.js';
+import { db, EMPTY_GAME_STATS, listenToAuth, sendPasswordReset, signIn, signOutUser, signUp } from '../../firebase-client.js?v=202609262217';
 import { doc, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const bridge = {

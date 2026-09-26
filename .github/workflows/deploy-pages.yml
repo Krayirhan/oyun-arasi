@@ -24,6 +24,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      # Sürüm ekleri, kodlayıcı ve oyun mantığı testleri (bağımlılık gerektirmez).
+      - name: Static tests
+        run: npm run test:static
+
       - name: Inject deployment-only Firebase config
         env:
           FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
