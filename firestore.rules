@@ -41,10 +41,14 @@ service cloud.firestore {
 
     function validPlatformGame(gameId, data) {
       return gameId in ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba']
-        && data.keys().hasOnly(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt'])
+        && data.keys().hasOnly(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt', 'clientUpdatedAt', 'deviceCounters'])
         && data.keys().hasAll(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt'])
         && data.gameId == gameId && data.schemaVersion == 1
-        && data.state is map && data.stats is map && data.updatedAt is timestamp;
+        && data.state is map && data.state.keys().size() <= 64
+        && data.stats is map && data.stats.keys().size() <= 32
+        && data.updatedAt is timestamp
+        && (!('clientUpdatedAt' in data) || (data.clientUpdatedAt is int && data.clientUpdatedAt >= 0))
+        && (!('deviceCounters' in data) || (data.deviceCounters is map && data.deviceCounters.keys().size() <= 20));
     }
 
     function validHarfaneGame(gameId, data) {
@@ -62,16 +66,18 @@ service cloud.firestore {
         && request.resource.data.diff(resource.data).affectedKeys()
           .hasOnly(['schemaVersion', 'email', 'displayName', 'lastSeenAt', 'gameStats'])
         && validProfile(request.resource.data);
-      allow delete: if false;
+      // Hesap silme: kullanıcı kendi profilini ve oyun belgelerini silebilir.
+      allow delete: if signedInAs(userId);
 
       match /games/{gameId} {
-        allow read: if signedInAs(userId) && knownGame(gameId);
+        allow get: if signedInAs(userId) && knownGame(gameId);
+        allow list: if signedInAs(userId);
         allow create, update: if signedInAs(userId) && knownGame(gameId)
           && (validPlatformGame(gameId, request.resource.data)
             || (gameId in ['series'] || gameId.matches('^daily-[0-9]{4}-[0-9]{2}-[0-9]{2}$'))
               && request.resource.data.keys().hasOnly(['date', 'mode', 'level', 'seriesWins', 'seriesBest', 'completed', 'completedRuns', 'order', 'puzzleNumber', 'guesses', 'current', 'levelCounted', 'gameOver', 'won', 'attempts', 'completedAt'])
               && validHarfaneGame(gameId, request.resource.data));
-        allow delete: if false;
+        allow delete: if signedInAs(userId);
       }
     }
   }

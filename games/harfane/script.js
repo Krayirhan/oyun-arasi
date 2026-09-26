@@ -539,9 +539,10 @@ function authErrorMessage(error) {
     'auth/invalid-credential': 'E-posta veya şifre hatalı.',
     'auth/invalid-email': 'Geçerli bir e-posta yaz.',
     'auth/weak-password': 'Şifre en az 6 karakter olmalı.',
-    'auth/network-request-failed': 'İnternet bağlantını kontrol et.'
+    'auth/network-request-failed': 'İnternet bağlantını kontrol et.',
+    'auth/too-many-requests': 'Çok fazla deneme yapıldı. Biraz bekleyip tekrar dene.'
   };
-  return messages[error.code] || 'İşlem tamamlanamadı. Lütfen tekrar dene.';
+  return messages[error?.code] || 'İşlem tamamlanamadı. Lütfen tekrar dene.';
 }
 
 function openAuthModal(mode = authMode) {
@@ -555,7 +556,7 @@ function openModal(type) {
     content.innerHTML = `<h2 id="modal-title">Üç farklı oyun yolu</h2><p><strong>Günlük:</strong> Her gün herkes için aynı kelimeyi altı tahminde bul.</p><p><strong>Sefer:</strong> 70 seviyeyi tamamla. İlk 20 seviyede altı, sonraki 25 seviyede beş, son 25 seviyede dört tahmin hakkın var. Yanlış sonuçta aynı seviyeyi yeniden denersin.</p><p><strong>Antrenman:</strong> Baskı olmadan sınırsız oyna. 70 kelime bitene kadar tekrar gelmez.</p><ul class="rules"><li><span class="rule-tile green">A</span> Yeşil harf doğru yerde.</li><li><span class="rule-tile yellow">R</span> Sarı harf kelimede var, yeri yanlış.</li><li><span class="rule-tile gray">T</span> Gri harf kelimede yok.</li></ul>`;
   } else if (type === 'auth') {
     const isSignUp = authMode === 'signup';
-    content.innerHTML = `<h2 id="modal-title">${isSignUp ? 'Hesap oluştur' : 'Tekrar hoş geldin'}</h2><p>${isSignUp ? 'Serini ve oyun geçmişini cihazlar arasında sakla.' : 'Hesabına giriş yap, kaldığın yerden devam et.'}</p><form class="auth-form" id="auth-form">${isSignUp ? '<label>Kullanıcı adı<input id="auth-name" type="text" maxlength="30" autocomplete="name" required /></label>' : ''}<label>E-posta<input id="auth-email" type="email" autocomplete="email" required /></label><label>Şifre<input id="auth-password" type="password" minlength="6" autocomplete="current-password" required /></label><button class="auth-submit" type="submit">${isSignUp ? 'Kayıt ol' : 'Giriş yap'}</button></form><p class="auth-error" id="auth-error"></p><button class="auth-switch" id="auth-switch" type="button">${isSignUp ? 'Zaten hesabın var mı? Giriş yap' : 'Hesabın yok mu? Kayıt ol'}</button>`;
+    content.innerHTML = `<h2 id="modal-title">${isSignUp ? 'Hesap oluştur' : 'Tekrar hoş geldin'}</h2><p>${isSignUp ? 'Serini ve oyun geçmişini cihazlar arasında sakla.' : 'Hesabına giriş yap, kaldığın yerden devam et.'}</p><form class="auth-form" id="auth-form">${isSignUp ? '<label>Kullanıcı adı<input id="auth-name" type="text" maxlength="30" autocomplete="name" required /></label>' : ''}<label>E-posta<input id="auth-email" type="email" autocomplete="email" required /></label><label>Şifre<input id="auth-password" type="password" minlength="6" autocomplete="current-password" required /></label><button class="auth-submit" type="submit">${isSignUp ? 'Kayıt ol' : 'Giriş yap'}</button></form><p class="auth-error" id="auth-error" role="status"></p>${isSignUp ? '' : '<button class="auth-switch" id="auth-forgot" type="button">Şifremi unuttum</button>'}<button class="auth-switch" id="auth-switch" type="button">${isSignUp ? 'Zaten hesabın var mı? Giriş yap' : 'Hesabın yok mu? Kayıt ol'}</button>`;
     document.querySelector('#auth-form').addEventListener('submit', async event => {
       event.preventDefault();
       const errorElement = document.querySelector('#auth-error');
@@ -568,9 +569,21 @@ function openModal(type) {
       try {
         if (isSignUp) await firebaseBridge.signUp(email, password, name);
         else await firebaseBridge.signIn(email, password);
-        closeModal(); showToast(isSignUp ? 'Hesabın oluşturuldu.' : 'Giriş yapıldı.');
+        closeModal(); showToast(isSignUp ? 'Hesabın oluşturuldu. Doğrulama bağlantısı e-postana gönderildi.' : 'Giriş yapıldı.');
       } catch (error) {
         errorElement.textContent = authErrorMessage(error); submit.disabled = false;
+      }
+    });
+    document.querySelector('#auth-forgot')?.addEventListener('click', async () => {
+      const errorElement = document.querySelector('#auth-error');
+      const email = document.querySelector('#auth-email').value.trim();
+      if (!email) { errorElement.textContent = 'Önce e-posta adresini yaz.'; return; }
+      if (!firebaseBridge) { errorElement.textContent = 'Firebase hazırlanıyor, birazdan tekrar dene.'; return; }
+      try {
+        await firebaseBridge.sendPasswordReset(email);
+        errorElement.textContent = 'Bu adrese kayıtlı bir hesap varsa şifre sıfırlama bağlantısı gönderdik.';
+      } catch (error) {
+        errorElement.textContent = authErrorMessage(error);
       }
     });
     document.querySelector('#auth-switch').addEventListener('click', () => openAuthModal(isSignUp ? 'signin' : 'signup'));

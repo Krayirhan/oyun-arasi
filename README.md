@@ -22,13 +22,20 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `games/hafiza/`: 4×4 ve 6×6 Hafıza Kartları, rekorlar ve oturum kaydı.
 - `games/mayin-tarlasi/`: Üç zorluk seviyeli Mayın Tarlası ve oyun/rekor kaydı.
 - `firebase-client.js`, `account.js`, `account.css`: ortak hesap, Firebase bağlantısı ve oyun ilerlemesi eşitlemesi.
+- `firestore-codec.js`: Firestore'un saklayamadığı iç içe dizileri (ör. 2048 tahtası) kayıt sırasında metne çevirir.
 - `cloud-sync.js`: oyunların Firebase'i sonradan yüklediği ara katman. Oyunlar `firebase-client.js` yerine bunu içe aktarır; Firebase yüklenemezse oyun yine açılır ve cihazda kaydolur.
 - `firebase-config.js`, `firestore.rules`, `firebase.json`: Oyun Arası Firebase yapılandırması ve erişim kuralları. `firestore.rules` `main` dalına gelince `.github/workflows/deploy-firestore-rules.yml` ile otomatik yayımlanır (kurulum: `FIREBASE_SETUP.md`).
 
 Yeni bir oyun, kendine ait `games/<oyun-adi>/` klasöründe tutulur. Sayfası için mevcut bir oyun sayfası (örneğin `games/sudoku/index.html`) kopyalanır; oyun henüz hazır değilse panel yerine `.soon-stage` "Yakında" bölümü konur ve `catalog.js` satırına `soon: true` eklenir. Oyun hazır olunca `.soon-stage` bölümü oyun paneliyle (`.play-bar`, `.play-options`, `.board-frame`, `.status`) değiştirilir, `styles.css` ve `script.js` eklenir ve `catalog.js` satırındaki `soon: true` kaldırılır. Oyun ve `catalog.js` listesine bir satır olarak eklenir. Oyun sayfası kendi `styles.css` dosyasından sonra `game-shell.css`'i yükler, `<body>` etiketine `class="game-page" data-game="<oyun-adi>"` verir ve vurgu rengi `game-shell.css` içinde tanımlanır; "Tüm Oyunlar" ızgarası, arama ve kategori filtreleri bu listeden otomatik çalışır. Oyunlar cihazda kaydolur; giriş yapıldığında desteklenen oyun ilerlemesi `users/{uid}/games/{gameId}` altında eşitlenir. Yeni hesap profili bütün oyunlar için sıfır başlangıç istatistikleriyle açılır. Harfle Antrenman torbası cihazda kalır.
 
-Yeni oyunların bağımsız kuralları `logic.js` dosyalarında tutulur. Oyun klasörlerindeki küçük modül tanımları tarayıcı importlarını ve Node.js testlerini aynı biçimde çalıştırır. Yerleşik testler bağımlılık kurmadan çalıştırılır:
+Yeni oyunların bağımsız kuralları `logic.js` dosyalarında tutulur. Oyun klasörlerindeki küçük modül tanımları tarayıcı importlarını ve Node.js testlerini aynı biçimde çalıştırır.
+
+Testler kökteki geliştirme bağımlılıklarıyla çalışır (Node 22+ ve Firestore emülatörü için Java 21+ gerekir):
 
 ```sh
-node --test games/xox/logic.test.mjs games/hafiza/logic.test.mjs games/mayin-tarlasi/logic.test.mjs games/sudoku/logic.test.mjs games/sekil/logic.test.mjs games/kelime-avi/logic.test.mjs games/tetris/logic.test.mjs games/soliter/logic.test.mjs games/mahjong/logic.test.mjs games/araba/logic.test.mjs
+npm install
+npm test          # Firestore kural testleri (emülatörde) + tüm oyun mantığı testleri
+npm run test:logic  # yalnızca oyun mantığı testleri, emülatörsüz
 ```
+
+`firestore.rules` yalnızca GitHub Actions ile yayımlanır: `main`'e gelen değişiklikte önce testler çalışır, geçerse kurallar yayına alınır. Elle `firebase deploy` yapılırsa `scripts/guard-rules-deploy.mjs` yerel kural dosyası `origin/main` ile aynı değilse yayını durdurur. Ayrıntılar: `FIREBASE_SETUP.md`.

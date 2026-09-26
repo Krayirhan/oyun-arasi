@@ -382,7 +382,8 @@ const cloudSync = syncGameOnAccountChange('soliter', {
   write: incoming => { stopAuto(); game = resumeGame(parseCloudGame(incoming)); records = mergeRecords(records, incoming.records); render(); },
   isValid: incoming => Boolean(incoming && typeof incoming.gameJson === 'string' && parseCloudGame(incoming) && incoming.records && typeof incoming.records === 'object'),
   merge: (local, remote) => ({ gameJson: remote.gameJson, records: mergeRecords(local.records, remote.records) }),
-  getStats: current => ({ wins: current.records.wins, draw1: current.records[1], draw3: current.records[3] }),
+  getStats: current => ({ draw1: current.records[1], draw3: current.records[3] }),
+  counters: current => ({ wins: Number(current.records?.wins) || 0 }),
   onStatus: message => { saveElement.textContent = message; }
 });
 

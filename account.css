@@ -17,3 +17,9 @@
 .account-switch { margin-top: 14px; border: 0; padding: 5px 0; background: transparent; color: #16804f; font-size: 12px; font-weight: 700; cursor: pointer; }
 .account-error { min-height: 17px; margin: 10px 0 0; color: #b33f3f; font-size: 12px; }
 @media (max-width: 520px) { .account-dialog { padding: 25px 21px; } .account-button { padding: 8px 11px; font-size: 11px; } }
+.account-ok { color: #16804f; }
+.account-verify { margin: -6px 0 16px; padding: 10px 12px; border-radius: 10px; background: #fff7e0; color: #6b5310; font-size: 12px; }
+.account-verify .account-switch { margin: 0; padding: 0; color: #8a5a00; text-decoration: underline; }
+.account-danger { display: block; color: #b33f3f; }
+.account-danger-fill { background: #b33f3f; }
+.account-dialog .account-switch + .account-switch { display: block; margin-top: 4px; }

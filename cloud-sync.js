@@ -22,6 +22,7 @@ export function syncGameOnAccountChange(gameId, options) {
 
   return {
     save(state) { sync?.save(state); },
+    flush() { return sync?.flush(); },
     destroy() { destroyed = true; sync?.destroy(); }
   };
 }
