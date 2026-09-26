@@ -25,17 +25,19 @@ import {
   setDoc,
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
-import { firebaseConfig } from './firebase-config.js?v=202609262228';
-import { decodeState, encodeState } from './firestore-codec.js?v=202609262228';
+import { firebaseConfig } from './firebase-config.js?v=202609262300';
+import { decodeState, encodeState } from './firestore-codec.js?v=202609262300';
 
 const existingApp = getApps().find(candidate => candidate.name === '[DEFAULT]');
 export const app = existingApp || initializeApp(firebaseConfig);
 
-// App Check: site anahtarı firebase-config.js'e girilince açılır. Anahtar boşsa atlanır.
-if (!existingApp && firebaseConfig.appCheckSiteKey && !useEmulator()) {
+// App Check (reCAPTCHA Enterprise): anahtar yalnızca yayın alan adlarında geçerli olduğu için
+// localhost'ta ve emülatörde atlanır. Anahtar boşsa da atlanır.
+const LOCAL_HOST = ['localhost', '127.0.0.1'].includes(location.hostname);
+if (!existingApp && firebaseConfig.appCheckSiteKey && !LOCAL_HOST && !useEmulator()) {
   try {
-    const { initializeAppCheck, ReCaptchaV3Provider } = await import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app-check.js');
-    initializeAppCheck(app, { provider: new ReCaptchaV3Provider(firebaseConfig.appCheckSiteKey), isTokenAutoRefreshEnabled: true });
+    const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import('https://www.gstatic.com/firebasejs/11.10.0/firebase-app-check.js');
+    initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider(firebaseConfig.appCheckSiteKey), isTokenAutoRefreshEnabled: true });
   } catch {
     // App Check yüklenemezse oyunlar yine çalışır; zorunlu kılındıysa bulut kaydı reddedilir.
   }

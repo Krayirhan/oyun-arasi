@@ -56,12 +56,12 @@ Secret yoksa yayın adımı hata vermeden atlanır ve uyarı bırakır; o durumd
 
 ## App Check
 
-Kod hazırdır; `firebase-config.js` içindeki `appCheckSiteKey` boş olduğu sürece kapalıdır. Açmak için:
+App Check açıktır ve **reCAPTCHA Enterprise** sağlayıcısını kullanır. Gizli anahtar gerekmez.
 
-1. [reCAPTCHA yönetim paneli](https://www.google.com/recaptcha/admin) → yeni **reCAPTCHA v3** site anahtarı oluştur, alan adlarına `oyunarasi.site` (ve kullanılıyorsa `krayirhan.github.io`) ekle.
-2. Firebase Console → **App Check** → web uygulaması **Oyun Arasi Web** → reCAPTCHA v3 sağlayıcısını seç, gizli anahtarı gir.
-3. Site anahtarını (herkese açık değer) `firebase-config.js` → `appCheckSiteKey` alanına yaz ve `main`'e gönder.
-4. App Check → Firestore metriklerinde birkaç gün doğrulanmış istek oranını izle; neredeyse tüm istekler doğrulanıyorsa Firestore için **Enforce**'u aç.
+- **Anahtar:** reCAPTCHA yönetim panelinde "Oyun Arası" (skora dayalı v3, Google Cloud projesi *Oyun Arasi*). Alan adları: `oyunarasi.site` ve `oyun-arasi.pages.dev`. Site anahtarı `firebase-config.js` → `appCheckSiteKey` alanındadır (herkese açık değer). Ayda 10.000 doğrulama ücretsizdir.
+- **Firebase kaydı:** Console → App Check → Apps → *Oyun Arasi Web* → reCAPTCHA Enterprise (token süresi 1 saat).
+- **Yerel geliştirme:** Anahtar localhost'a tanımlı olmadığı için App Check localhost'ta ve emülatörde başlatılmaz.
+- **Zorunlu kılma:** App Check → APIs → Cloud Firestore metriklerinde birkaç gün doğrulanmış istek oranı izlenir. İsteklerin neredeyse tamamı "Verified" ise **Enforce** açılır. Zorunlu kılındıktan sonra App Check token'ı olmayan istemciler (eski önbellekli sayfalar, reklam engelleyicinin reCAPTCHA'yı kestiği tarayıcılar) buluta yazamaz; oyunlar cihazda kaydolmaya devam eder.
 
 ## Yerel geliştirme
 

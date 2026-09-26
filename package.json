@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "test": "firebase emulators:exec --only firestore --project demo-oyun-arasi \"node --test tests/*.test.mjs games/*/logic.test.mjs\"",
-    "test:static": "node --test tests/asset-versions.test.mjs tests/firestore-codec.test.mjs games/*/logic.test.mjs",
+    "test:static": "node --test tests/asset-versions.test.mjs tests/firestore-codec.test.mjs tests/library.test.mjs games/*/logic.test.mjs",
     "test:logic": "node --test games/*/logic.test.mjs",
     "bump": "node scripts/bump-assets.mjs"
   },
