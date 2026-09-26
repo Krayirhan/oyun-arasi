@@ -6,9 +6,9 @@
     <meta name="theme-color" content="#f8f4ec" />
     <meta name="description" content="Beş harfli kelimeyi altı denemede bul. Her gün yeni bir Harfle." />
     <title>Harfle | Oyun Arası</title>
-    <link rel="stylesheet" href="styles.css?v=202609262300" />
-    <link rel="stylesheet" href="../../game-shell.css?v=202609262300" />
-    <link rel="stylesheet" href="../../play-page.css?v=202609262300" />
+    <link rel="stylesheet" href="styles.css?v=202609270005" />
+    <link rel="stylesheet" href="../../game-shell.css?v=202609270005" />
+    <link rel="stylesheet" href="../../play-page.css?v=202609270005" />
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
   </head>
   <body class="game-page" data-game="harfane">
@@ -60,56 +60,61 @@
       </section>
 
       <div class="game-screen hidden" id="game-screen">
-      <section class="game-intro">
-        <div>
-          <p class="eyebrow"><span id="mode-label">GÜNÜN KAYDI</span> <span id="puzzle-number">#001</span></p>
-          <h1>İz sür.<br /><em>Kelimeyi bul.</em></h1>
-          <p class="intro-copy" id="intro-copy">Beş harf · Altı tahmin<br />Renkli ipuçlarını takip et.</p>
+        <div class="game-guide">
+          <section class="game-intro">
+            <div>
+              <p class="eyebrow"><span id="mode-label">GÜNÜN KAYDI</span> <span id="puzzle-number">#001</span></p>
+              <h1>İz sür.<br /><em>Kelimeyi bul.</em></h1>
+              <p class="intro-copy" id="intro-copy">Beş harf · Altı tahmin<br />Renkli ipuçlarını takip et.</p>
+            </div>
+            <div class="intro-aside">
+              <span class="aside-label" id="progress-label">GÜNLÜK SERİ</span>
+              <div class="streak-card" aria-label="Galibiyet serisi">
+                <span class="streak-icon">✦</span>
+                <div><strong id="streak-value">0</strong><span id="progress-unit">gün</span></div>
+              </div>
+              <span class="aside-note" id="progress-note">Her gün yeni bir kelime.</span>
+            </div>
+          </section>
+
+          <details class="how-card" id="how-card" open>
+            <summary>
+              <svg class="how-book" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1v13c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z M12 6.5v13" /></svg>
+              <span><strong>Nasıl oynanır?</strong><small>Renkler ipucu verir</small></span>
+              <svg class="how-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
+            </summary>
+            <ol class="how-steps">
+              <li>Beş harfli bir kelime yaz ve gönder.</li>
+              <li>Yeşil harf doğru yerde, sarı harf kelimede var ama başka yerde, gri harf kelimede yok.</li>
+              <li>İpuçlarıyla gizli kelimeyi altı tahminde bul!</li>
+            </ol>
+          </details>
         </div>
-        <div class="intro-aside">
-          <span class="aside-label" id="progress-label">GÜNLÜK SERİ</span>
-          <div class="streak-card" aria-label="Galibiyet serisi">
-            <span class="streak-icon">✦</span>
-            <div><strong id="streak-value">0</strong><span id="progress-unit">gün</span></div>
+
+        <div class="game-play">
+          <section class="board-wrap" aria-label="Tahmin tahtası">
+            <div class="board" id="board"></div>
+            <p class="message" id="message" role="status" aria-live="polite"></p>
+            <div class="board-caption"><span>1</span><span>6 tahmin hakkı</span><span>6</span></div>
+          </section>
+
+          <div class="section-label"><span>01 / TAHMİN PANELİ</span><i></i><span>TR · 5 HARF</span></div>
+          <section class="keyboard" id="keyboard" aria-label="Sanal klavye"></section>
+        </div>
+
+        <section class="daily-footer">
+          <div>
+            <span class="footer-label" id="footer-label">YENİ GÜNÜN BULMACASINA</span>
+            <strong id="countdown">00:00:00</strong>
           </div>
-          <span class="aside-note" id="progress-note">Her gün yeni bir kelime.</span>
-        </div>
-      </section>
-
-      <section class="board-wrap" aria-label="Tahmin tahtası">
-        <div class="board" id="board"></div>
-        <p class="message" id="message" role="status" aria-live="polite"></p>
-        <div class="board-caption"><span>1</span><span>6 tahmin hakkı</span><span>6</span></div>
-      </section>
-
-      <div class="section-label"><span>01 / TAHMİN PANELİ</span><i></i><span>TR · 5 HARF</span></div>
-      <section class="keyboard" id="keyboard" aria-label="Sanal klavye"></section>
-
-      <section class="daily-footer">
-        <div>
-          <span class="footer-label" id="footer-label">YENİ GÜNÜN BULMACASINA</span>
-          <strong id="countdown">00:00:00</strong>
-        </div>
-        <div class="footer-actions">
-          <button class="back-button" id="back-home-button">← Menü</button>
-          <button class="next-level-button hidden" id="next-level-button">Sonraki seviye <span>↗</span></button>
-          <button class="share-button" id="share-button" disabled>Sonucunu paylaş <span>↗</span></button>
-        </div>
-      </section>
+          <div class="footer-actions">
+            <button class="back-button" id="back-home-button">← Menü</button>
+            <button class="next-level-button hidden" id="next-level-button">Sonraki seviye <span>↗</span></button>
+            <button class="share-button" id="share-button" disabled>Sonucunu paylaş <span>↗</span></button>
+          </div>
+        </section>
       </div>
       <section class="play-extras" aria-label="Oyun hakkında">
-        <details class="how-card" id="how-card" open>
-          <summary>
-            <svg class="how-book" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1v13c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z M12 6.5v13" /></svg>
-            <span><strong>Nasıl oynanır?</strong><small>Renkler ipucu verir</small></span>
-            <svg class="how-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-          </summary>
-          <ol class="how-steps">
-            <li>Beş harfli bir kelime yaz ve gönder.</li>
-            <li>Yeşil harf doğru yerde, sarı harf kelimede var ama başka yerde, gri harf kelimede yok.</li>
-            <li>İpuçlarıyla gizli kelimeyi altı tahminde bul!</li>
-          </ol>
-        </details>
         <aside class="goal-card" aria-labelledby="goal-title">
           <h2 id="goal-title">Hedef ne?</h2>
           <p>Beş harfli gizli kelimeyi, renkli ipuçlarını takip ederek altı tahminde bul!</p>
@@ -131,11 +136,11 @@
     </div>
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
-    <script src="kelimeler.js?v=202609262300"></script>
-    <script type="module" src="firebase.js?v=202609262300"></script>
-    <script src="script.js?v=202609262300"></script>
-    <script defer src="../../catalog.js?v=202609262300"></script>
-    <script defer src="../../library.js?v=202609262300"></script>
-    <script defer src="../../game-shell.js?v=202609262300"></script>
+    <script src="kelimeler.js?v=202609270005"></script>
+    <script type="module" src="firebase.js?v=202609270005"></script>
+    <script src="script.js?v=202609270005"></script>
+    <script defer src="../../catalog.js?v=202609270005"></script>
+    <script defer src="../../library.js?v=202609270005"></script>
+    <script defer src="../../game-shell.js?v=202609270005"></script>
   </body>
 </html>

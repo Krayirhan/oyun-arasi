@@ -1,6 +1,6 @@
 // Rekorlarım: her oyunun en iyi sonuçları. Bu cihazdaki kayıtlar okunur; giriş yapılmışsa
 // profildeki (tüm cihazlardan birleşik) istatistiklerle birleştirilir, en iyi değer gösterilir.
-import { loadFirebaseClient } from '../cloud-sync.js?v=202609262300';
+import { loadFirebaseClient } from '../cloud-sync.js?v=202609270005';
 
 const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
 const byLevel = records => ({

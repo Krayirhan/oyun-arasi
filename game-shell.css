@@ -53,6 +53,7 @@ body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-
 /* header: same logo as the landing page */
 .game-page .topbar { height: 68px; border-bottom-color: var(--line); }
 .game-page .brand { display: inline-flex; align-items: center; gap: 10px; }
+.game-page .site-header .brand::before { width: 38px; height: 34px; flex: none; background: #ffa915; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath fill='black' d='M7 4h18a5 5 0 0 1 4.8 3.7l2 8.1a3.5 3.5 0 0 1-5.5 3.6L22 16H10l-4.3 3.4a3.5 3.5 0 0 1-5.5-3.6l2-8.1A5 5 0 0 1 7 4Zm2 3v3H6v3h3v3h3v-3h3v-3h-3V7H9Zm14 2a1.6 1.6 0 1 0 0 3.2A1.6 1.6 0 0 0 23 9Zm4 4a1.6 1.6 0 1 0 0 3.2A1.6 1.6 0 0 0 27 13Z'/%3E%3C/svg%3E") center / contain no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 24'%3E%3Cpath fill='black' d='M7 4h18a5 5 0 0 1 4.8 3.7l2 8.1a3.5 3.5 0 0 1-5.5 3.6L22 16H10l-4.3 3.4a3.5 3.5 0 0 1-5.5-3.6l2-8.1A5 5 0 0 1 7 4Zm2 3v3H6v3h3v3h3v-3h3v-3h-3V7H9Zm14 2a1.6 1.6 0 1 0 0 3.2A1.6 1.6 0 0 0 23 9Zm4 4a1.6 1.6 0 1 0 0 3.2A1.6 1.6 0 0 0 27 13Z'/%3E%3C/svg%3E") center / contain no-repeat; content: ''; }
 .logo-word { font: 700 30px / 1 'Fredoka', sans-serif; letter-spacing: -.02em; background: linear-gradient(90deg, #061a6e, #0a36b5); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
 .logo-word span { -webkit-text-fill-color: #f25a1a; }
 .game-page .back-link { color: var(--ink); font-size: 14px; font-weight: 500; }
@@ -80,6 +81,7 @@ body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-
 .site-header .account-slot { padding-left: 18px; border-left: 1px solid var(--line); }
 .game-page .site-header .account-button { display: flex; align-items: center; gap: 10px; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--ink); font: 700 16px 'Roboto Condensed', sans-serif; }
 .game-page .site-header .account-button::before { content: ''; width: 40px; height: 40px; flex: none; border-radius: 50%; background: #0d2272 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Ccircle cx='12' cy='8.6' r='3.6'/%3E%3Cpath d='M5.6 17.6c0-2.7 2.2-4.5 4.9-4.5h3c2.7 0 4.9 1.8 4.9 4.5v.8H5.6z'/%3E%3C/svg%3E") center / 62% no-repeat; }
+.game-page .site-header .account-button::after { margin-left: 4px; color: var(--muted); content: '⌄'; font-size: 15px; }
 .game-page .site-header .account-button:hover { color: var(--accent); }
 
 /* readable minimum sizes */
@@ -109,7 +111,7 @@ body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-
 /* Harfle (games/harfane) keeps its own layout; the platform header and colors come from here */
 body[data-game='harfane'] .topbar { gap: 16px; padding-bottom: 0; }
 body[data-game='harfane'] .crumbs { padding-inline: 0; }
-.play-extras { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 20px; align-items: start; margin: 48px 0 30px; }
+.play-extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; align-items: start; margin: 32px 0 30px; }
 .play-extras > .how-card, .play-extras > .goal-card, .play-extras > .more-card { grid-area: auto; }
 .play-extras .goal-equation b { min-width: 52px; height: 52px; font-size: 26px; }
 .goal-equation .goal-green { background: #2f9e62; color: #fff; }

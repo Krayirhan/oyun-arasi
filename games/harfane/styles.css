@@ -29,7 +29,7 @@ body {
 button { font: inherit; }
 button:focus-visible { outline: 3px solid #90bf4d; outline-offset: 3px; }
 .hidden { display: none !important; }
-.app-shell { width: min(100% - 48px, 1120px); margin: auto; padding: 22px 0 44px; }
+.app-shell { width: min(100% - 48px, 1560px); margin: auto; padding: 22px 0 44px; }
 
 /* Shared header */
 .topbar { display: flex; min-height: 58px; justify-content: space-between; align-items: center; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
@@ -47,7 +47,7 @@ button:focus-visible { outline: 3px solid #90bf4d; outline-offset: 3px; }
 .icon-button:hover, .modal-close:hover { border-color: var(--green); background: var(--mint); color: var(--green-dark); }
 
 /* Landing page */
-.home-screen { padding: 72px 0 0; }
+.home-screen { max-width: 1120px; margin: 0 auto; padding: 72px 0 0; }
 .home-heading { position: relative; max-width: 740px; }
 .eyebrow, .footer-label, .aside-label, .section-label, .board-caption { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
 .home-heading .eyebrow { margin: 0 0 17px; color: var(--green); }
@@ -74,8 +74,10 @@ h1 em { color: var(--green); font-style: normal; }
 .home-auth-button { padding: 10px 14px; }
 
 /* Game layout */
-.game-screen { display: grid; grid-template-columns: minmax(0, 1fr) 245px; grid-template-rows: auto auto auto auto; column-gap: 48px; align-items: start; max-width: 880px; margin: 40px auto 0; }
-.game-intro { display: flex; grid-column: 1; grid-row: 1; justify-content: space-between; align-items: flex-end; gap: 18px; padding: 0 0 22px; }
+.game-screen { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(620px, 820px) minmax(300px, 1fr); gap: 20px 26px; align-items: start; width: 100%; margin: 34px auto 0; }
+.game-guide { display: grid; gap: 18px; grid-column: 1; }
+.game-play { display: grid; gap: 0; grid-column: 2; min-width: 0; }
+.game-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; padding: 0 0 2px; }
 .game-intro .eyebrow { display: flex; gap: 9px; margin: 0 0 11px; color: var(--green); }
 .game-intro .eyebrow span + span { color: #9aa69f; }
 .game-intro h1 { font-size: clamp(34px, 4vw, 49px); }
@@ -88,7 +90,7 @@ h1 em { color: var(--green); font-style: normal; }
 .streak-card div { display: flex; align-items: baseline; gap: 6px; }
 .streak-card strong { color: var(--green-dark); font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; }
 .streak-card div span { color: var(--muted); font-size: 10px; }
-.board-wrap { position: relative; display: flex; grid-column: 1; grid-row: 2; flex-direction: column; align-items: center; padding: 22px 22px 17px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 12px 34px rgba(23,54,43,.045); }
+.board-wrap { position: relative; display: flex; flex-direction: column; align-items: center; padding: 22px 22px 17px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 12px 34px rgba(23,54,43,.045); }
 .board { display: grid; grid-template-columns: repeat(5, 58px); gap: 7px; }
 .tile { display: grid; width: 58px; height: 58px; place-items: center; border: 2px solid #e2e8e2; border-radius: 13px; background: #fbfcf9; color: var(--ink); font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; text-transform: uppercase; transition: transform .12s ease, background .2s ease, border .2s ease; }
 .tile.filled { border-color: #93bca1; background: #fff; transform: scale(1.025); }
@@ -106,10 +108,10 @@ h1 em { color: var(--green); font-style: normal; }
 .message-pulse { animation: message-pulse .3s ease; }
 @keyframes message-pulse { 50% { transform: translateY(-2px); opacity: .55; } }
 .board-caption { display: none; }
-.section-label { display: flex; grid-column: 1; grid-row: 3; align-items: center; gap: 10px; margin: 19px 2px 9px; color: var(--muted); font-size: 9px; }
+.section-label { display: flex; align-items: center; gap: 10px; margin: 19px 2px 9px; color: var(--muted); font-size: 9px; }
 .section-label i { flex: 1; height: 1px; background: var(--line); }
 .section-label span:last-child { color: #9aa69f; }
-.keyboard { display: flex; grid-column: 1; grid-row: 4; flex-direction: column; align-items: center; gap: 7px; width: min(100%, 550px); justify-self: center; }
+.keyboard { display: flex; flex-direction: column; align-items: center; gap: 7px; width: min(100%, 550px); justify-self: center; }
 .key-row { display: flex; width: 100%; justify-content: center; gap: 5px; }
 .key-row:nth-child(2) { width: 92%; }
 .key-row:nth-child(3) { width: 86%; }
@@ -119,7 +121,7 @@ h1 em { color: var(--green); font-style: normal; }
 .key.correct { border-color: var(--green); background: var(--green); color: #fff; }
 .key.present { border-color: var(--yellow); background: var(--yellow); color: #42370f; }
 .key.absent { border-color: var(--gray); background: var(--gray); color: #fff; }
-.daily-footer { display: flex; grid-column: 2; grid-row: 1 / span 4; flex-direction: column; align-items: stretch; gap: 16px; margin-top: 5px; padding: 18px; border: 1px solid var(--line); border-radius: 17px; background: var(--surface); }
+.daily-footer { display: flex; grid-column: 3; flex-direction: column; align-items: stretch; gap: 16px; margin-top: 0; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 5px 18px rgba(23,54,43,.045); }
 .footer-label { display: block; margin: 0 0 5px; color: var(--muted); font-size: 9px; }
 #countdown { color: var(--green-dark); font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: .03em; }
 .footer-actions { display: flex; flex-direction: column; gap: 8px; }
@@ -163,8 +165,16 @@ h1 em { color: var(--green); font-style: normal; }
 .toast { position: fixed; bottom: 25px; left: 50%; z-index: 10; transform: translate(-50%, 20px); padding: 12px 17px; border: 1px solid rgba(255,255,255,.15); border-radius: 11px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none; transition: .25s ease; }
 .toast.show { transform: translate(-50%, 0); opacity: 1; }
 
+@media (min-width: 781px) and (max-width: 1319px) {
+  .game-screen { grid-template-columns: minmax(240px, .8fr) minmax(0, 1.2fr); gap: 20px; }
+  .game-guide { grid-column: 1; }
+  .game-play { grid-column: 2; }
+  .daily-footer { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
+  .footer-actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
+}
+
 @media (max-width: 780px) {
-  .app-shell { width: min(100% - 30px, 560px); padding-top: 15px; }
+  .app-shell { width: min(100% - 30px, 700px); padding-top: 15px; }
   .live-label { display: none; }
   .home-screen { padding-top: 52px; }
   .home-heading h1 { font-size: clamp(43px, 10vw, 62px); }
@@ -176,6 +186,7 @@ h1 em { color: var(--green); font-style: normal; }
   .mode-card i { position: absolute; right: 18px; bottom: 20px; padding: 0; }
   .home-account { align-items: flex-start; flex-direction: column; margin-top: 22px; }
   .game-screen { display: flex; flex-direction: column; gap: 0; margin-top: 28px; }
+  .game-guide, .game-play { display: contents; }
   .game-intro { width: 100%; align-items: flex-start; padding-bottom: 17px; }
   .game-intro h1 { font-size: clamp(34px, 9vw, 45px); }
   .intro-copy { font-size: 11px; }
@@ -184,14 +195,16 @@ h1 em { color: var(--green); font-style: normal; }
   .streak-card { min-width: auto; padding: 8px 10px; }
   .streak-card div span { display: none; }
   .board-wrap { width: 100%; padding: 15px 8px 11px; border-radius: 17px; }
+  .board-wrap { order: 2; }
   .board { grid-template-columns: repeat(5, min(16vw, 58px)); gap: 6px; }
   .tile { width: min(16vw, 58px); height: min(16vw, 58px); border-radius: 11px; font-size: min(7vw, 24px); }
-  .section-label { width: 100%; margin-top: 15px; font-size: 8px; }
-  .keyboard { width: 100%; gap: 6px; }
+  .section-label { order: 3; width: 100%; margin-top: 15px; font-size: 8px; }
+  .keyboard { order: 4; width: 100%; gap: 6px; }
   .key-row { gap: 3px; }
   .key { height: 42px; border-radius: 8px; font-size: 11px; }
   .key.wide { font-size: 8px; }
-  .daily-footer { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; margin-top: 23px; padding: 13px; }
+  .how-card { order: 5; margin-top: 20px; }
+  .daily-footer { order: 6; width: 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; margin-top: 23px; padding: 13px; }
   #countdown { font-size: 16px; }
   .footer-label { font-size: 8px; }
   .footer-actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }

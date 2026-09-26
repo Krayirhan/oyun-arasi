@@ -1,5 +1,5 @@
-import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=202609262300';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609262300';
+import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=202609270005';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270005';
 
 const KEY = 'oyunarasi-sekil-v1';
 const boardElement = document.querySelector('#board');

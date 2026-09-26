@@ -1,5 +1,5 @@
-import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=202609262300';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609262300';
+import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=202609270005';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270005';
 
 const KEY = 'oyunarasi-araba-v1';
 const canvas = document.querySelector('#board');
