@@ -6,7 +6,7 @@
     <meta name="theme-color" content="#f8f4ec" />
     <meta name="description" content="Oyun Arası’nda Harfle, Sudoku, Şekil Birleştir, Kelime Avı, Blok Düşür, Solitaire, Mahjong, Araba Yarışı, 2048, XOX, Mayın Tarlası ve Hafıza Kartları’nı ücretsiz oyna." />
     <title>Oyun Arası — Bugün ne oynasak?</title>
-    <link rel="stylesheet" href="styles.css?v=5" />
+    <link rel="stylesheet" href="styles.css?v=6" />
     <link rel="stylesheet" href="account.css" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
     <script type="module" src="account.js"></script>
@@ -19,72 +19,72 @@
       <symbol id="i-cube" viewBox="0 0 48 48"><path d="M24 5 41 14.5v19L24 43 7 33.5v-19zM7 14.5l17 9.5 17-9.5M24 24v19" fill="none" stroke="#0b1030" stroke-width="3.4" stroke-linejoin="round" /></symbol>
       <symbol id="i-pad" viewBox="0 0 48 48"><path d="M15 12h18c6.5 0 9.6 4 11 10.5l2 9.5c1.1 5.2-1.9 8.5-5.6 8.5-2.7 0-4.5-1.7-6.1-4.2L32.7 34H15.3l-1.6 2.3c-1.6 2.5-3.4 4.2-6.1 4.2-3.7 0-6.7-3.3-5.6-8.5l2-9.5C5.4 16 8.5 12 15 12z" fill="currentColor" /><path d="M13 20.5h3.4v3.8h3.8v3.4h-3.8v3.8H13v-3.8H9.2v-3.4H13z" fill="var(--hole, #fff)" /><g fill="var(--hole, #fff)"><circle cx="33.5" cy="21.5" r="2.3" /><circle cx="38" cy="26" r="2.3" /><circle cx="33.5" cy="30.5" r="2.3" /><circle cx="29" cy="26" r="2.3" /></g></symbol>
       <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 21s-8.5-5.2-8.5-11.2C3.5 6.6 5.8 4.5 8.4 4.5c1.6 0 2.8.8 3.6 2 .8-1.2 2-2 3.6-2 2.6 0 4.9 2.1 4.9 5.3C20.5 15.8 12 21 12 21z" fill="currentColor" /></symbol>
-      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" /><path d="M12 6.5V12l3.8 3" fill="none" stroke="#f8f4ec" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
+      <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor" /><path d="M12 6.5V12l3.8 3" fill="none" stroke="var(--clock-hand, #f8f4ec)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
       <symbol id="i-trophy" viewBox="0 0 24 24"><path d="M6 3h12v2h3v2.5c0 3-2.2 5.2-5 5.5-.8 1.6-2 2.6-3 2.9V18h3v3H8v-3h3v-2.1c-1-.3-2.2-1.3-3-2.9-2.8-.3-5-2.5-5-5.5V5h3zm0 4H5v.5c0 1.5.9 2.8 2.2 3.3C6.4 9.6 6 8.3 6 7zm12 0c0 1.3-.4 2.6-1.2 3.8 1.3-.5 2.2-1.8 2.2-3.3V7z" fill="currentColor" /></symbol>
       <symbol id="i-people" viewBox="0 0 24 24"><g fill="currentColor"><circle cx="12" cy="6.5" r="3.2" /><circle cx="5" cy="9" r="2.5" /><circle cx="19" cy="9" r="2.5" /><path d="M6.5 19c0-3.6 2.4-6.3 5.5-6.3s5.5 2.7 5.5 6.3z" /><path d="M0.5 19c0-3 1.8-5.2 4.3-5.2 1 0 1.9.3 2.6.9C6.1 15.8 5.4 17.3 5.3 19z" /><path d="M23.5 19c0-3-1.8-5.2-4.3-5.2-1 0-1.9.3-2.6.9 1.3 1.1 2 2.6 2.1 4.3z" /></g></symbol>
       <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M4 12h15m-6-6 6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" /></symbol>
     </svg>
     <div class="stage">
       <header class="topbar">
-        <a class="at logo" href="./" style="--x:18;--y:8;--w:218;--h:52" aria-label="Oyun Arası ana sayfa"><span class="logo-word">OYUN<span>ARASI</span></span></a>
-        <label class="at search" style="--x:416;--y:11;--w:559;--h:39">
+        <a class="at logo" href="./" style="--x:24;--y:8;--w:218;--h:52" aria-label="Oyun Arası ana sayfa"><span class="logo-word">OYUN<span>ARASI</span></span></a>
+        <label class="at search" style="--x:426;--y:11;--w:560;--h:39">
           <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></svg>
           <input id="game-search" type="search" placeholder="Oyun ara..." autocomplete="off" aria-label="Oyunlarda ara" />
         </label>
         <nav aria-label="Ana gezinme">
-          <a class="at nav-link" href="games/2048/" style="--x:1183;--y:14;--w:113;--h:34"><svg class="nav-pad" aria-hidden="true"><use href="#i-pad" /></svg>Hemen oyna</a>
-          <a class="at nav-link" href="games/xox/" style="--x:1319;--y:14;--w:153;--h:34"><svg aria-hidden="true"><use href="#i-people" /></svg>Arkadaşlarınla oyna</a>
-          <div class="at account-slot" style="--x:1520;--y:12;--w:140;--h:40" data-account-root></div>
+          <a class="at nav-link" href="games/2048/" style="--x:1171;--y:14;--w:113;--h:34"><svg class="nav-pad" aria-hidden="true"><use href="#i-pad" /></svg>Hemen oyna</a>
+          <a class="at nav-link" href="games/xox/" style="--x:1307;--y:14;--w:153;--h:34"><svg aria-hidden="true"><use href="#i-people" /></svg>Arkadaşlarınla oyna</a>
+          <div class="at account-slot" style="--x:1508;--y:12;--w:140;--h:40" data-account-root></div>
         </nav>
       </header>
 
       <aside class="sidebar" aria-label="Oyun kategorileri">
-        <button class="at side-cat cat-kesfet active" type="button" data-filter="all" style="--x:12;--y:64;--w:212;--h:88"><svg aria-hidden="true"><use href="#i-compass" /></svg><span><strong>Keşfet</strong><small>Sana özel oyunlar</small></span></button>
-        <button class="at side-cat cat-kelime" type="button" data-filter="word" style="--x:12;--y:160;--w:212;--h:88"><svg viewBox="0 0 48 48" aria-hidden="true"><text x="0" y="32" font-family="Fredoka, sans-serif" font-weight="700" font-size="38" fill="#0b1030">A</text><text x="18" y="46" font-family="Fredoka, sans-serif" font-weight="700" font-size="33" fill="#0b1030" stroke="#fecf40" stroke-width="2.5" stroke-linejoin="round" paint-order="stroke">B</text></svg><span><strong>Kelime</strong><small>Zekânı konuştur</small></span></button>
-        <button class="at side-cat cat-mantik" type="button" data-filter="logic" style="--x:12;--y:256;--w:212;--h:88"><svg aria-hidden="true"><use href="#i-cube" /></svg><span><strong>Mantık</strong><small>Beyin egzersizi</small></span></button>
-        <button class="at side-cat cat-klasik" type="button" data-filter="classic" style="--x:12;--y:352;--w:212;--h:88"><svg aria-hidden="true"><use href="#i-pad" /></svg><span><strong>Klasikler</strong><small>Hepimizin favorileri</small></span></button>
-        <nav class="at side-panel" style="--x:12;--y:448;--w:212;--h:264" aria-label="Kısayollar">
+        <button class="at side-cat cat-kesfet active" type="button" data-filter="all" style="--x:24;--y:74;--w:204;--h:84"><svg aria-hidden="true"><use href="#i-compass" /></svg><span><strong>Keşfet</strong><small>Sana özel oyunlar</small></span></button>
+        <button class="at side-cat cat-kelime" type="button" data-filter="word" style="--x:24;--y:168;--w:204;--h:84"><svg viewBox="0 0 48 48" aria-hidden="true"><text x="0" y="32" font-family="Fredoka, sans-serif" font-weight="700" font-size="38" fill="#0b1030">A</text><text x="18" y="46" font-family="Fredoka, sans-serif" font-weight="700" font-size="33" fill="#0b1030" stroke="#fecf40" stroke-width="2.5" stroke-linejoin="round" paint-order="stroke">B</text></svg><span><strong>Kelime</strong><small>Zekânı konuştur</small></span></button>
+        <button class="at side-cat cat-mantik" type="button" data-filter="logic" style="--x:24;--y:262;--w:204;--h:84"><svg aria-hidden="true"><use href="#i-cube" /></svg><span><strong>Mantık</strong><small>Beyin egzersizi</small></span></button>
+        <button class="at side-cat cat-klasik" type="button" data-filter="classic" style="--x:24;--y:356;--w:204;--h:84"><svg aria-hidden="true"><use href="#i-pad" /></svg><span><strong>Klasikler</strong><small>Hepimizin favorileri</small></span></button>
+        <nav class="at side-panel" style="--x:24;--y:450;--w:204;--h:256" aria-label="Kısayollar">
           <a href="#oyunlar"><svg aria-hidden="true"><use href="#i-heart" /></svg>Favorilerim</a>
           <a href="games/2048/"><svg aria-hidden="true"><use href="#i-clock" /></svg>Son Oynananlar</a>
           <a href="games/harfane/"><svg aria-hidden="true"><use href="#i-trophy" /></svg>Liderlik Tablosu</a>
-          <a href="#" data-invite><svg aria-hidden="true"><use href="#i-people" /></svg>Arkadaşlarını Davet Et</a>
+          <a href="#" data-invite><svg aria-hidden="true"><use href="#i-people" /></svg>Arkadaş Davet Et</a>
         </nav>
       </aside>
 
       <main>
-        <section class="at hero" style="--x:232;--y:64;--w:586;--h:648">
+        <section class="at hero" style="--x:240;--y:74;--w:571;--h:632">
           <img src="assets/landing/hero.webp" alt="" />
           <h1 class="sr-only">Bugün ne oynasak?</h1>
-          <p class="at hero-copy" style="--x:304;--y:312;--w:250;--h:88">Zamanın sana kalsın.<br />Kısa bir mola, büyük bir keyif.<br />Oyun Arası’nda her an iyi bir<br />oyun seni bekliyor.</p>
-          <a class="at hotspot pill" href="games/2048/" style="--x:304;--y:410;--w:209;--h:52">Hemen oyna</a>
+          <p class="at hero-copy" style="--x:310;--y:316;--w:244;--h:86">Zamanın sana kalsın.<br />Kısa bir mola, büyük bir keyif.<br />Oyun Arası’nda her an iyi bir<br />oyun seni bekliyor.</p>
+          <a class="at hotspot pill" href="games/2048/" style="--x:310;--y:411;--w:204;--h:51">Hemen oyna</a>
         </section>
 
-        <a class="at card-2048 lift" href="games/2048/" style="--x:826;--y:64;--w:432;--h:648" aria-label="2048 — Küçük hamle, büyük tatmin. Hemen oyna">
+        <a class="at card-2048 lift" href="games/2048/" style="--x:823;--y:74;--w:421;--h:632" aria-label="2048 — Küçük hamle, büyük tatmin. Hemen oyna">
           <img src="assets/landing/card-2048-v2.webp" alt="" />
         </a>
-        <a class="at card lift card-mola" href="games/harfane/" style="--x:1266;--y:64;--w:396;--h:320"><img src="assets/landing/promo-mola-v2.webp" alt="5 dakikalık mola — Kısa oyunlarla kafanı dağıt." /><span class="card-arrow" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span></a>
-        <a class="at card lift card-friends" href="games/xox/" style="--x:1266;--y:392;--w:396;--h:320"><img src="assets/landing/promo-friends.webp" alt="Arkadaşınla oyna — Aynı oyunda buluşun, rekabet edin ya da sadece eğlenin." /></a>
+        <a class="at card lift card-mola" href="games/harfane/" style="--x:1256;--y:74;--w:392;--h:310"><img src="assets/landing/promo-mola-v2.webp" alt="5 dakikalık mola — Kısa oyunlarla kafanı dağıt." /><span class="card-arrow" aria-hidden="true"><svg><use href="#i-arrow" /></svg></span></a>
+        <a class="at card lift card-friends" href="games/xox/" style="--x:1256;--y:396;--w:392;--h:310"><img src="assets/landing/promo-friends.webp" alt="Arkadaşınla oyna — Aynı oyunda buluşun, rekabet edin ya da sadece eğlenin." /></a>
 
         <section class="shelf" id="oyunlar" aria-labelledby="shelf-title">
-          <h2 class="at shelf-title" id="shelf-title" style="--x:30;--y:726;--w:420;--h:36">Sana Özel Seçtiklerimiz<svg viewBox="0 0 24 30" aria-hidden="true"><path d="M8 11 17 3M7 17l14-3M8 23l10 5" /></svg></h2>
-          <a class="at shelf-all" href="#tum-oyunlar" data-show-all style="--x:1462;--y:729;--w:180;--h:30">Tüm Oyunları Keşfet<svg aria-hidden="true"><use href="#i-arrow" /></svg></a>
-          <div class="at track" id="game-shelf" style="--x:32;--y:770;--w:1630;--h:162">
-            <a class="thumb" href="games/harfane/" data-category="word" data-search="harfle harfane kelime günlük wordle türkçe" style="--w:162"><img src="assets/covers/harfle.webp" alt="Harfle" /></a>
-            <a class="thumb" href="games/sudoku/" data-category="logic number" data-search="sudoku sayı" style="--w:162"><img src="assets/covers/sudoku.webp" alt="Sudoku" /></a>
-            <a class="thumb" href="games/tetris/" data-category="classic logic" data-search="blok düşür tetris" style="--w:162"><img src="assets/covers/blok-dusur.webp" alt="Blok Düşür" /></a>
-            <a class="thumb" href="games/soliter/" data-category="classic" data-search="soliter solitaire kart" style="--w:324"><img src="assets/covers/soliter.webp" alt="Solitaire" /></a>
-            <a class="thumb" href="games/mahjong/" data-category="classic logic" data-search="mahjong taş" style="--w:162"><img src="assets/covers/mahjong.webp" alt="Mahjong" /></a>
-            <a class="thumb" href="games/kelime-avi/" data-category="word" data-search="kelime avı harf" style="--w:162"><img src="assets/covers/kelime-avi.webp" alt="Kelime Avı" /></a>
-            <a class="thumb" href="games/araba/" data-category="classic" data-search="araba yarışı yarış" style="--w:162"><img src="assets/covers/araba.webp" alt="Araba Yarışı" /></a>
-            <a class="thumb" href="games/sekil/" data-category="logic" data-search="şekil birleştir blok" style="--w:162"><img src="assets/covers/sekil.webp" alt="Şekil Birleştir" /></a>
-            <a class="thumb" href="games/mayin-tarlasi/" data-category="logic classic" data-search="mayın tarlası minesweeper dikkat" style="--w:162"><img src="assets/covers/mayin-tarlasi.webp" alt="Mayın Tarlası" /></a>
-            <a class="thumb" href="games/hafiza/" data-category="logic" data-search="hafıza kartları eş bul" style="--w:162"><img src="assets/covers/hafiza.webp" alt="Hafıza Kartları" /></a>
-            <a class="thumb" href="games/xox/" data-category="classic" data-search="xox üç taş arkadaş iki kişi" style="--w:162"><img src="assets/covers/xox.webp" alt="XOX" /></a>
-            <a class="thumb" href="games/2048/" data-category="logic number classic" data-search="2048 sayı birleştir" style="--w:162"><img src="assets/covers/2048.webp" alt="2048" /></a>
+          <h2 class="at shelf-title" id="shelf-title" style="--x:22;--y:734;--w:420;--h:36">Sana Özel Seçtiklerimiz<svg viewBox="0 0 24 30" aria-hidden="true"><path d="M8 11 17 3M7 17l14-3M8 23l10 5" /></svg></h2>
+          <a class="at shelf-all" href="#tum-oyunlar" data-show-all style="--x:1448;--y:737;--w:200;--h:30">Tüm Oyunları Keşfet<svg aria-hidden="true"><use href="#i-arrow" /></svg></a>
+          <div class="at track" id="game-shelf" style="--x:24;--y:782;--w:1624;--h:146">
+            <a class="thumb" href="games/harfane/" data-category="word" data-search="harfle harfane kelime günlük wordle türkçe" style="--w:146"><img src="assets/covers/harfle.webp" alt="Harfle" /></a>
+            <a class="thumb" href="games/sudoku/" data-category="logic number" data-search="sudoku sayı" style="--w:146"><img src="assets/covers/sudoku.webp" alt="Sudoku" /></a>
+            <a class="thumb" href="games/tetris/" data-category="classic logic" data-search="blok düşür tetris" style="--w:146"><img src="assets/covers/blok-dusur.webp" alt="Blok Düşür" /></a>
+            <a class="thumb" href="games/soliter/" data-category="classic" data-search="soliter solitaire kart" style="--w:292"><img src="assets/covers/soliter.webp" alt="Solitaire" /></a>
+            <a class="thumb" href="games/mahjong/" data-category="classic logic" data-search="mahjong taş" style="--w:146"><img src="assets/covers/mahjong.webp" alt="Mahjong" /></a>
+            <a class="thumb" href="games/kelime-avi/" data-category="word" data-search="kelime avı harf" style="--w:146"><img src="assets/covers/kelime-avi.webp" alt="Kelime Avı" /></a>
+            <a class="thumb" href="games/araba/" data-category="classic" data-search="araba yarışı yarış" style="--w:146"><img src="assets/covers/araba.webp" alt="Araba Yarışı" /></a>
+            <a class="thumb" href="games/sekil/" data-category="logic" data-search="şekil birleştir blok" style="--w:146"><img src="assets/covers/sekil.webp" alt="Şekil Birleştir" /></a>
+            <a class="thumb" href="games/mayin-tarlasi/" data-category="logic classic" data-search="mayın tarlası minesweeper dikkat" style="--w:146"><img src="assets/covers/mayin-tarlasi.webp" alt="Mayın Tarlası" /></a>
+            <a class="thumb" href="games/hafiza/" data-category="logic" data-search="hafıza kartları eş bul" style="--w:146"><img src="assets/covers/hafiza.webp" alt="Hafıza Kartları" /></a>
+            <a class="thumb" href="games/xox/" data-category="classic" data-search="xox üç taş arkadaş iki kişi" style="--w:146"><img src="assets/covers/xox.webp" alt="XOX" /></a>
+            <a class="thumb" href="games/2048/" data-category="logic number classic" data-search="2048 sayı birleştir" style="--w:146"><img src="assets/covers/2048.webp" alt="2048" /></a>
           </div>
-          <button class="at arrow" type="button" data-scroll="-1" style="--x:12;--y:830;--w:41;--h:41" aria-label="Önceki oyunlar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg></button>
-          <button class="at arrow" type="button" data-scroll="1" style="--x:1625;--y:830;--w:41;--h:41" aria-label="Sonraki oyunlar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg></button>
-          <p class="at empty-search" id="empty-search" style="--x:32;--y:830;--w:1630;--h:40" hidden>Bu aramayla eşleşen oyun bulamadık.</p>
+          <button class="at arrow" type="button" data-scroll="-1" style="--x:4;--y:835;--w:41;--h:41" aria-label="Önceki oyunlar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6" /></svg></button>
+          <button class="at arrow" type="button" data-scroll="1" style="--x:1627;--y:835;--w:41;--h:41" aria-label="Sonraki oyunlar"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6" /></svg></button>
+          <p class="at empty-search" id="empty-search" style="--x:24;--y:835;--w:1624;--h:40" hidden>Bu aramayla eşleşen oyun bulamadık.</p>
         </section>
       </main>
     </div>
