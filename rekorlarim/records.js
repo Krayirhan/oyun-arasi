@@ -1,6 +1,6 @@
 // Rekorlarım: her oyunun en iyi sonuçları. Bu cihazdaki kayıtlar okunur; giriş yapılmışsa
 // profildeki (tüm cihazlardan birleşik) istatistiklerle birleştirilir, en iyi değer gösterilir.
-import { loadFirebaseClient } from '../cloud-sync.js?v=202609270036';
+import { loadFirebaseClient } from '../cloud-sync.js?v=202609270130';
 
 const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
 const byLevel = records => ({
@@ -36,7 +36,13 @@ const LOCAL = {
     return { wins: records.wins || 0, draw1: records[1] || {}, draw3: records[3] || {} };
   },
   mahjong: () => byLevel(read('oyunarasi-mahjong-v1')?.records),
-  araba: () => read('oyunarasi-araba-v1')?.records || {}
+  araba: () => read('oyunarasi-araba-v1')?.records || {},
+  'platform-macera': () => {
+    const campaign = read('oyunarasi-platform-macera-v1')?.campaign || {};
+    return { furthestLevel: campaign.furthestLevel || 0, completedLevels: campaign.completed?.length || 0,
+      totalStars: Object.values(campaign.stars || {}).reduce((sum, stars) => sum + (Number(stars) || 0), 0),
+      bestScore: Math.max(0, ...Object.values(campaign.bestScores || {}).filter(Number.isFinite)) };
+  }
 };
 
 const time = value => {
@@ -59,7 +65,8 @@ const FIELDS = {
   tetris: [['En iyi skor', 'bestScore', number], ['En çok satır', 'bestLines', number]],
   soliter: [['Galibiyet', 'wins', number], ['1 kart süre', 'draw1.bestMs', time], ['3 kart süre', 'draw3.bestMs', time]],
   mahjong: levelTimes,
-  araba: [['En iyi skor', 'bestScore', number], ['En uzun yol', 'bestDistance', value => `${number(value)} m`]]
+  araba: [['En iyi skor', 'bestScore', number], ['En uzun yol', 'bestDistance', value => `${number(value)} m`]],
+  'platform-macera': [['En ileri bölüm', 'furthestLevel', value => `${number(value)} / 30`], ['Tamamlanan bölüm', 'completedLevels', number], ['Toplam yıldız', 'totalStars', value => `${number(value)} / 90`], ['En iyi skor', 'bestScore', number]]
 };
 
 // Süre ve hamlede küçük olan, diğer her şeyde büyük olan değer daha iyidir.

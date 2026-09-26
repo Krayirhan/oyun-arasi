@@ -141,6 +141,9 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .cover-araba { background: #3d4250; color: #fff; }
 .cover-araba i { column-gap: calc(8 * var(--u)); }
 .cover-araba i span:not([data-tone='n']) { width: 70%; justify-self: center; border-radius: calc(7 * var(--u)); }
+.cover-platform-macera { background: linear-gradient(145deg, #8edaf1, #5e9e80); color: #10264b; }
+.cover-platform-macera i { grid-template-columns: repeat(3, calc(29 * var(--u))); }
+.cover-platform-macera i span { border-radius: 35%; }
 .cover-2048 { background: #ffcd3c; }
 .cover-2048 i { grid-template-columns: repeat(2, calc(34 * var(--u))); }
 .cover-2048 i span { height: calc(34 * var(--u)); background: #f3e6cf; }

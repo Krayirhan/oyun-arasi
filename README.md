@@ -17,6 +17,7 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `games/soliter/`: Solitaire (Klondike; klasör ve kayıt kimliği `soliter`); 1 ya da 3 kart çekiş, sürükle-bırak ve dokununca otomatik taşıma, geri alma ve otomatik bitirme.
 - `games/mahjong/`: Mahjong (eşleştirmeli solitaire); 46, 102 ve 144 taşlık üç dizilim, her zaman çözülebilir dağıtım, ipucu, karıştırma ve geri alma.
 - `games/araba/`: Araba Yarışı; 4 şeritli sonsuz yol, hızlanan trafik (her dalgada geçilebilir bir şerit açık kalır), jetonlar ve skor rekoru.
+- `games/platform-macera/`: Zıp Zıp; orman, saat mekanizmaları ve volkan dünyalarında 30 el yapımı bölüm, üç değiştirilebilir kahraman, kontrol noktaları, düşmanlar, anahtarlar ve yıldız/puan ilerlemesi.
 - `games/harfane/`: Harfle oyununun arayüzü, oyun mantığı ve kelime listeleri.
 - `games/xox/`: Aynı cihazda iki kişilik XOX ve skor kaydı.
 - `games/hafiza/`: 4×4 ve 6×6 Hafıza Kartları, rekorlar ve oturum kaydı.

@@ -1,5 +1,5 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609270036';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270036';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609270130';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270130';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');

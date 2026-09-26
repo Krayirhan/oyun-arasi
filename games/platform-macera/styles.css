@@ -1,0 +1,90 @@
+/* Zıp Zıp: the shared page shell stays common; the platform world is rendered in its own canvas. */
+body[data-game='platform-macera'] { --frame: #163c68; --title: #3156c8; --title-shadow: #1d347e; --accent: #3156c8; --accent-deep: #1d347e; --accent-soft: #e1eaff; }
+
+.play-panel { overflow: hidden; }
+.play-bar { align-items: center; }
+.play-panel .scores { gap: 8px; }
+.play-panel .score-card { min-width: 76px; padding-inline: 10px; }
+.play-panel .score-card > strong { font-size: 25px; }
+.play-panel .actions { flex-wrap: wrap; justify-content: flex-end; }
+.play-panel .actions .play-button { min-height: 44px; padding-inline: 13px; font-size: 16px; }
+.play-options { justify-content: flex-start; align-items: center; gap: 10px; }
+.hero-switch, .settings-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+.hero-switch button, .settings-buttons button, .continue-button {
+  min-height: 36px; padding: 6px 11px; border: 1px solid rgb(255 255 255 / .4); border-radius: 10px;
+  background: rgb(255 255 255 / .1); color: #fff; font-weight: 700; cursor: pointer;
+}
+.hero-switch button[aria-pressed='true'], .settings-buttons button[aria-pressed='true'] { border-color: #fecf40; background: #fecf40; color: #16234e; }
+.energy-readout { display: flex; align-items: center; gap: 7px; color: #fff; font-size: 11px; font-weight: 800; white-space: nowrap; }
+.energy-track { display: block; width: 78px; height: 10px; overflow: hidden; border-radius: 99px; background: rgb(255 255 255 / .2); }
+.energy-track i { display: block; width: 100%; height: 100%; border-radius: inherit; background: #63e1b2; transition: width .15s; }
+.energy-readout strong { min-width: 22px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.settings-buttons { margin-left: auto; }
+
+.board-frame { display: grid; gap: 10px; padding: 10px; }
+.game-stage { position: relative; width: 100%; overflow: hidden; aspect-ratio: 16 / 9; border: 1px solid rgb(255 255 255 / .18); border-radius: 14px; background: #10274b; }
+.game-stage[hidden] { display: none; }
+.game-stage canvas { display: block; width: 100%; height: 100%; touch-action: none; }
+.game-stage .game-overlay { z-index: 3; }
+.game-stage .overlay-card { width: min(100%, 390px); }
+.game-stage .overlay-actions { flex-wrap: wrap; }
+.level-map { display: grid; gap: 12px; min-height: 280px; max-height: 540px; overflow: auto; padding: clamp(12px, 2vw, 22px); border: 1px solid rgb(255 255 255 / .2); border-radius: 16px; background: linear-gradient(145deg, #163e71, #0d2850); color: #fff; }
+.level-map[hidden] { display: none; }
+.map-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.map-heading h2 { color: #fff; font: 700 clamp(20px, 3vw, 28px) / 1.1 'Fredoka', sans-serif; }
+.map-heading .overlay-kicker { margin-bottom: 3px; color: #fecf40; font-size: 11px; }
+.continue-button { border-color: #fecf40; background: #fecf40; color: #16234e; }
+.world-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
+.world-tabs button { min-height: 36px; padding: 7px 12px; border: 1px solid rgb(255 255 255 / .22); border-radius: 10px; background: rgb(255 255 255 / .08); color: #fff; font-weight: 700; cursor: pointer; }
+.world-tabs button[aria-selected='true'] { border-color: #fecf40; background: #fecf40; color: #16234e; }
+.world-description { color: rgb(255 255 255 / .82); font-size: 14px; }
+.level-grid { display: grid; grid-template-columns: repeat(5, minmax(42px, 1fr)); gap: 8px; }
+.level-choice { position: relative; display: grid; min-height: 54px; place-items: center; border: 1px solid rgb(255 255 255 / .25); border-radius: 12px; background: rgb(255 255 255 / .1); color: #fff; font: 700 18px 'Fredoka', sans-serif; cursor: pointer; }
+.level-choice[aria-pressed='true'] { border-color: #fecf40; background: #fecf40; color: #16234e; box-shadow: 0 0 0 2px rgb(254 207 64 / .25); }
+.level-choice:disabled { opacity: .42; cursor: not-allowed; }
+.level-choice small { position: absolute; right: 5px; bottom: 3px; font: 700 10px 'Roboto Condensed', sans-serif; color: #fecf40; }
+.level-choice[aria-pressed='true'] small { color: #16234e; }
+.level-selection { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 8px; border-top: 1px solid rgb(255 255 255 / .18); }
+.level-selection p { color: rgb(255 255 255 / .86); font-size: 14px; }
+.level-selection .play-button:disabled { opacity: .48; cursor: not-allowed; }
+.touch-pad { display: none; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.touch-pad button { min-height: 50px; padding: 6px; border: 1px solid rgb(255 255 255 / .25); border-radius: 12px; background: rgb(255 255 255 / .15); color: #fff; font: 700 17px 'Fredoka', sans-serif; touch-action: none; user-select: none; }
+.touch-pad button:active, .touch-pad button.pressed { background: #fecf40; color: #16234e; }
+.play-panel-footer .scores .score-card { gap: 6px !important; }
+body[data-game='platform-macera'] .goal-equation b { min-width: 46px; }
+
+@media (pointer: coarse), (max-width: 760px) {
+  .touch-pad { display: grid; }
+}
+@media (max-width: 760px) {
+  .play-panel .play-bar { align-items: stretch; }
+  .play-panel .scores { justify-content: space-between; }
+  .play-panel .score-card { min-width: 0; flex: 1; }
+  .play-panel .actions { justify-content: stretch; }
+  .play-panel .actions .play-button { flex: 1; min-width: 0; white-space: normal; }
+  .play-options { display: grid; grid-template-columns: 1fr auto; }
+  .hero-switch { grid-column: 1 / -1; }
+  .settings-buttons { margin-left: 0; }
+  .level-map { max-height: 460px; }
+  .level-choice { min-height: 45px; }
+}
+@media (max-width: 420px) {
+  .level-grid { grid-template-columns: repeat(5, minmax(34px, 1fr)); gap: 5px; }
+  .level-choice { min-height: 40px; border-radius: 9px; font-size: 15px; }
+  .world-tabs button { flex: 1; padding-inline: 7px; font-size: 12px; }
+  .level-selection { align-items: stretch; flex-direction: column; }
+  .settings-buttons button, .hero-switch button { min-height: 34px; padding-inline: 8px; font-size: 12px; }
+  .energy-track { width: 58px; }
+  .energy-readout { font-size: 10px; }
+}
+@media (min-width: 761px) and (max-height: 700px) {
+  .play-panel { padding: 13px; }
+  .play-panel .play-bar { margin-bottom: 8px; }
+  .play-options { margin-bottom: 8px; }
+  .board-frame { padding: 8px; }
+  .level-map { max-height: 410px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .energy-track i { transition: none; }
+  .level-choice { scroll-behavior: auto; }
+}

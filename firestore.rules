@@ -7,13 +7,13 @@ service cloud.firestore {
     }
 
     function knownGame(gameId) {
-      return gameId in ['2048', 'series', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba']
+      return gameId in ['2048', 'series', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera']
         || gameId.matches('^daily-[0-9]{4}-[0-9]{2}-[0-9]{2}$');
     }
 
     function validGameStats(value) {
       return value is map
-        && value.keys().hasOnly(['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba'])
+        && value.keys().hasOnly(['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera'])
         && (!('2048' in value) || value['2048'] is map)
         && (!('harfane' in value) || value.harfane is map)
         && (!('xox' in value) || value.xox is map)
@@ -25,7 +25,8 @@ service cloud.firestore {
         && (!('tetris' in value) || value.tetris is map)
         && (!('soliter' in value) || value.soliter is map)
         && (!('mahjong' in value) || value.mahjong is map)
-        && (!('araba' in value) || value.araba is map);
+        && (!('araba' in value) || value.araba is map)
+        && (!('platform-macera' in value) || value['platform-macera'] is map);
     }
 
     // Favoriler ve son oynananlar (library.js); en fazla 12'şer öğe.
@@ -50,7 +51,7 @@ service cloud.firestore {
     }
 
     function validPlatformGame(gameId, data) {
-      return gameId in ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba']
+      return gameId in ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera']
         && data.keys().hasOnly(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt', 'clientUpdatedAt', 'deviceCounters'])
         && data.keys().hasAll(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt'])
         && data.gameId == gameId && data.schemaVersion == 1
