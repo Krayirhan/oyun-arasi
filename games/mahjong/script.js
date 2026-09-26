@@ -13,6 +13,12 @@ const hintButton = document.querySelector('#hint-button');
 const shuffleButton = document.querySelector('#shuffle-button');
 const overlay = document.querySelector('#game-overlay');
 const overlayShuffle = document.querySelector('#overlay-shuffle');
+const scrollElement = document.querySelector('#tile-scroll');
+const zoomRow = document.querySelector('#zoom-row');
+const zoomLevelElement = document.querySelector('#zoom-level');
+const ZOOM_KEY = 'oyunarasi-mahjong-zoom';
+const ZOOMS = [1, 1.5, 2];
+const ZOOM_BELOW = 16;       // tiles narrower than this (in half-tile px) get zoom buttons
 
 const NUMERALS = ['一', '二', '三', '四', '五', '六', '七', '八', '九'];
 const WINDS = [['東', 'Doğu'], ['南', 'Güney'], ['西', 'Batı'], ['北', 'Kuzey']];
@@ -26,6 +32,7 @@ let selected = -1;
 let hinted = [];
 let busy = false;
 let tileElements = [];
+let zoom = loadZoom();
 
 // What each face shows: big glyph, small suit mark, CSS classes and a spoken name.
 function faceView(face) {
@@ -60,7 +67,14 @@ function formatTime(milliseconds) {
   return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
 }
 
-// Tile size follows the free width (and, on wide screens, the window height).
+function loadZoom() {
+  try { const saved = Number(localStorage.getItem(ZOOM_KEY)); return ZOOMS.includes(saved) ? saved : 1; }
+  catch { return 1; }
+}
+
+// Tile size follows the free width (and, on wide screens, the window height). When the tiles come out
+// too small to tap comfortably (the 144-tile board on a phone), zoom buttons enlarge them and the
+// board scrolls sideways inside its frame.
 function layoutBoard() {
   const positions = positionsFor(game.level);
   const spanX = Math.max(...positions.map(p => p.x)) + 2;
@@ -70,7 +84,14 @@ function layoutBoard() {
   const width = frameElement.clientWidth - (mobile ? 24 : 28) - 8;
   const height = mobile ? Infinity : Math.max(320, window.innerHeight - 330);
   const depth = 0.22;
-  const u = Math.max(9, Math.min(34, width / (spanX + layers * depth), height / (spanY * 1.3 + layers * depth)));
+  const fit = Math.max(9, Math.min(34, width / (spanX + layers * depth), height / (spanY * 1.3 + layers * depth)));
+  const zoomable = fit < ZOOM_BELOW;
+  zoomRow.hidden = !zoomable;
+  const factor = zoomable ? zoom : 1;
+  zoomLevelElement.textContent = `%${Math.round(factor * 100)}`;
+  document.querySelector('#zoom-out').disabled = factor <= ZOOMS[0];
+  document.querySelector('#zoom-in').disabled = factor >= ZOOMS[ZOOMS.length - 1];
+  const u = Math.min(34, fit * factor);
   const v = u * 1.3;
   boardElement.style.setProperty('--u', `${u}px`);
   boardElement.style.setProperty('--v', `${v}px`);
@@ -250,6 +271,8 @@ document.addEventListener('keydown', event => {
   else if (key === 'h') { event.preventDefault(); showHint(); }
   else if (key === 'k') { event.preventDefault(); shuffle(); }
   else if (key === 'escape') { selected = -1; hinted = []; render(); }
+  else if (key === '+' || key === '=') { event.preventDefault(); stepZoom(1); }
+  else if (key === '-') { event.preventDefault(); stepZoom(-1); }
 });
 
 document.addEventListener('visibilitychange', () => {
@@ -264,6 +287,26 @@ new ResizeObserver(() => {
   if (width !== lastWidth) { lastWidth = width; layoutBoard(); }
 }).observe(frameElement);
 window.addEventListener('resize', layoutBoard);
+
+// Zooming keeps the middle of what you were looking at in view.
+function setZoom(next) {
+  if (!ZOOMS.includes(next) || next === zoom) return;
+  const centerX = (scrollElement.scrollLeft + scrollElement.clientWidth / 2) / Math.max(1, scrollElement.scrollWidth);
+  zoom = next;
+  try { localStorage.setItem(ZOOM_KEY, String(zoom)); } catch {}
+  layoutBoard();
+  scrollElement.scrollLeft = centerX * scrollElement.scrollWidth - scrollElement.clientWidth / 2;
+  if (zoom > 1) statusElement.textContent = 'Tahtada gezinmek için parmağınla sağa sola kaydır.';
+}
+
+function stepZoom(direction) {
+  if (zoomRow.hidden) return;
+  const index = ZOOMS.indexOf(zoom);
+  setZoom(ZOOMS[Math.max(0, Math.min(ZOOMS.length - 1, index + direction))]);
+}
+
+document.querySelector('#zoom-in').addEventListener('click', () => stepZoom(1));
+document.querySelector('#zoom-out').addEventListener('click', () => stepZoom(-1));
 
 const cloudSync = syncGameOnAccountChange('mahjong', {
   read: () => ({ game: pauseGame(game), records }),
