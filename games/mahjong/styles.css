@@ -2,7 +2,8 @@
 body[data-game='mahjong'] { --frame: #2f7d3a; --title: #2f7d3a; --title-shadow: #1f5527; }
 
 .board-frame { display: grid; justify-items: center; }
-.tile-board { --u: 22px; --v: 29px; position: relative; margin: 4px auto; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
+.tile-scroll { display: flex; justify-self: stretch; width: 100%; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch; scrollbar-width: thin; }
+.tile-board { --u: 22px; --v: 29px; position: relative; flex: none; margin: 4px auto; user-select: none; -webkit-user-select: none; touch-action: manipulation; }
 .tile { position: absolute; display: grid; place-items: center; align-content: center; width: calc(var(--u) * 2 - 2px); height: calc(var(--v) * 2 - 2px); padding: 0; border: 0; border-radius: calc(var(--u) * .28); background: linear-gradient(160deg, #fffdf6, #f3ebd6); color: #1b2240; box-shadow: 1px 1px 0 #d9ccaa, 2px 2px 0 #cdbd94, 3px 3px 0 #b9a676, calc(var(--u) * .25 + 2px) calc(var(--u) * .25 + 2px) calc(var(--u) * .3) rgb(0 0 0 / .28); line-height: 1; cursor: pointer; transition: transform .12s, filter .12s, opacity .18s; }
 .tile b { font: 700 calc(var(--u) * 1.05) / 1 'Noto Serif SC', 'Songti SC', 'SimSun', serif; }
 .tile small { margin-top: calc(var(--u) * .08); font: 700 calc(var(--u) * .5) / 1 'Noto Serif SC', 'Songti SC', 'SimSun', serif; }
@@ -25,6 +26,11 @@ body[data-game='mahjong'] { --frame: #2f7d3a; --title: #2f7d3a; --title-shadow: 
 @keyframes tile-shake { 25% { transform: translateX(-3px); } 75% { transform: translateX(3px); } }
 
 .tool-row { display: flex; gap: 8px; }
+.zoom-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 8px; color: #fff; font: 700 13px 'Roboto Condensed', sans-serif; letter-spacing: .06em; }
+.zoom-row[hidden] { display: none; }
+.zoom-button { width: 44px; height: 40px; padding: 0; border: 0; border-radius: 12px; background: rgb(255 255 255 / .2); color: #fff; font: 700 24px / 1 'Fredoka', sans-serif; cursor: pointer; touch-action: manipulation; }
+.zoom-button:disabled { opacity: .4; cursor: default; }
+.zoom-row output { min-width: 48px; text-align: center; font-size: 15px; }
 .tool-button { min-height: 44px; padding: 0 16px; border: 0; border-radius: 12px; background: rgb(255 255 255 / .18); color: #fff; font: 700 16px 'Fredoka', sans-serif; cursor: pointer; }
 .tool-button:hover:not(:disabled) { background: rgb(255 255 255 / .28); }
 .tool-button:disabled { opacity: .45; cursor: default; }

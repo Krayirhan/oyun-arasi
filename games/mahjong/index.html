@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="../../account.css" />
     <link rel="stylesheet" href="../../game-shell.css?v=5" />
     <link rel="stylesheet" href="../../play-page.css?v=4" />
-    <link rel="stylesheet" href="styles.css?v=4" />
+    <link rel="stylesheet" href="styles.css?v=5" />
     <script type="module" src="../../account.js"></script>
     <script type="module" src="script.js"></script>
     <script defer src="../../catalog.js?v=8"></script>
@@ -80,7 +80,15 @@
             <span class="play-record" id="best">Kolay rekoru: —</span>
           </div>
           <div class="board-frame">
-            <div class="tile-board" id="board" role="group" aria-label="Mahjong taşları" aria-describedby="board-help"></div>
+            <div class="zoom-row" id="zoom-row" hidden>
+              <span>YAKINLAŞTIR</span>
+              <button class="zoom-button" id="zoom-out" type="button" aria-label="Uzaklaştır">−</button>
+              <output id="zoom-level" aria-live="polite">%100</output>
+              <button class="zoom-button" id="zoom-in" type="button" aria-label="Yakınlaştır">+</button>
+            </div>
+            <div class="tile-scroll" id="tile-scroll">
+              <div class="tile-board" id="board" role="group" aria-label="Mahjong taşları" aria-describedby="board-help"></div>
+            </div>
             <div class="game-overlay hidden" id="game-overlay" aria-live="polite">
               <div class="overlay-card">
                 <p class="overlay-kicker" id="overlay-kicker">KAZANDIN</p>
