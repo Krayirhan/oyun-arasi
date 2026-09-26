@@ -1,4 +1,4 @@
-/* Tetris — well, side boxes, piece colors and touch pad. The page layout comes from play-page.css. */
+/* Blok Düşür — well, side boxes, piece colors and touch pad. The page layout comes from play-page.css. */
 body[data-game='tetris'] { --frame: #5b2bb5; --title: #5b2bb5; --title-shadow: #3d1c7c; }
 
 .t-I { --block: #33c3e6; --edge: #1690ad; }

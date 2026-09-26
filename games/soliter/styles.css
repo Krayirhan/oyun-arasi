@@ -1,4 +1,4 @@
-/* Soliter — card table, cards and drag ghost. The page layout comes from play-page.css. */
+/* Solitaire — card table, cards and drag ghost. The page layout comes from play-page.css. */
 body[data-game='soliter'] { --frame: #0f7a55; --title: #0f7a55; --title-shadow: #0a5239; }
 
 .board-frame { display: grid; }

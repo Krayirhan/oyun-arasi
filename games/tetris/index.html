@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f8f4ec" />
-    <meta name="description" content="Düşen blokları diz, satırları temizle. Oyun Arası&#x27;nda ücretsiz Tetris oyna." />
-    <title>Tetris | Oyun Arası</title>
+    <meta name="description" content="Düşen blokları diz, satırları temizle. Oyun Arası&#x27;nda ücretsiz Blok Düşür oyna." />
+    <title>Blok Düşür | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../account.css" />
     <link rel="stylesheet" href="../../game-shell.css?v=5" />
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="styles.css?v=4" />
     <script type="module" src="../../account.js"></script>
     <script type="module" src="script.js"></script>
-    <script defer src="../../catalog.js?v=5"></script>
+    <script defer src="../../catalog.js?v=8"></script>
     <script defer src="../../game-shell.js?v=2"></script>
   </head>
   <body class="game-page" data-game="tetris">
@@ -30,12 +30,12 @@
         <a href="../../" aria-label="Ana sayfa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z" /></svg></a>
         <span aria-hidden="true">›</span><a href="../../#tum-oyunlar">Oyunlar</a>
         <span aria-hidden="true">›</span><a href="../../?kategori=classic#tum-oyunlar">Klasikler</a>
-        <span aria-hidden="true">›</span><span aria-current="page">Tetris</span>
+        <span aria-hidden="true">›</span><span aria-current="page">Blok Düşür</span>
       </nav>
 
       <main class="play-layout">
         <section class="play-intro" aria-labelledby="game-title">
-          <h1 id="game-title" class="title-art">Tetris<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
+          <h1 id="game-title" class="title-art">Blok Düşür<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
           <p class="tagline">Blokları diz, satırları temizle!</p>
         </section>
 
@@ -60,7 +60,7 @@
           <p class="save-state" id="save-state">Oyun bu cihazda saklanır.</p>
         </section>
 
-        <section class="play-panel" aria-label="Tetris oyunu">
+        <section class="play-panel" aria-label="Blok Düşür oyunu">
           <div class="play-bar">
             <div class="scores" aria-label="Skorlar">
               <div class="score-card"><span>SKOR</span><strong id="score">0</strong><i id="score-gain" aria-hidden="true"></i></div>
@@ -79,11 +79,11 @@
                 <div class="stat-box"><span>SATIR</span><strong id="lines">0</strong></div>
               </div>
               <div class="well-wrap">
-                <div class="well" id="board" role="img" aria-label="Tetris oyun alanı, 10 sütun, 20 satır" aria-describedby="board-help"></div>
+                <div class="well" id="board" role="img" aria-label="Blok Düşür oyun alanı, 10 sütun, 20 satır" aria-describedby="board-help"></div>
                 <p class="clear-pop" id="clear-pop" aria-hidden="true"></p>
                 <div class="game-overlay" id="game-overlay" aria-live="polite">
                   <div class="overlay-card">
-                    <p class="overlay-kicker" id="overlay-kicker">TETRIS</p>
+                    <p class="overlay-kicker" id="overlay-kicker">BLOK DÜŞÜR</p>
                     <h2 id="overlay-title">Hazır mısın?</h2>
                     <p id="overlay-copy">Başla'ya bas ya da bir ok tuşuna dokun.</p>
                     <div class="overlay-actions"><button class="play-button play-new" id="overlay-button" type="button">Başla</button></div>

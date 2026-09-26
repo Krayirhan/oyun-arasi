@@ -96,7 +96,7 @@ function render() {
 
 function renderOverlay() {
   const texts = {
-    ready: ['TETRIS', 'Hazır mısın?', 'Başla’ya bas ya da bir ok tuşuna dokun.', 'Başla'],
+    ready: ['BLOK DÜŞÜR', 'Hazır mısın?', 'Başla’ya bas ya da bir ok tuşuna dokun.', 'Başla'],
     paused: ['DURAKLATILDI', 'Mola!', `Skor ${game.score.toLocaleString('tr-TR')} · ${game.lines} satır. Kaldığın yerden devam edebilirsin.`, 'Devam et'],
     over: ['OYUN BİTTİ', 'Bloklar tepeye ulaştı!', `Skor ${game.score.toLocaleString('tr-TR')} · ${game.lines} satır${game.score > 0 && game.score >= records.bestScore ? ' — yeni rekor!' : '.'}`, 'Yeni oyun']
   }[game.status];
@@ -111,7 +111,7 @@ function renderOverlay() {
   overlayButton.textContent = button;
 }
 
-const CLEAR_NAMES = ['', 'Tek satır', 'Çift satır', 'Üç satır', 'TETRIS!'];
+const CLEAR_NAMES = ['', 'Tek satır', 'Çift satır', 'Üç satır', 'DÖRTLÜ!'];
 
 // Compares the new state with the old one to save after each lock and celebrate cleared lines.
 function update(next) {

@@ -1,4 +1,4 @@
-// Tetris — pure game rules. Every function returns a new game object; nothing here touches the DOM.
+// Blok Düşür — pure game rules. Every function returns a new game object; nothing here touches the DOM.
 // Board: 10 columns × 22 rows (the top 2 rows are hidden spawn space), stored row by row as
 // '' (empty) or a piece letter so the whole game can be saved as JSON.
 
@@ -60,7 +60,7 @@ const KICKS_I = {
   '0>3': [[0, 0], [-1, 0], [2, 0], [-1, -2], [2, 1]]
 };
 
-// Milliseconds per row at each level (Tetris guideline curve).
+// Milliseconds per row at each level (the common falling-block guideline curve).
 export function gravityMs(level) {
   const l = Math.min(Math.max(level, 1), 20);
   return Math.max(Math.pow(0.8 - (l - 1) * 0.007, l - 1) * 1000, 16);

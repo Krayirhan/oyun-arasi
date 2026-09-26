@@ -13,8 +13,8 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `games/sudoku/`: Kolay, Orta ve Zor seviyeli, her seferinde tek çözümlü yeni bulmaca üreten Sudoku; not modu, geri alma, ipucu ve seviye rekorları.
 - `games/sekil/`: Şekil Birleştir; 8×8 tahtaya üçer parça yerleştirilir, dolan satır ve sütunlar temizlenir.
 - `games/kelime-avi/`: Kelime Avı; 12 temadan kelimeler 8×8, 10×10 ya da 12×12 harf tablosuna gizlenir, oyuncu çizerek bulur.
-- `games/tetris/`: Tetris; 7'li torba, döndürme ve duvar tekmeleri, gölge parça, tutma, sıradaki 3 parça ve her 10 satırda hızlanma.
-- `games/soliter/`: Soliter (Klondike); 1 ya da 3 kart çekiş, sürükle-bırak ve dokununca otomatik taşıma, geri alma ve otomatik bitirme.
+- `games/tetris/`: Blok Düşür (düşen blok oyunu; klasör ve kayıt kimliği `tetris` olarak kaldı); 7'li torba, döndürme ve duvar tekmeleri, gölge parça, tutma, sıradaki 3 parça ve her 10 satırda hızlanma.
+- `games/soliter/`: Solitaire (Klondike; klasör ve kayıt kimliği `soliter`); 1 ya da 3 kart çekiş, sürükle-bırak ve dokununca otomatik taşıma, geri alma ve otomatik bitirme.
 - `games/mahjong/`: Mahjong (eşleştirmeli solitaire); 46, 102 ve 144 taşlık üç dizilim, her zaman çözülebilir dağıtım, ipucu, karıştırma ve geri alma.
 - `games/araba/`: Araba Yarışı; 4 şeritli sonsuz yol, hızlanan trafik (her dalgada geçilebilir bir şerit açık kalır), jetonlar ve skor rekoru.
 - `games/harfane/`: Harfle oyununun arayüzü, oyun mantığı ve kelime listeleri.

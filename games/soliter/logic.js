@@ -1,4 +1,4 @@
-// Soliter (Klondike) — pure game rules. Every function returns a new game object (or null for an
+// Solitaire (Klondike) — pure game rules. Every function returns a new game object (or null for an
 // illegal move); nothing here touches the DOM.
 // Cards are numbers 0–51: suit = Math.floor(card / 13) (0 ♠, 1 ♥, 2 ♦, 3 ♣), rank = card % 13 + 1.
 
