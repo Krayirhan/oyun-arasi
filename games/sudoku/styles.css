@@ -2,7 +2,7 @@
 body[data-game='sudoku'] { --frame: #b86e00; --title: #b86e00; --title-shadow: #7d4a00; }
 
 .board-frame { display: grid; gap: 14px; }
-.sudoku-board { display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); aspect-ratio: 1; overflow: hidden; border: 3px solid #5a3500; border-radius: 14px; background: #5a3500; gap: 1px; }
+.sudoku-board { display: grid; width: min(100%, calc(100svh - 340px)); margin-inline: auto; grid-template-columns: repeat(9, minmax(0, 1fr)); aspect-ratio: 1; overflow: hidden; border: 3px solid #5a3500; border-radius: 14px; background: #5a3500; gap: 1px; }
 .sudoku-cell { position: relative; display: grid; place-items: center; min-width: 0; padding: 0; border: 0; border-radius: 0; background: #fffaf0; color: #1f5fbf; font: 600 clamp(20px, 2.6vw, 34px) / 1 'Fredoka', sans-serif; cursor: pointer; transition: background .12s; }
 /* thicker lines between the 3×3 boxes */
 .sudoku-cell[data-col='2'], .sudoku-cell[data-col='5'] { margin-right: 2px; }
@@ -35,7 +35,7 @@ body[data-game='sudoku'] { --frame: #b86e00; --title: #b86e00; --title-shadow: #
 
 @media (max-width: 760px) {
   .board-frame { gap: 10px; }
-  .sudoku-board { border-radius: 10px; }
+  .sudoku-board { width: min(100%, calc(100svh - 300px)); border-radius: 10px; }
   .sudoku-cell { font-size: clamp(18px, 6vw, 28px); }
   .notes { padding: 1px; }
   .notes i { font-size: clamp(7px, 2.2vw, 11px); }

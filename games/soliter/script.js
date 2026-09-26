@@ -1,5 +1,5 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609270005';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270005';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609270036';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270036';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');
@@ -65,7 +65,8 @@ function measure() {
   const mobile = window.matchMedia('(max-width: 760px)').matches;
   const gap = mobile ? 5 : 10;
   const width = frameElement.clientWidth - (mobile ? 24 : 28);
-  const w = Math.max(38, Math.min(96, Math.floor((width - gap * 6) / 7)));
+  const minCardWidth = mobile ? 30 : 38;
+  const w = Math.max(minCardWidth, Math.min(96, Math.floor((width - gap * 6) / 7)));
   size = { w, h: Math.round(w * 1.4), gap, mobile };
   tableElement.style.setProperty('--card-w', `${w}px`);
   tableElement.style.setProperty('--card-h', `${size.h}px`);

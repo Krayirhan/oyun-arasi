@@ -12,7 +12,7 @@ body[data-game='kelime-avi'] { --frame: #c2185b; --title: #c2185b; --title-shado
 
 .board-frame { display: grid; justify-items: center; gap: 14px; }
 .letter-grid, .word-list { width: min(100%, 470px); }
-.letter-grid { --size: 8; display: grid; grid-template-columns: repeat(var(--size), minmax(0, 1fr)); gap: 4px; aspect-ratio: 1; padding: 10px; border-radius: 16px; background: #fffaf3; touch-action: none; user-select: none; -webkit-user-select: none; }
+.letter-grid { --size: 8; display: grid; width: min(100%, 470px, calc(100svh - 340px)); grid-template-columns: repeat(var(--size), minmax(0, 1fr)); gap: 4px; aspect-ratio: 1; padding: 10px; border-radius: 16px; background: #fffaf3; touch-action: none; user-select: none; -webkit-user-select: none; }
 .letter-cell { display: grid; place-items: center; min-width: 0; aspect-ratio: 1; padding: 0; border: 0; border-radius: 50%; background: transparent; color: var(--ink); font: 700 calc(min(560px, 100%) / var(--size) * .5) / 1 'Fredoka', sans-serif; cursor: pointer; transition: background .1s, transform .1s; }
 .letter-grid .letter-cell { font-size: clamp(14px, calc(36px - var(--size) * 1.4px), 28px); }
 .letter-cell:hover { background: #fde4ee; }

@@ -84,6 +84,12 @@ body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-
 .game-page .site-header .account-button::after { margin-left: 4px; color: var(--muted); content: '⌄'; font-size: 15px; }
 .game-page .site-header .account-button:hover { color: var(--accent); }
 
+@media (min-width: 761px) and (max-width: 900px) {
+  .site-header { gap: 12px; }
+  .site-search { flex-basis: clamp(140px, 23vw, 180px); min-width: 0; }
+  .site-header .account-slot { padding-left: 12px; }
+}
+
 /* readable minimum sizes */
 .game-page .eyebrow { font-size: 12px; letter-spacing: .12em; }
 .game-page .intro, .game-page .intro-copy { font-size: 15px; }
@@ -177,6 +183,15 @@ a.more-tile:hover, a.more-tile:focus-visible { transform: translateY(-3px); box-
 @media (max-width: 380px) {
   .logo-word { font-size: 21px; }
   .game-page .back-link { font-size: 12px; }
+  body[data-game='harfane'] .site-header { gap: 5px; }
+  body[data-game='harfane'] .site-header .brand { gap: 6px; }
+  body[data-game='harfane'] .site-header .brand::before { width: 28px; height: 26px; }
+  body[data-game='harfane'] .topbar-actions { gap: 4px; }
+  body[data-game='harfane'] .site-header .logo-word { font-size: 16px; }
+  body[data-game='harfane'] .search-link { width: 28px; height: 28px; }
+  body[data-game='harfane'] .search-link svg { width: 16px; height: 16px; }
+  body[data-game='harfane'] .topbar-actions .auth-button { padding: 4px 3px; font-size: 9px; }
+  body[data-game='harfane'] .topbar-actions .icon-button { width: 28px; height: 28px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .more-tile { transition: none; }

@@ -1,7 +1,7 @@
 /* XOX — board and marks. The page layout comes from play-page.css. */
 body[data-game='xox'] { --frame: #0a2fb5; --title: #0b36c0; --title-shadow: #071f7a; }
 
-.board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; max-width: 470px; margin: 0 auto; aspect-ratio: 1; }
+.board { display: grid; width: min(100%, 470px, calc(100svh - 340px)); grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(8px, 1.5vw, 14px); margin: 0 auto; aspect-ratio: 1; }
 .cell { aspect-ratio: 1; display: grid; place-items: center; min-width: 0; border: 0; border-radius: 18px; background: var(--surface); color: var(--accent); font: 700 clamp(56px, 7vw, 110px) / 1 'Fredoka', sans-serif; cursor: pointer; box-shadow: 0 5px 0 rgb(0 0 0 / .14); transition: transform .15s, background .15s; }
 .cell:not(:disabled):hover { transform: translateY(-3px); background: #fff; }
 .cell.mark-o { color: var(--orange); }

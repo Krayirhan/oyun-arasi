@@ -23,5 +23,5 @@ body[data-game='mayin-tarlasi'] { --frame: #1768a0; --title: #1768a0; --title-sh
 .goal-equation .goal-mine { color: #d24e3c; }
 
 @media (max-width: 760px) {
-  .board { --gap: 3px; }
+  .board { --gap: 3px; --cell: clamp(22px, calc((100cqw - (var(--columns) - 1) * var(--gap)) / var(--columns)), 56px); }
 }

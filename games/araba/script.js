@@ -1,5 +1,5 @@
-import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=202609270005';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270005';
+import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=202609270036';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270036';
 
 const KEY = 'oyunarasi-araba-v1';
 const canvas = document.querySelector('#board');
@@ -41,15 +41,14 @@ function formatDistance(metres) {
 // Canvas size: as tall as the window allows on wide screens, as wide as the panel on phones.
 function resize() {
   const mobile = window.matchMedia('(max-width: 760px)').matches;
-  const available = frameElement.clientWidth - (mobile ? 24 : 28);
+  const available = Math.max(1, frameElement.clientWidth - (mobile ? 24 : 28));
   let h;
   let w;
   if (mobile) {
     w = Math.min(available, 440);
-    h = Math.min(w * 1.45, window.innerHeight - 230);
-    h = Math.max(h, 380);
+    h = Math.max(240, Math.min(w * 1.45, window.innerHeight - 300));
   } else {
-    h = Math.max(420, Math.min(640, window.innerHeight - 330));
+    h = Math.max(280, Math.min(640, window.innerHeight - 330));
     w = Math.min(available, h * 0.66);
   }
   const ratio = Math.min(window.devicePixelRatio || 1, 2);

@@ -18,7 +18,7 @@
 
 * { box-sizing: border-box; }
 body {
-  min-width: 320px;
+  min-width: 0;
   min-height: 100vh;
   margin: 0;
   background: var(--paper);
@@ -176,6 +176,9 @@ h1 em { color: var(--green); font-style: normal; }
 @media (max-width: 780px) {
   .app-shell { width: min(100% - 30px, 700px); padding-top: 15px; }
   .live-label { display: none; }
+  body[data-game='harfane'] .site-search, body[data-game='harfane'] .all-games { display: none; }
+  body[data-game='harfane'] .search-link { display: grid; }
+  body[data-game='harfane'] .topbar { gap: 10px; }
   .home-screen { padding-top: 52px; }
   .home-heading h1 { font-size: clamp(43px, 10vw, 62px); }
   .home-heading > p:last-child { font-size: 14px; }

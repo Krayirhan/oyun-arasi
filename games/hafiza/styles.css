@@ -1,7 +1,7 @@
 /* Hafıza Kartları — board and cards. The page layout comes from play-page.css. */
 body[data-game='hafiza'] { --frame: #6a3dc2; --title: #6a3dc2; --title-shadow: #3f2185; }
 
-.board { --columns: 4; display: grid; grid-template-columns: repeat(var(--columns), minmax(0, 1fr)); gap: 12px; }
+.board { --columns: 4; display: grid; width: min(100%, calc(100svh - 340px)); grid-template-columns: repeat(var(--columns), minmax(0, 1fr)); gap: clamp(6px, 1.5vw, 12px); margin-inline: auto; }
 .card { aspect-ratio: 1; min-width: 0; display: grid; place-items: center; border: 0; border-radius: 14px; background: repeating-linear-gradient(45deg, transparent 0 9px, rgb(255 255 255 / .08) 9px 18px), linear-gradient(145deg, #9a6cf0, #7a4bd6); color: #fff; font: 700 clamp(24px, 3vw, 40px) / 1 'Fredoka', sans-serif; cursor: pointer; box-shadow: 0 5px 0 rgb(0 0 0 / .18); transition: transform .16s, background .16s; }
 .card:hover:not(.matched) { transform: translateY(-3px); }
 .card.revealed { background: var(--surface); color: var(--ink); font-size: clamp(28px, 3.6vw, 46px); }
