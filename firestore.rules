@@ -28,8 +28,18 @@ service cloud.firestore {
         && (!('araba' in value) || value.araba is map);
     }
 
+    // Favoriler ve son oynananlar (library.js); en fazla 12'şer öğe.
+    function validLibrary(value) {
+      return value is map
+        && value.keys().hasOnly(['favorites', 'favoritesUpdatedAt', 'recent'])
+        && (!('favorites' in value) || (value.favorites is list && value.favorites.size() <= 12))
+        && (!('recent' in value) || (value.recent is list && value.recent.size() <= 12))
+        && (!('favoritesUpdatedAt' in value) || value.favoritesUpdatedAt is int);
+    }
+
     function validProfile(data) {
-      return data.keys().hasOnly(['schemaVersion', 'email', 'displayName', 'createdAt', 'lastSeenAt', 'gameStats'])
+      return data.keys().hasOnly(['schemaVersion', 'email', 'displayName', 'createdAt', 'lastSeenAt', 'gameStats', 'library'])
+        && (!('library' in data) || validLibrary(data.library))
         && data.keys().hasAll(['schemaVersion', 'email', 'displayName', 'lastSeenAt', 'gameStats'])
         && data.schemaVersion == 2
         && data.email is string && data.email.size() <= 320
@@ -64,7 +74,7 @@ service cloud.firestore {
       allow create: if signedInAs(userId) && validProfile(request.resource.data);
       allow update: if signedInAs(userId)
         && request.resource.data.diff(resource.data).affectedKeys()
-          .hasOnly(['schemaVersion', 'email', 'displayName', 'lastSeenAt', 'gameStats'])
+          .hasOnly(['schemaVersion', 'email', 'displayName', 'lastSeenAt', 'gameStats', 'library'])
         && validProfile(request.resource.data);
       // Hesap silme: kullanıcı kendi profilini ve oyun belgelerini silebilir.
       allow delete: if signedInAs(userId);

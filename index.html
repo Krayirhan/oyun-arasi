@@ -6,12 +6,13 @@
     <meta name="theme-color" content="#f8f4ec" />
     <meta name="description" content="Oyun Arası’nda Harfle, Sudoku, Şekil Birleştir, Kelime Avı, Blok Düşür, Solitaire, Mahjong, Araba Yarışı, 2048, XOX, Mayın Tarlası ve Hafıza Kartları’nı ücretsiz oyna." />
     <title>Oyun Arası — Bugün ne oynasak?</title>
-    <link rel="stylesheet" href="styles.css?v=202609262217" />
-    <link rel="stylesheet" href="account.css?v=202609262217" />
+    <link rel="stylesheet" href="styles.css?v=202609262228" />
+    <link rel="stylesheet" href="account.css?v=202609262228" />
     <link rel="icon" href="favicon.svg" type="image/svg+xml" />
-    <script type="module" src="account.js?v=202609262217"></script>
-    <script defer src="catalog.js?v=202609262217"></script>
-    <script defer src="home.js?v=202609262217"></script>
+    <script type="module" src="account.js?v=202609262228"></script>
+    <script defer src="catalog.js?v=202609262228"></script>
+    <script defer src="library.js?v=202609262228"></script>
+    <script defer src="home.js?v=202609262228"></script>
   </head>
   <body>
     <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -44,9 +45,9 @@
         <button class="at side-cat cat-mantik" type="button" data-filter="logic" style="--x:24;--y:262;--w:204;--h:84"><svg aria-hidden="true"><use href="#i-cube" /></svg><span><strong>Mantık</strong><small>Beyin egzersizi</small></span></button>
         <button class="at side-cat cat-klasik" type="button" data-filter="classic" style="--x:24;--y:356;--w:204;--h:84"><svg aria-hidden="true"><use href="#i-pad" /></svg><span><strong>Klasikler</strong><small>Hepimizin favorileri</small></span></button>
         <nav class="at side-panel" style="--x:24;--y:450;--w:204;--h:256" aria-label="Kısayollar">
-          <a href="#oyunlar"><svg aria-hidden="true"><use href="#i-heart" /></svg>Favorilerim</a>
-          <a href="games/2048/"><svg aria-hidden="true"><use href="#i-clock" /></svg>Son Oynananlar</a>
-          <a href="games/harfane/"><svg aria-hidden="true"><use href="#i-trophy" /></svg>Liderlik Tablosu</a>
+          <a href="#tum-oyunlar" data-filter-link="fav"><svg aria-hidden="true"><use href="#i-heart" /></svg>Favorilerim</a>
+          <a href="#tum-oyunlar" data-filter-link="recent"><svg aria-hidden="true"><use href="#i-clock" /></svg>Son Oynananlar</a>
+          <a href="rekorlarim/"><svg aria-hidden="true"><use href="#i-trophy" /></svg>Rekorlarım</a>
           <a href="#" data-invite><svg aria-hidden="true"><use href="#i-people" /></svg>Arkadaş Davet Et</a>
         </nav>
       </aside>

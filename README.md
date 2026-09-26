@@ -22,6 +22,8 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `games/hafiza/`: 4×4 ve 6×6 Hafıza Kartları, rekorlar ve oturum kaydı.
 - `games/mayin-tarlasi/`: Üç zorluk seviyeli Mayın Tarlası ve oyun/rekor kaydı.
 - `firebase-client.js`, `account.js`, `account.css`: ortak hesap, Firebase bağlantısı ve oyun ilerlemesi eşitlemesi.
+- `library.js`: favoriler ve son oynanan oyunlar (cihazda; girişliyse profildeki `library` alanıyla eşitlenir). Oyun sayfalarında ♥ düğmesi ve son oynanan kaydı `game-shell.js`'te, ana sayfadaki Favorilerim / Son Oynananlar filtreleri ve kişisel karusel `home.js`'tedir.
+- `rekorlarim/`: Rekorlarım sayfası; her oyunun cihazdaki ve (girişliyse) hesaptaki en iyi sonuçlarını birleştirerek gösterir.
 - `firestore-codec.js`: Firestore'un saklayamadığı iç içe dizileri (ör. 2048 tahtası) kayıt sırasında metne çevirir.
 - `cloud-sync.js`: oyunların Firebase'i sonradan yüklediği ara katman. Oyunlar `firebase-client.js` yerine bunu içe aktarır; Firebase yüklenemezse oyun yine açılır ve cihazda kaydolur.
 - `firebase-config.js`, `firestore.rules`, `firebase.json`: Oyun Arası Firebase yapılandırması ve erişim kuralları. `firestore.rules` `main` dalına gelince `.github/workflows/deploy-firestore-rules.yml` ile otomatik yayımlanır (kurulum: `FIREBASE_SETUP.md`).
@@ -37,5 +39,7 @@ npm install
 npm test          # Firestore kural testleri (emülatörde) + tüm oyun mantığı testleri
 npm run test:logic  # yalnızca oyun mantığı testleri, emülatörsüz
 ```
+
+**Önbellek sürümü:** Cloudflare JS/CSS dosyalarını saatlerce önbellekte tutar. Bir JS ya da CSS dosyası değiştiğinde `npm run bump` çalıştırılır; tüm yerel referanslara yeni ve ortak bir `?v=` sürümü yazılır. `tests/asset-versions.test.mjs` eksik ya da farklı sürümde CI'ı kırmızıya çevirir.
 
 `firestore.rules` yalnızca GitHub Actions ile yayımlanır: `main`'e gelen değişiklikte önce testler çalışır, geçerse kurallar yayına alınır. Elle `firebase deploy` yapılırsa `scripts/guard-rules-deploy.mjs` yerel kural dosyası `origin/main` ile aynı değilse yayını durdurur. Ayrıntılar: `FIREBASE_SETUP.md`.

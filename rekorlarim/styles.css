@@ -1,0 +1,13 @@
+.records-main { max-width: 1080px; margin: 0 auto; padding: 0 16px 40px; }
+.records-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 28px 0 0; padding: 0; list-style: none; }
+.record-card { display: grid; gap: 14px; padding: 16px; border-radius: 18px; background: #fff; box-shadow: 0 3px 12px rgb(13 27 76 / .08); }
+.record-card.is-empty { background: #fbf9f4; box-shadow: none; outline: 1.5px dashed #e2ddd0; }
+.record-game { display: flex; align-items: center; gap: 12px; color: var(--ink, #0d1b4c); }
+.record-game img { width: 52px; height: 52px; flex: none; border-radius: 12px; object-fit: cover; }
+.record-game strong { font-size: 20px; }
+.record-card dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin: 0; }
+.record-card dl div { padding: 8px 10px; border-radius: 10px; background: var(--accent-soft, #e4e9fb); }
+.record-card dt { color: #5f6873; font-size: 12px; }
+.record-card dd { margin: 2px 0 0; color: var(--ink, #0d1b4c); font-size: 18px; font-weight: 800; }
+.record-empty { color: #5f6873; font-size: 14px; font-weight: 700; }
+.record-empty:hover { color: var(--accent, #0a2fb5); }

@@ -1,5 +1,5 @@
-import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609262217';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609262217';
+import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609262228';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609262228';
 
 const KEY = 'oyunarasi-kelime-avi-v1';
 const gridElement = document.querySelector('#board');

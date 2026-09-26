@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f8f4ec" />
+    <meta name="description" content="Oyun Arası'ndaki 12 oyunda en iyi sürelerin, skorların ve serilerin." />
+    <title>Rekorlarım | Oyun Arası</title>
+    <link rel="icon" href="../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../account.css?v=202609262228" />
+    <link rel="stylesheet" href="../game-shell.css?v=202609262228" />
+    <link rel="stylesheet" href="../play-page.css?v=202609262228" />
+    <link rel="stylesheet" href="styles.css?v=202609262228" />
+    <script type="module" src="../account.js?v=202609262228"></script>
+    <script defer src="../catalog.js?v=202609262228"></script>
+    <script defer src="../library.js?v=202609262228"></script>
+    <script type="module" src="records.js?v=202609262228"></script>
+  </head>
+  <body class="game-page records-page">
+    <div class="play-page">
+      <header class="topbar site-header">
+        <a class="brand" href="../" aria-label="Oyun Arası ana sayfa"><span class="logo-word">OYUN<span>ARASI</span></span></a>
+        <form class="site-search" action="../" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></svg><input name="q" type="search" placeholder="Oyun ara..." autocomplete="off" aria-label="Oyunlarda ara" /></form>
+        <a class="search-link" href="../?ara" aria-label="Oyun ara"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></svg></a>
+        <a class="all-games" href="../#tum-oyunlar"><svg viewBox="0 0 24 24" aria-hidden="true"><g><circle cx="5" cy="5" r="2.2" /><circle cx="12" cy="5" r="2.2" /><circle cx="19" cy="5" r="2.2" /><circle cx="5" cy="12" r="2.2" /><circle cx="12" cy="12" r="2.2" /><circle cx="19" cy="12" r="2.2" /><circle cx="5" cy="19" r="2.2" /><circle cx="12" cy="19" r="2.2" /><circle cx="19" cy="19" r="2.2" /></g></svg>Tüm oyunlar</a>
+        <div class="account-slot" data-account-root></div>
+      </header>
+
+      <nav class="crumbs" aria-label="Sayfa konumu">
+        <a href="../" aria-label="Ana sayfa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z" /></svg></a>
+        <span aria-hidden="true">›</span><span aria-current="page">Rekorlarım</span>
+      </nav>
+
+      <main class="records-main">
+        <section class="play-intro" aria-labelledby="records-title">
+          <h1 id="records-title" class="title-art">Rekorlarım<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
+          <p class="tagline" id="records-summary">Rekorların yükleniyor…</p>
+        </section>
+        <ol class="records-list" id="records-list" aria-label="Oyun rekorları"></ol>
+      </main>
+
+      <footer class="footer"><a href="../" aria-label="Oyun Arası ana sayfa"><span class="logo-word">OYUN<span>ARASI</span></span></a><span>Biraz oyna, iyi hisset.</span></footer>
+    </div>
+  </body>
+</html>

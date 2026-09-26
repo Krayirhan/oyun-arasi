@@ -72,3 +72,25 @@ if (moreGames) {
     return tile;
   }));
 }
+
+// Son oynananlar ve favori düğmesi (library.js).
+const library = window.OyunArasiLibrary;
+const gameId = document.body.dataset.game;
+const crumbs = document.querySelector('.crumbs');
+if (library && gameId) {
+  library.recordPlay(gameId);
+  if (crumbs) {
+    const favorite = document.createElement('button');
+    favorite.type = 'button';
+    favorite.className = 'favorite-toggle';
+    const paint = () => {
+      const on = library.isFavorite(gameId);
+      favorite.setAttribute('aria-pressed', String(on));
+      favorite.innerHTML = `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-8.5-5.2-8.5-11.2C3.5 6.6 5.8 4.5 8.4 4.5c1.6 0 2.8.8 3.6 2 .8-1.2 2-2 3.6-2 2.6 0 4.9 2.1 4.9 5.3C20.5 15.8 12 21 12 21z" /></svg><span>${on ? 'Favorilerde' : 'Favorilere ekle'}</span>`;
+    };
+    favorite.addEventListener('click', () => { library.toggleFavorite(gameId); paint(); });
+    window.addEventListener('oyunarasi-library-changed', paint);
+    paint();
+    crumbs.append(favorite);
+  }
+}

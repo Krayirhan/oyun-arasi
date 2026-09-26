@@ -25,8 +25,8 @@ import {
   setDoc,
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
-import { firebaseConfig } from './firebase-config.js?v=202609262217';
-import { decodeState, encodeState } from './firestore-codec.js?v=202609262217';
+import { firebaseConfig } from './firebase-config.js?v=202609262228';
+import { decodeState, encodeState } from './firestore-codec.js?v=202609262228';
 
 const existingApp = getApps().find(candidate => candidate.name === '[DEFAULT]');
 export const app = existingApp || initializeApp(firebaseConfig);
@@ -87,6 +87,7 @@ export const EMPTY_GAME_STATS = Object.freeze({
 // Profil belgesine oturum başına bir kez dokunulur (1 okuma + 1 yazma). Eksik oyunların
 // başlangıç istatistikleri o sırada tamamlanır.
 const profileTouches = new Map();
+const profileSnapshots = new Map();
 
 export function saveProfile(user) {
   if (!user) return Promise.resolve();
@@ -103,6 +104,7 @@ export function saveProfile(user) {
 async function touchProfile(user) {
   const profileRef = doc(db, 'users', user.uid);
   const existing = await getDoc(profileRef);
+  profileSnapshots.set(user.uid, existing.data() || null);
   const currentStats = existing.data()?.gameStats || {};
   const missingStats = Object.fromEntries(Object.entries(EMPTY_GAME_STATS).filter(([gameId]) => !(gameId in currentStats)));
   await setDoc(profileRef, {
@@ -131,7 +133,10 @@ export async function signIn(email, password) {
 
 export async function signOutUser() {
   await flushAllSyncs();
-  return signOut(auth);
+  const uid = auth.currentUser?.uid;
+  await signOut(auth);
+  // Aynı sayfada tekrar giriş yapılırsa profil taze okunsun.
+  if (uid) { profileTouches.delete(uid); profileSnapshots.delete(uid); }
 }
 
 // Hesabın var olup olmadığını belli etmemek için "kullanıcı yok" hatası başarı gibi sayılır.
@@ -169,11 +174,68 @@ export async function deleteAccount(password) {
   }
 }
 
+// ---- Favoriler ve son oynananlar (library.js) ------------------------------------------
+// Girişte profildeki `library` alanı yerelle birleştirilir (profil zaten okunduğu için ek okuma
+// yok); bu cihazdaki değişiklikler 5 saniye sonra profile yazılır.
+let librarySyncStarted = false;
+
+export function startLibrarySync() {
+  const library = window.OyunArasiLibrary;
+  if (librarySyncStarted || !library) return;
+  librarySyncStarted = true;
+  let user = null;
+  let timer = 0;
+  let lastSent = '';
+
+  const push = async () => {
+    window.clearTimeout(timer);
+    if (!user || deletingAccount) return;
+    const data = library.snapshot();
+    const serialized = JSON.stringify(data);
+    if (serialized === lastSent) return;
+    try {
+      await updateDoc(doc(db, 'users', user.uid), { library: data, lastSeenAt: serverTimestamp() });
+      lastSent = serialized;
+    } catch {}
+  };
+
+  listenToAuth(async nextUser => {
+    user = nextUser;
+    lastSent = '';
+    if (!user) return;
+    try {
+      await saveProfile(user);
+      if (user !== nextUser) return;
+      const remote = library.normalize(profileSnapshots.get(user.uid)?.library);
+      lastSent = JSON.stringify(remote);
+      const merged = library.merge(library.snapshot(), remote);
+      library.replace(merged);
+      if (JSON.stringify(merged) !== lastSent) await push();
+    } catch {}
+  });
+
+  window.addEventListener('oyunarasi-library-changed', event => {
+    if (!user || event.detail?.source !== 'local') return;
+    window.clearTimeout(timer);
+    timer = window.setTimeout(push, 5000);
+  });
+  window.addEventListener('pagehide', push);
+}
+
 export function listenToAuth(callback) {
   return onAuthStateChanged(auth, user => {
     if (user) saveProfile(user).catch(() => {});
     callback(user);
   });
+}
+
+// Profil belgesi (Rekorlarım sayfası). Bu sayfa açılışında profil zaten okunduysa tekrar okumaz.
+export async function loadProfile(user) {
+  if (!user) return null;
+  await saveProfile(user);
+  if (profileSnapshots.has(user.uid)) return profileSnapshots.get(user.uid);
+  const snapshot = await getDoc(doc(db, 'users', user.uid));
+  return snapshot.exists() ? snapshot.data() : null;
 }
 
 export async function loadGame(user, gameId) {
@@ -444,8 +506,8 @@ export function syncGameOnAccountChange(gameId, options) {
 
 export const platformFirebase = {
   app, auth, db, saveProfile, signUp, signIn, signOut: signOutUser,
-  sendPasswordReset, resendVerification, deleteAccount,
-  onAuthStateChanged: listenToAuth, loadGame, saveGame
+  sendPasswordReset, resendVerification, deleteAccount, startLibrarySync,
+  onAuthStateChanged: listenToAuth, loadProfile, loadGame, saveGame
 };
 
 window.oyunArasiFirebase = platformFirebase;

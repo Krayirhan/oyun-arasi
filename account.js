@@ -1,4 +1,4 @@
-import { loadFirebaseClient } from './cloud-sync.js?v=202609262217';
+import { loadFirebaseClient } from './cloud-sync.js?v=202609262228';
 
 const slot = document.querySelector('[data-account-root]');
 if (slot) {
@@ -134,6 +134,7 @@ if (slot) {
   loadFirebaseClient()
     .then(loaded => {
       platformFirebase = loaded.platformFirebase;
+      platformFirebase.startLibrarySync();
       platformFirebase.onAuthStateChanged(user => {
         setButton(user);
         window.dispatchEvent(new CustomEvent('oyunarasi-auth-changed', { detail: { user } }));

@@ -9,6 +9,7 @@ function renderTile(game) {
   tile.dataset.category = game.category;
   tile.dataset.search = `${game.title} ${game.search || ''}`;
   tile.dataset.title = game.title;
+  tile.dataset.id = game.id;
   tile.setAttribute('aria-label', game.soon ? `${game.title} (yakında)` : game.title);
 
   if (game.image) {
@@ -31,6 +32,12 @@ function renderTile(game) {
     tile.append(label, cells);
   }
 
+  const favoriteMark = document.createElement('span');
+  favoriteMark.className = 'tile-fav';
+  favoriteMark.setAttribute('aria-hidden', 'true');
+  favoriteMark.textContent = '♥';
+  tile.append(favoriteMark);
+
   const name = document.createElement('span');
   name.className = 'tile-name';
   name.textContent = game.title;
@@ -41,7 +48,16 @@ function renderTile(game) {
 library.append(...(window.OYUN_ARASI_GAMES || []).map(renderTile));
 
 const shelfCards = [...document.querySelectorAll('.thumb')];
+shelfCards.forEach(card => { card.dataset.id = card.getAttribute('href').match(/games\/([^/]+)\//)?.[1] || ''; });
 const tiles = [...library.querySelectorAll('.tile')];
+const games = window.OyunArasiLibrary;
+const libraryTitle = document.querySelector('#library-title');
+const libraryTitleText = libraryTitle.firstChild;
+const shortcutLinks = [...document.querySelectorAll('[data-filter-link]')];
+const SPECIAL = {
+  fav: { title: 'Favorilerim', empty: 'Henüz favorin yok. Oyun sayfasındaki ♥ Favorilere ekle düğmesiyle ekleyebilirsin.' },
+  recent: { title: 'Son Oynananlar', empty: 'Henüz bir oyun oynamadın. Bir oyun aç, burada görünsün.' }
+};
 const categoryButtons = [...document.querySelectorAll('.side-cat[data-filter]')];
 const searchInput = document.querySelector('#game-search');
 const emptyMessage = document.querySelector('#empty-search');
@@ -58,11 +74,21 @@ function showToast(message) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), 2200);
 }
 
-function filterCards(list, query) {
+function libraryState() {
+  const favorites = new Set(games?.favorites() || []);
+  const recent = new Map((games?.recent() || []).map(entry => [entry.id, entry.at]));
+  return { favorites, recent };
+}
+
+function filterCards(list, query, state, useSpecial = true) {
   let visibleCount = 0;
+  const category = !useSpecial && SPECIAL[selectedCategory] ? 'all' : selectedCategory;
   for (const card of list) {
     const categories = card.dataset.category.split(' ');
-    const matchesCategory = selectedCategory === 'all' || categories.includes(selectedCategory);
+    const matchesCategory = category === 'all'
+      || (category === 'fav' ? state.favorites.has(card.dataset.id)
+        : category === 'recent' ? state.recent.has(card.dataset.id)
+          : categories.includes(category));
     const matchesSearch = !query || card.dataset.search.toLocaleLowerCase('tr-TR').includes(query);
     card.hidden = !matchesCategory || !matchesSearch;
     if (!card.hidden) visibleCount += 1;
@@ -70,15 +96,49 @@ function filterCards(list, query) {
   return visibleCount;
 }
 
+// Karusel: önce son oynananlar (en yeni önce), sonra favoriler, sonra henüz oynanmamış oyunlar.
+function personalizeShelf(state) {
+  const rank = card => {
+    const playedAt = state.recent.get(card.dataset.id);
+    if (playedAt) return [0, -playedAt];
+    if (state.favorites.has(card.dataset.id)) return [1, 0];
+    return [2, 0];
+  };
+  const ordered = shelfCards
+    .map((card, index) => ({ card, index, key: rank(card) }))
+    .sort((a, b) => a.key[0] - b.key[0] || a.key[1] - b.key[1] || a.index - b.index);
+  track.append(...ordered.map(({ card }) => card));
+  for (const card of shelfCards) {
+    let badge = card.querySelector('.thumb-badge');
+    const played = state.recent.has(card.dataset.id);
+    if (played && !badge) {
+      badge = Object.assign(document.createElement('span'), { className: 'thumb-badge', textContent: 'Devam et' });
+      card.append(badge);
+    } else if (!played && badge) badge.remove();
+  }
+}
+
 function updateCatalog() {
   const query = searchInput.value.trim().toLocaleLowerCase('tr-TR');
+  const state = libraryState();
+  personalizeShelf(state);
 
-  const shelfCount = filterCards(shelfCards, query);
+  const shelfCount = filterCards(shelfCards, query, state, false);
   emptyMessage.hidden = shelfCount > 0;
   track.hidden = shelfCount === 0;
   track.scrollLeft = 0;
 
-  const tileCount = filterCards(tiles, query);
+  tiles.forEach(tile => tile.classList.toggle('is-fav', state.favorites.has(tile.dataset.id)));
+  const ordered = selectedCategory === 'recent'
+    ? [...tiles].sort((a, b) => (state.recent.get(b.dataset.id) || 0) - (state.recent.get(a.dataset.id) || 0))
+    : tiles;
+  library.append(...ordered);
+  const special = SPECIAL[selectedCategory];
+  libraryTitleText.textContent = special ? special.title : 'Tüm Oyunlar';
+  libraryEmpty.textContent = special && !query ? special.empty : 'Bu aramayla eşleşen oyun bulamadık.';
+  shortcutLinks.forEach(link => link.toggleAttribute('aria-current', link.dataset.filterLink === selectedCategory));
+
+  const tileCount = filterCards(tiles, query, state);
   libraryEmpty.hidden = tileCount > 0;
   library.hidden = tileCount === 0;
   libraryCount.textContent = `${tileCount} oyun`;
@@ -110,6 +170,17 @@ document.querySelector('[data-show-all]').addEventListener('click', event => {
 });
 
 searchInput.addEventListener('input', updateCatalog);
+
+shortcutLinks.forEach(link => link.addEventListener('click', event => {
+  event.preventDefault();
+  const filter = link.dataset.filterLink;
+  selectCategory(selectedCategory === filter ? 'all' : filter);
+  document.querySelector('#tum-oyunlar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}));
+
+// Hesaptan gelen favoriler ya da başka sekmede oynanan oyunlar ekrana yansısın.
+window.addEventListener('oyunarasi-library-changed', updateCatalog);
+window.addEventListener('storage', event => { if (event.key === 'oyunarasi-library-v1') updateCatalog(); });
 
 document.querySelectorAll('[data-scroll]').forEach(button => {
   button.addEventListener('click', () => {

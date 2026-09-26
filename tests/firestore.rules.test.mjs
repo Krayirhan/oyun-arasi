@@ -85,6 +85,32 @@ describe('profil', () => {
   });
 });
 
+describe('favoriler ve son oynananlar', () => {
+  const library = { favorites: ['sudoku', 'xox'], favoritesUpdatedAt: 1790000000000, recent: [{ id: 'xox', at: 1790000000000 }] };
+
+  test('kendi profilinde library alanını yazar', async () => {
+    await seed('users/alice', profile());
+    await assertSucceeds(updateDoc(doc(as('alice'), 'users/alice'), { library, lastSeenAt: serverTimestamp() }));
+    await assertSucceeds(setDoc(doc(as('bob'), 'users/bob'), profile({ library })));
+  });
+
+  test('12 öğeden fazlasını ve yanlış tipleri reddeder', async () => {
+    await seed('users/alice', profile());
+    const ref = doc(as('alice'), 'users/alice');
+    const many = Array.from({ length: 13 }, (_, index) => `oyun-${index}`);
+    await assertFails(updateDoc(ref, { library: { ...library, favorites: many } }));
+    await assertFails(updateDoc(ref, { library: { ...library, recent: many.map(id => ({ id, at: 1 })) } }));
+    await assertFails(updateDoc(ref, { library: { ...library, favoritesUpdatedAt: 'dün' } }));
+    await assertFails(updateDoc(ref, { library: { ...library, hile: true } }));
+    await assertFails(updateDoc(ref, { library: 'favoriler' }));
+  });
+
+  test('başkasının library alanını yazamaz', async () => {
+    await seed('users/bob', profile());
+    await assertFails(updateDoc(doc(as('alice'), 'users/bob'), { library }));
+  });
+});
+
 describe('platform oyunları', () => {
   for (const gameId of PLATFORM_GAMES) {
     test(`${gameId}: kendi belgesini yazar ve okur`, async () => {

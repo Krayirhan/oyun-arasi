@@ -221,3 +221,9 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
   .lift, .side-cat, .arrow, .thumb.soon::after, .toast, .tile, .tile-name { transition: none; }
   .lift:hover, .side-cat:hover, .arrow:hover, .tile:hover, .tile:focus-visible { transform: none; }
 }
+
+/* Favoriler, son oynananlar ve kişisel karusel */
+.tile-fav { position: absolute; top: calc(8 * var(--u)); right: calc(8 * var(--u)); z-index: 3; display: none; place-items: center; width: calc(26 * var(--u)); height: calc(26 * var(--u)); border-radius: 50%; background: #fff; color: #e0405f; font-size: calc(15 * var(--u)); line-height: 1; box-shadow: 0 calc(2 * var(--u)) calc(6 * var(--u)) rgb(13 27 76 / .2); }
+.tile.is-fav .tile-fav { display: grid; }
+.thumb-badge { position: absolute; left: calc(8 * var(--u)); bottom: calc(8 * var(--u)); padding: calc(4 * var(--u)) calc(9 * var(--u)); border-radius: 999px; background: rgb(13 27 76 / .88); color: #fff; font: 700 calc(12 * var(--u)) / 1 'Roboto Condensed', sans-serif; letter-spacing: .02em; pointer-events: none; }
+.side-panel a[aria-current] { background: rgb(13 27 76 / .08); font-weight: 700; }

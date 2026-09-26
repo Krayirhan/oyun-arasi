@@ -15,6 +15,8 @@ Her hesap `users/{uid}` belgesinde açılır. Hesap oluşturulurken `gameStats` 
 - `tetris`: en iyi skor ve satır; `araba`: en iyi skor ve mesafe; `sekil`: en iyi skor.
 - `soliter`: toplam galibiyet ve tek/üç kart rekorları.
 
+Profilde ayrıca `library` alanı tutulur: `favorites` (en fazla 12 oyun kimliği), `favoritesUpdatedAt` ve `recent` (`{id, at}`, en fazla 12). Girişte cihazdaki favoriler ve son oynananlarla birleştirilir; favorilerde en son değiştirilen taraf kazanır.
+
 Profil bir oturumda bir kez güncellenir; eski hesaplarda eksik olan oyunların başlangıç istatistikleri o sırada eklenir.
 
 ## Eşitleme
