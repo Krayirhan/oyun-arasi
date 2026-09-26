@@ -1,12 +1,25 @@
 name: Deploy Firestore rules
 
-# firestore.rules main dalına geldiğinde Firebase Rules API ile yayımlanır. API kuralları önce derler;
-# hatalı bir kural dosyası yayımlanmaz ve iş kırmızı olur.
+# firestore.rules main dalına geldiğinde önce kural testleri (Firestore emülatörü) ve oyun mantığı testleri
+# çalışır; hepsi geçerse kurallar Firebase Rules API ile yayımlanır. API kuralları ayrıca derler; hatalı bir
+# kural dosyası yayımlanmaz ve iş kırmızı olur. Pull request'lerde yalnızca testler çalışır.
 on:
   push:
     branches: [main]
     paths:
       - firestore.rules
+      - tests/**
+      - package.json
+      - package-lock.json
+      - .github/workflows/deploy-firestore-rules.yml
+  pull_request:
+    paths:
+      - firestore.rules
+      - tests/**
+      - games/**/logic*.js
+      - games/**/*.test.mjs
+      - package.json
+      - package-lock.json
       - .github/workflows/deploy-firestore-rules.yml
   workflow_dispatch:
 
@@ -21,7 +34,33 @@ env:
   PROJECT_ID: oyun-arasi
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Set up Java (Firestore emulator)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - name: Install test dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Rules and game logic tests
+        run: npm test
+
   deploy:
+    needs: test
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - name: Check service account secret

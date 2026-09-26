@@ -337,7 +337,8 @@ import { syncGameOnAccountChange } from '../../cloud-sync.js';
     write: incoming => { state = { ...incoming, best: Math.max(state.best, incoming.best || 0), undo: incoming.undo || null }; canUndo = Boolean(state.undo); statusElement.textContent = 'Hesap oyunun yüklendi.'; render(); saveStateToDevice(); },
     isValid: incoming => Boolean(incoming && isBoard(incoming.board) && Number.isFinite(incoming.score) && incoming.score >= 0),
     merge: (local, remote) => ({ ...remote, best: Math.max(local.best || 0, remote.best || 0) }),
-    getStats: current => ({ bestScore: current.best || 0, wins: current.won ? 1 : 0 }),
+    getStats: current => ({ bestScore: current.best || 0 }),
+    counters: current => ({ wins: current.won ? 1 : 0 }),
     onStatus: message => { saveState.textContent = message; }
   });
   render();

@@ -100,7 +100,8 @@ const cloudSync = syncGameOnAccountChange('xox', {
     O: Math.max(local.scores.O, remote.scores.O),
     draws: Math.max(local.scores.draws, remote.scores.draws)
   } }),
-  getStats: current => ({ rounds: current.scores.X + current.scores.O + current.scores.draws, xWins: current.scores.X, oWins: current.scores.O, draws: current.scores.draws }),
+  getStats: () => ({}),
+  counters: current => ({ rounds: current.scores.X + current.scores.O + current.scores.draws, xWins: current.scores.X, oWins: current.scores.O, draws: current.scores.draws }),
   onStatus: message => { saveElement.textContent = message; }
 });
 render();

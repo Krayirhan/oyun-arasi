@@ -1,23 +1,12 @@
-import { app, auth, db, EMPTY_GAME_STATS, saveProfile } from '../../firebase-client.js';
-import {
-  createUserWithEmailAndPassword,
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  updateProfile
-} from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-auth.js';
+import { db, EMPTY_GAME_STATS, listenToAuth, sendPasswordReset, signIn, signOutUser, signUp } from '../../firebase-client.js';
 import { doc, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const bridge = {
-  onAuthStateChanged(callback) { return onAuthStateChanged(auth, callback); },
-  async signUp(email, password, displayName) {
-    const result = await createUserWithEmailAndPassword(auth, email, password);
-    if (displayName) await updateProfile(result.user, { displayName });
-    await saveProfile(result.user);
-    return result.user;
-  },
-  signIn(email, password) { return signInWithEmailAndPassword(auth, email, password); },
-  signOut() { return signOut(auth); },
+  onAuthStateChanged(callback) { return listenToAuth(callback); },
+  signUp,
+  signIn,
+  signOut: signOutUser,
+  sendPasswordReset,
   async loadUserData(user, dateKey) {
     const [profileSnapshot, gameSnapshot] = await Promise.all([
       getDoc(doc(db, 'users', user.uid)),
@@ -30,7 +19,6 @@ const bridge = {
   },
   async saveGame(user, dateKey, game, profileData) {
     if (!user) return null;
-    await saveProfile(user);
     const profileRef = doc(db, 'users', user.uid);
     const gameRef = doc(db, 'users', user.uid, 'games', dateKey);
     return runTransaction(db, async transaction => {
