@@ -63,6 +63,17 @@ App Check açıktır ve **reCAPTCHA Enterprise** sağlayıcısını kullanır. G
 - **Yerel geliştirme:** Anahtar localhost'a tanımlı olmadığı için App Check localhost'ta ve emülatörde başlatılmaz.
 - **Zorunlu kılma:** App Check → APIs → Cloud Firestore metriklerinde birkaç gün doğrulanmış istek oranı izlenir. İsteklerin neredeyse tamamı "Verified" ise **Enforce** açılır. Zorunlu kılındıktan sonra App Check token'ı olmayan istemciler (eski önbellekli sayfalar, reklam engelleyicinin reCAPTCHA'yı kestiği tarayıcılar) buluta yazamaz; oyunlar cihazda kaydolmaya devam eder.
 
+## Plan ve kota uyarısı
+
+Proje Firebase **Spark** (ücretsiz) planındadır; bağlı fatura hesabı yoktur, ücret çıkmaz. Günlük ücretsiz sınır dolarsa (Firestore: 20.000 yazma, 50.000 okuma) bulut kayıtları o gün reddedilir, oyunlar cihazda kaydolmaya devam eder.
+
+Sınıra yaklaşıldığını önceden bildirmek için Google Cloud Monitoring'de bir uyarı vardır:
+
+- **Politika:** *Oyun Arası - günlük Firestore yazma kotası* (Cloud Console → Monitoring → Alerting). Metrik `firestore.googleapis.com/document/write_count`, 24 saatlik toplam (tüm yazma türleri birlikte) 15.000'i geçince tetiklenir.
+- **Bildirim kanalı:** *Oyun Arası uyarıları* → `studioskrayirhan@gmail.com` (Monitoring → Alerting → Edit notification channels).
+- Uyarı şu an ücretsizdir; Google, Cloud Monitoring uyarı koşullarını Eylül 2027'den itibaren ücretlendirmeyi planlıyor. O tarihte tekrar gözden geçirilmelidir.
+- Okumalar için de istenirse aynı yolla ikinci bir uyarı (`document/read_count`, eşik 40.000) eklenebilir.
+
 ## Yerel geliştirme
 
 ```sh
