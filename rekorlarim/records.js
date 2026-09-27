@@ -1,6 +1,6 @@
 // Rekorlarım: her oyunun en iyi sonuçları. Bu cihazdaki kayıtlar okunur; giriş yapılmışsa
 // profildeki (tüm cihazlardan birleşik) istatistiklerle birleştirilir, en iyi değer gösterilir.
-import { loadFirebaseClient } from '../cloud-sync.js?v=202609280043';
+import { loadFirebaseClient } from '../cloud-sync.js?v=202609280150';
 
 const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
 const byLevel = records => ({
@@ -34,6 +34,7 @@ const LOCAL = {
     const records = read('oyunarasi-kelime-merdiveni-v1')?.records || {};
     return { dailyWins: records.dailyWins || 0, bestStars: records.bestStars || 0, totalStars: records.totalStars || 0, seriesCompleted: records.seriesCompleted || 0 };
   },
+  'balon-patlat': () => read('oyunarasi-balon-patlat-v1')?.records || {},
   tetris: () => read('oyunarasi-tetris-v1')?.records || {},
   soliter: () => {
     const records = read('oyunarasi-soliter-v1')?.records || {};
@@ -71,6 +72,7 @@ const FIELDS = {
   sekil: [['En iyi skor', 'bestScore', number]],
   'kelime-avi': levelTimes,
   'kelime-merdiveni': [['Günlük galibiyet', 'dailyWins', number], ['En iyi bulmaca', 'bestStars', value => `${number(value)} ★`], ['Toplam yıldız', 'totalStars', value => `${number(value)} ★`], ['Tamamlanan sefer', 'seriesCompleted', number]],
+  'balon-patlat': [['En iyi skor', 'bestScore', number], ['En çok doğru', 'bestCorrect', number], ['En uzun kombo', 'bestCombo', number], ['En iyi isabet', 'bestAccuracy', value => `%${number(value)}`]],
   tetris: [['En iyi skor', 'bestScore', number], ['En çok satır', 'bestLines', number]],
   soliter: [['Galibiyet', 'wins', number], ['1 kart süre', 'draw1.bestMs', time], ['3 kart süre', 'draw3.bestMs', time]],
   mahjong: levelTimes,

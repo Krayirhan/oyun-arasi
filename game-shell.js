@@ -143,7 +143,8 @@ const FULLSCREEN_OPTIONS = {
   'mayin-tarlasi': { key: false },
   'platform-macera': { orientation: 'landscape' },
   tetris: { orientation: 'portrait' },
-  araba: { orientation: 'portrait' }
+  araba: { orientation: 'portrait' },
+  'balon-patlat': { orientation: 'portrait' }
 };
 const FULLSCREEN_ICONS = {
   enter: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><path d="M8 8 3 3m13 5 5-5M8 16l-5 5m13-5 5 5"/></svg>',
