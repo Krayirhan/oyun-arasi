@@ -1,4 +1,4 @@
-// Zıp Zıp v2 ses efektleri: tamamen WebAudio ile sentezlenir, dosya indirmez.
+// Zıpkın: Volkana Yolculuk ses efektleri: tamamen WebAudio ile sentezlenir, dosya indirmez.
 export function createAudio(isEnabled) {
   let ctx = null;
   let master = null;

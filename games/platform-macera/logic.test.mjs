@@ -8,7 +8,7 @@ const steps = (run, input, seconds) => { for (let t = 0; t < seconds; t += STEP)
 const settle = run => steps(run, idle(), 0.3);
 const tileAt = (level, x, y) => level.grid[Math.floor(y / TILE) * level.cols + Math.floor(x / TILE)];
 
-describe('Zıp Zıp bölümleri', () => {
+describe('Zıpkın bölümleri', () => {
   test('bölümler üç dünyaya dağılmış ve oynanabilir veri içeriyor', () => {
     assert.equal(WORLDS.length, 3);
     assert.equal(LEVELS.length, LEVEL_COUNT);
@@ -37,7 +37,7 @@ describe('Zıp Zıp bölümleri', () => {
   });
 });
 
-describe('Zıp Zıp fiziği', () => {
+describe('Zıpkın fiziği', () => {
   test('uzun basılı zıplama kısa zıplamadan belirgin şekilde yüksek', () => {
     const apex = hold => {
       const run = settle(createRun(1));
@@ -133,7 +133,7 @@ describe('Zıp Zıp fiziği', () => {
   });
 });
 
-describe('Zıp Zıp kampanyası', () => {
+describe('Zıpkın kampanyası', () => {
   test('bitirilen bölüm sonrakini açar, rekorlar düşmez', () => {
     const first = finishCampaign(createCampaign(), { level: 1, stars: 3, score: 1800, time: 20 });
     assert.equal(first.furthestLevel, 2);

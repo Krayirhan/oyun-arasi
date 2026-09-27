@@ -1,8 +1,8 @@
-import { LEVELS, WORLDS } from './levels.js?v=202609271320';
-import { LEVEL_COUNT, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js?v=202609271320';
-import { createRenderer } from './render.js?v=202609271320';
-import { createAudio } from './audio.js?v=202609271320';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271320';
+import { LEVELS, WORLDS } from './levels.js?v=202609271811';
+import { LEVEL_COUNT, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js?v=202609271811';
+import { createRenderer } from './render.js?v=202609271811';
+import { createAudio } from './audio.js?v=202609271811';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271811';
 
 const SAVE_KEY = 'oyunarasi-platform-macera-v2';
 const OLD_SAVE_KEY = 'oyunarasi-platform-macera-v1';
@@ -201,8 +201,8 @@ function completeLevel() {
   audio.play('checkpoint');
   const last = run.level === LEVEL_COUNT;
   const newRecord = !previousBest || lastResult.time < previousBest;
-  overlayKicker.textContent = last ? 'MACERA TAMAMLANDI' : `${levelCode(run.level)} TAMAMLANDI`;
-  overlayTitle.textContent = last ? 'Tüm bölümler bitti!' : lastResult.stars === 3 ? 'Kusursuz!' : lastResult.stars === 2 ? 'Harika!' : 'Başardın!';
+  overlayKicker.textContent = last ? 'VOLKANA ULAŞTIN' : `${levelCode(run.level)} TAMAMLANDI`;
+  overlayTitle.textContent = last ? 'Zirvedesin, Zıpkın!' : lastResult.stars === 3 ? 'Kusursuz!' : lastResult.stars === 2 ? 'Harika!' : 'Başardın!';
   overlayStars.hidden = false;
   overlayStars.replaceChildren(...[0, 1, 2].map(i => Object.assign(document.createElement('span'), { textContent: '★', className: i < lastResult.stars ? 'on' : '' })));
   const level = LEVELS[run.level - 1];

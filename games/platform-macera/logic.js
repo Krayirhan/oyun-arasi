@@ -1,6 +1,6 @@
-// Zıp Zıp v2: tile tabanlı, sabit adımlı platform fiziği. Çizim ve ses yok; olaylar `run.events` kuyruğuna yazılır.
+// Zıpkın: Volkana Yolculuk — tile tabanlı, sabit adımlı platform fiziği. Çizim ve ses yok; olaylar `run.events` kuyruğuna yazılır.
 // Performans için `tick` durumu yerinde değiştirir; testler bu dosyayı doğrudan Node'da çalıştırır.
-import { LEVELS, TILE, T } from './levels.js?v=202609271320';
+import { LEVELS, TILE, T } from './levels.js?v=202609271811';
 
 export const LEVEL_COUNT = LEVELS.length;
 export const PLAYER_W = 20;

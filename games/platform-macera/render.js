@@ -1,7 +1,7 @@
-// Zıp Zıp v2 çizim katmanı: kamera, tile önbelleği, paralaks arka plan, karakter animasyonu, parçacıklar ve HUD.
+// Zıpkın: Volkana Yolculuk çizim katmanı: kamera, tile önbelleği, paralaks arka plan, karakter animasyonu, parçacıklar ve HUD.
 // Oyun mantığına dokunmaz; `run` durumunu ve `run.events` olaylarını okur.
-import { TILE, T, WORLDS } from './levels.js?v=202609271320';
-import { PLAYER_H, PLAYER_W, geyserActive } from './logic.js?v=202609271320';
+import { TILE, T, WORLDS } from './levels.js?v=202609271811';
+import { PLAYER_H, PLAYER_W, geyserActive } from './logic.js?v=202609271811';
 
 export const VIEW_W = 960;
 export const VIEW_H = 540;
@@ -12,7 +12,13 @@ const PALETTES = [
   { sky: ['#160f33', '#35275f', '#7c5aa6'], far: '#2a2152', mid: '#231b47', near: '#1b153a', body: '#3a3d5e', body2: '#30334f', top: '#f4bd4f', top2: '#c98b2c', edge: '#1c1d33', accent: '#f4bd4f', glow: '#ffe3a1', ambient: '#ffd98a', plank: '#b98a3a' },
   { sky: ['#1a0a14', '#4b1426', '#c24a2e'], far: '#3a1224', mid: '#2c0e1c', near: '#1f0914', body: '#33232f', body2: '#291b26', top: '#ff7b3d', top2: '#d0492a', edge: '#150b12', accent: '#ff8a3d', glow: '#ffd08a', ambient: '#ffb35c', plank: '#6d4a3d' }
 ];
-const HERO = { ready: '#3ad8ff', readyDark: '#1778d8', used: '#9a86ff', usedDark: '#5a45c8', light: '#e6fbff' };
+// Zıpkın paleti: dash hakkı varken kor turuncusu, bitince sönük; tepe camgöbeği, dash izi parlak camgöbeği.
+const HERO = {
+  ready: '#ff7a2f', readyLight: '#ffd27a', readyDark: '#c2410c',
+  used: '#9c7b6b', usedLight: '#cdb7a8', usedDark: '#5d463b',
+  crest: '#35d6e8', crestDark: '#0e7c8c', crestUsed: '#6f848c',
+  outline: '#10183a', streak: '#5ff0ff'
+};
 
 function seeded(seed) {
   let s = seed >>> 0;
@@ -226,7 +232,8 @@ export function createRenderer(canvas, getSettings) {
         }
         case 'dash':
           shake(4); hero.sx = 1.25; hero.sy = 0.8;
-          burst(e.x, e.y, 14, { color: HERO.ready, speed: 220, angle: Math.atan2(-e.dy, -e.dx), spread: 1.3, life: 0.4, gravity: 0 });
+          burst(e.x, e.y, 14, { color: HERO.streak, speed: 220, angle: Math.atan2(-e.dy, -e.dx), spread: 1.3, life: 0.4, gravity: 0 });
+          burst(e.x, e.y, 6, { color: HERO.readyLight, speed: 140, angle: Math.atan2(-e.dy, -e.dx), spread: 1.8, life: 0.3, gravity: 0 });
           break;
         case 'refill': hero.flashWhite = 0.12; break;
         case 'slide': burst(e.x + e.dir * 10, e.y + 6, 1, { color: '#dfe8ff', speed: 30, angle: -Math.PI / 2, spread: 1, life: 0.3, size: 2.5, gravity: -40 }); break;
@@ -545,6 +552,8 @@ export function createRenderer(canvas, getSettings) {
     }
   }
 
+  // Zıpkın: turuncu gövdeli, başında zıpkın ucu tepesi olan kahraman. Dash hakkı varken kor gibi parlar,
+  // hak bitince söner; dash sırasında arkasında camgöbeği bir zıpkın izi bırakır. Çarpışma kutusu PLAYER_W × PLAYER_H.
   function drawHero(run, rx, ry, dt) {
     // Esneme/basılma yaylanması
     const k = 1 - Math.exp(-dt * 14);
@@ -552,54 +561,106 @@ export function createRenderer(canvas, getSettings) {
     hero.pop = Math.max(0, hero.pop - dt * 4);
     hero.flashWhite = Math.max(0, hero.flashWhite - dt);
     hero.blink -= dt; if (hero.blink < -0.12) hero.blink = 2 + Math.random() * 3;
-    // Anten yay fiziği
-    hero.antennaV += (-hero.antenna * 180 - hero.antennaV * 10 - run.vx * 0.02 - (run.vy - (run.wasGrounded ? 0 : 0)) * 0.01) * dt;
+    // Tepe yay fiziği: hareketle sallanır
+    hero.antennaV += (-hero.antenna * 180 - hero.antennaV * 10 - run.vx * 0.02 - run.vy * 0.01) * dt;
     hero.antenna = Math.max(-1.2, Math.min(1.2, hero.antenna + hero.antennaV * dt));
 
     const ready = run.dashes > 0;
-    if (run.dashTime > 0 || (!reduced() && Math.hypot(run.vx, run.vy) > 600)) {
+    const dashing = run.dashTime > 0;
+    const cx0 = rx + PLAYER_W / 2; const cy0 = ry + PLAYER_H / 2;
+    if (dashing || (!reduced() && Math.hypot(run.vx, run.vy) > 600)) {
       hero.trailTimer -= dt;
-      if (hero.trailTimer <= 0) { hero.trailTimer = 0.022; trail.push({ x: rx, y: ry, life: 0.25, facing: run.facing }); }
+      if (hero.trailTimer <= 0) { hero.trailTimer = 0.018; trail.push({ x: rx, y: ry, cx: cx0, cy: cy0, life: 0.28 }); }
     }
     for (let i = trail.length - 1; i >= 0; i -= 1) {
-      const tr = trail[i]; tr.life -= dt;
-      if (tr.life <= 0) { trail.splice(i, 1); continue; }
-      ctx.globalAlpha = tr.life * 2.2; ctx.fillStyle = HERO.used;
-      ctx.beginPath(); ctx.roundRect(tr.x - 2, tr.y - 2, PLAYER_W + 4, PLAYER_H + 2, 9); ctx.fill();
+      trail[i].life -= dt;
+      if (trail[i].life <= 0) trail.splice(i, 1);
+    }
+    // Zıpkın izi: arkaya doğru incelen camgöbeği çizgi + yarı saydam turuncu kopyalar
+    if (trail.length) {
+      ctx.lineCap = 'round';
+      for (const tr of trail) {
+        ctx.globalAlpha = tr.life * 0.9; ctx.fillStyle = HERO.ready;
+        ctx.beginPath(); ctx.roundRect(tr.x, tr.y + 2, PLAYER_W, PLAYER_H - 2, 9); ctx.fill();
+      }
+      for (let i = 0; i < trail.length; i += 1) {
+        const a = trail[i]; const b = trail[i + 1] || { cx: cx0, cy: cy0, life: 0.28 };
+        const width = 2 + (i / trail.length) * 6;
+        ctx.globalAlpha = Math.min(1, a.life * 3.5);
+        ctx.strokeStyle = HERO.outline; ctx.lineWidth = width + 2.5;
+        ctx.beginPath(); ctx.moveTo(a.cx, a.cy); ctx.lineTo(b.cx, b.cy); ctx.stroke();
+        ctx.strokeStyle = HERO.streak; ctx.lineWidth = width;
+        ctx.beginPath(); ctx.moveTo(a.cx, a.cy); ctx.lineTo(b.cx, b.cy); ctx.stroke();
+      }
+      ctx.lineCap = 'butt';
     }
     ctx.globalAlpha = 1;
     if (hero.hidden || run.status === 'dying') return;
     let scaleIn = 1 - hero.pop * 0.6;
     if (run.status === 'complete') scaleIn = 0;
     const w = (PLAYER_W + 4) * hero.sx * scaleIn; const h = (PLAYER_H + 2) * hero.sy * scaleIn;
-    const cx = rx + PLAYER_W / 2; const bottom = ry + PLAYER_H;
+    if (w <= 0.5 || h <= 0.5) return;
+    const cx = cx0; const bottom = ry + PLAYER_H; const top = bottom - h;
+    const c = ready
+      ? { light: HERO.readyLight, main: HERO.ready, dark: HERO.readyDark, crest: HERO.crest, crestDark: HERO.crestDark }
+      : { light: HERO.usedLight, main: HERO.used, dark: HERO.usedDark, crest: HERO.crestUsed, crestDark: HERO.usedDark };
     // Gölge
     ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(cx, bottom + 1, w * 0.45, 3, 0, 0, Math.PI * 2); ctx.fill();
-    // Anten
-    const tipX = cx + Math.sin(hero.antenna) * 12 - run.facing * 2; const tipY = bottom - h - 10 + Math.abs(hero.antenna) * 3;
-    ctx.strokeStyle = ready ? HERO.readyDark : HERO.usedDark; ctx.lineWidth = 2.5;
-    ctx.beginPath(); ctx.moveTo(cx, bottom - h + 2); ctx.quadraticCurveTo(cx, bottom - h - 6, tipX, tipY); ctx.stroke();
-    ctx.fillStyle = ready ? '#ffe36b' : '#c9c2ff'; ctx.beginPath(); ctx.arc(tipX, tipY, 4, 0, Math.PI * 2); ctx.fill();
-    // Gövde
-    const body = ctx.createLinearGradient(cx - w / 2, bottom - h, cx + w / 2, bottom);
-    body.addColorStop(0, ready ? HERO.light : '#e9e3ff'); body.addColorStop(0.25, ready ? HERO.ready : HERO.used); body.addColorStop(1, ready ? HERO.readyDark : HERO.usedDark);
-    ctx.fillStyle = body; ctx.beginPath(); ctx.roundRect(cx - w / 2, bottom - h, w, h, [w * 0.48, w * 0.48, 7, 7]); ctx.fill();
-    if (hero.flashWhite > 0) { ctx.globalAlpha = hero.flashWhite * 6; ctx.fillStyle = '#fff'; ctx.fill(); ctx.globalAlpha = 1; }
+
+    // Zıpkın ucu tepe: yaylı sap + sivri uç. Dash sırasında dash yönüne döner.
+    let angle = hero.antenna * 0.9 - run.facing * 0.12;
+    if (dashing && (run.dashDx || run.dashDy)) angle = Math.atan2(run.dashDx, -run.dashDy) * 0.55;
+    const baseX = cx + run.facing * 1.5; const baseY = top + 3;
+    const stem = 9 * scaleIn;
+    const tipX = baseX + Math.sin(angle) * stem; const tipY = baseY - Math.cos(angle) * stem;
+    ctx.strokeStyle = HERO.outline; ctx.lineWidth = 4.5; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(baseX, baseY); ctx.quadraticCurveTo(baseX, baseY - stem * 0.6, tipX, tipY); ctx.stroke();
+    ctx.strokeStyle = c.crestDark; ctx.lineWidth = 2.2;
+    ctx.beginPath(); ctx.moveTo(baseX, baseY); ctx.quadraticCurveTo(baseX, baseY - stem * 0.6, tipX, tipY); ctx.stroke();
+    ctx.lineCap = 'butt';
+    ctx.save(); ctx.translate(tipX, tipY); ctx.rotate(angle);
+    const tip = 7 * scaleIn;
+    ctx.beginPath(); ctx.moveTo(0, -tip * 1.35); ctx.lineTo(tip * 0.8, tip * 0.25); ctx.lineTo(0, -tip * 0.05); ctx.lineTo(-tip * 0.8, tip * 0.25); ctx.closePath();
+    ctx.fillStyle = c.crest; ctx.strokeStyle = HERO.outline; ctx.lineWidth = 1.6; ctx.lineJoin = 'round';
+    ctx.fill(); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.moveTo(0, -tip * 1.1); ctx.lineTo(tip * 0.3, -tip * 0.1); ctx.lineTo(0, -tip * 0.25); ctx.closePath(); ctx.fill();
+    ctx.restore();
+
+    // Gövde: dış hat + kor gradyanı + açık tonlu karın
+    const radii = [w * 0.48, w * 0.48, 7, 7];
+    const body = ctx.createLinearGradient(cx - w / 2, top, cx + w / 2, bottom);
+    body.addColorStop(0, c.light); body.addColorStop(0.3, c.main); body.addColorStop(1, c.dark);
+    ctx.beginPath(); ctx.roundRect(cx - w / 2, top, w, h, radii);
+    ctx.fillStyle = body; ctx.fill();
+    ctx.save(); ctx.clip();
+    ctx.fillStyle = ready ? 'rgba(255,236,170,0.55)' : 'rgba(230,215,205,0.35)';
+    ctx.beginPath(); ctx.ellipse(cx + run.facing * 2, bottom - h * 0.22, w * 0.32, h * 0.26, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    ctx.strokeStyle = HERO.outline; ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.roundRect(cx - w / 2, top, w, h, radii); ctx.stroke();
+    if (hero.flashWhite > 0) { ctx.globalAlpha = Math.min(1, hero.flashWhite * 6); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.roundRect(cx - w / 2, top, w, h, radii); ctx.fill(); ctx.globalAlpha = 1; }
+    // Kor parıltısı: dash hakkı varken gövdeden küçük kıvılcımlar
+    if (ready && !reduced() && Math.random() < dt * 6) particles.push({ x: cx + (Math.random() - 0.5) * w * 0.6, y: top + h * 0.3, vx: (Math.random() - 0.5) * 20, vy: -40 - Math.random() * 30, life: 0.4, max: 0.4, size: 2, color: '#ffd27a', gravity: -20, drag: 1 });
     // Ayaklar
     const step = run.grounded && Math.abs(run.vx) > 40 && !reduced() ? Math.sin(clock * 22) * 3 : 0;
-    ctx.fillStyle = ready ? HERO.readyDark : HERO.usedDark;
+    ctx.fillStyle = HERO.outline;
     ctx.beginPath(); ctx.roundRect(cx - w * 0.38 + step, bottom - 4, 8, 5, 2); ctx.roundRect(cx + w * 0.38 - 8 - step, bottom - 4, 8, 5, 2); ctx.fill();
-    // Gözler
-    const eyeY = bottom - h * 0.62 + Math.max(-2, Math.min(2, run.vy * 0.004));
+    // Gözler: kararlı bakış
+    const eyeY = top + h * 0.4 + Math.max(-2, Math.min(2, run.vy * 0.004));
     const look = run.facing * 3.2;
     const blink = hero.blink < 0 ? 0.15 : 1;
     ctx.fillStyle = '#ffffff';
     ctx.beginPath(); ctx.ellipse(cx - 4.5 + look, eyeY, 3.6, 4.6 * blink, 0, 0, Math.PI * 2); ctx.ellipse(cx + 4.5 + look, eyeY, 3.6, 4.6 * blink, 0, 0, Math.PI * 2); ctx.fill();
     if (blink === 1) {
-      ctx.fillStyle = '#10213f';
+      ctx.fillStyle = HERO.outline;
       ctx.beginPath(); ctx.arc(cx - 4.5 + look * 1.25, eyeY + 0.6, 2, 0, Math.PI * 2); ctx.arc(cx + 4.5 + look * 1.25, eyeY + 0.6, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath(); ctx.arc(cx - 3.8 + look * 1.25, eyeY - 0.4, 0.8, 0, Math.PI * 2); ctx.arc(cx + 5.2 + look * 1.25, eyeY - 0.4, 0.8, 0, Math.PI * 2); ctx.fill();
     }
-    ctx.fillStyle = 'rgba(255,120,170,0.45)';
+    // Kaşlar: hafif çatık, kararlı ifade
+    ctx.strokeStyle = HERO.outline; ctx.lineWidth = 1.4;
+    ctx.beginPath(); ctx.moveTo(cx - 8 + look, eyeY - 6.5); ctx.lineTo(cx - 2 + look, eyeY - 5.5); ctx.moveTo(cx + 2 + look, eyeY - 5.5); ctx.lineTo(cx + 8 + look, eyeY - 6.5); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,90,90,0.45)';
     ctx.beginPath(); ctx.arc(cx - 8 + look, eyeY + 6, 2.4, 0, Math.PI * 2); ctx.arc(cx + 8 + look, eyeY + 6, 2.4, 0, Math.PI * 2); ctx.fill();
   }
 

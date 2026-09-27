@@ -4,18 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f8f4ec" />
-    <meta name="description" content="Koş, zıpla, duvardan sek ve dash at! Orman, saat kulesi ve volkanda 24 bölümlük hızlı Zıp Zıp macerası Oyun Arası'nda." />
-    <title>Zıp Zıp | Oyun Arası</title>
+    <meta name="description" content="Zıpkın'ı Orman'dan Saat Kulesi'ne, oradan volkanın zirvesine ulaştır! Koş, zıpla, duvardan sek, dash at: 24 bölümlük hız macerası Oyun Arası'nda." />
+    <title>Zıpkın: Volkana Yolculuk | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../account.css?v=202609271320" />
-    <link rel="stylesheet" href="../../game-shell.css?v=202609271320" />
-    <link rel="stylesheet" href="../../play-page.css?v=202609271320" />
-    <link rel="stylesheet" href="styles.css?v=202609271320" />
-    <script type="module" src="../../account.js?v=202609271320"></script>
-    <script type="module" src="script.js?v=202609271320"></script>
-    <script defer src="../../catalog.js?v=202609271320"></script>
-    <script defer src="../../library.js?v=202609271320"></script>
-    <script defer src="../../game-shell.js?v=202609271320"></script>
+    <link rel="stylesheet" href="../../account.css?v=202609271811" />
+    <link rel="stylesheet" href="../../game-shell.css?v=202609271811" />
+    <link rel="stylesheet" href="../../play-page.css?v=202609271811" />
+    <link rel="stylesheet" href="styles.css?v=202609271811" />
+    <script type="module" src="../../account.js?v=202609271811"></script>
+    <script type="module" src="script.js?v=202609271811"></script>
+    <script defer src="../../catalog.js?v=202609271811"></script>
+    <script defer src="../../library.js?v=202609271811"></script>
+    <script defer src="../../game-shell.js?v=202609271811"></script>
   </head>
   <body class="game-page" data-game="platform-macera">
     <div class="play-page">
@@ -31,13 +31,13 @@
         <a href="../../" aria-label="Ana sayfa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z" /></svg></a>
         <span aria-hidden="true">›</span><a href="../../#tum-oyunlar">Oyunlar</a>
         <span aria-hidden="true">›</span><a href="../../?kategori=classic#tum-oyunlar">Klasikler</a>
-        <span aria-hidden="true">›</span><span aria-current="page">Zıp Zıp</span>
+        <span aria-hidden="true">›</span><span aria-current="page">Zıpkın</span>
       </nav>
 
       <main class="play-layout">
         <section class="play-intro" aria-labelledby="game-title">
-          <h1 id="game-title" class="title-art">Zıp Zıp<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
-          <p class="tagline">Hızlı, akıcı, 24 bölümlük zıplama macerası!</p>
+          <h1 id="game-title" class="title-art">Zıpkın<span class="title-sub">Volkana Yolculuk</span><svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
+          <p class="tagline">Zıpkın'ı üç dünyadan geçirip volkanın zirvesine ulaştır!</p>
         </section>
 
         <details class="how-card" id="how-card" open>
@@ -47,10 +47,10 @@
             <svg class="how-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </summary>
           <ol class="how-steps">
-            <li>←/→ ile koş, Boşluk ile zıpla. Tuşu uzun basılı tutarsan daha yükseğe zıplarsın.</li>
+            <li>Zıpkın'ı ←/→ ile koştur, Boşluk ile zıplat. Tuşu uzun basılı tutarsan daha yükseğe zıplarsın.</li>
             <li>Havada duvara doğru basıp zıplarsan duvardan seker, bacalara tırmanırsın.</li>
-            <li>X ya da Shift ile yön tuşunun gösterdiği yöne dash at. Dash hakkın yere değince ya da yeşil küreyle dolar; karakterin mavisi hakkın olduğunu gösterir.</li>
-            <li>Bölümü bitir, üç kristali topla ve hedef sürenin altında kal: her biri bir yıldız.</li>
+            <li>X ya da Shift ile yön tuşunun gösterdiği yöne dash at. Dash hakkın yere değince ya da yeşil küreyle dolar; Zıpkın turuncu parlıyorsa dash hakkın var, sönükse yok.</li>
+            <li>Portala ulaş, üç kristali topla ve hedef sürenin altında kal: her biri bir yıldız. Orman'dan Saat Kulesi'ne, oradan volkanın zirvesine!</li>
           </ol>
         </details>
 
@@ -66,7 +66,7 @@
           <p class="save-state" id="save-state">İlerlemen bu cihazda saklanıyor.</p>
         </section>
 
-        <section class="play-panel" aria-label="Zıp Zıp oyunu">
+        <section class="play-panel" aria-label="Zıpkın oyunu">
           <div class="play-bar">
             <div class="scores" aria-label="Bölüm bilgileri">
               <div class="score-card"><span>BÖLÜM</span><strong id="level-number">1-1</strong></div>
@@ -80,7 +80,7 @@
           </div>
           <div class="board-frame">
             <div class="game-stage" id="game-stage" hidden>
-              <canvas id="board" width="960" height="540" role="img" aria-label="Zıp Zıp platform oyun alanı" aria-describedby="board-help"></canvas>
+              <canvas id="board" width="960" height="540" role="img" aria-label="Zıpkın oyun alanı" aria-describedby="board-help"></canvas>
               <div class="game-overlay hidden" id="game-overlay" aria-live="polite">
                 <div class="overlay-card">
                   <p class="overlay-kicker" id="overlay-kicker">OYUN DURAKLATILDI</p>
@@ -100,7 +100,7 @@
               </div>
             </div>
             <section class="level-map" id="level-map" aria-labelledby="map-title">
-              <div class="map-heading"><div><p class="overlay-kicker">24 BÖLÜMLÜK MACERA</p><h2 id="map-title">Bölüm seç</h2></div><p class="map-total" id="map-total">★ 0 / 72</p></div>
+              <div class="map-heading"><div><p class="overlay-kicker">ZIPKIN · VOLKANA YOLCULUK</p><h2 id="map-title">Yolculuğa devam et</h2><p class="map-story">Zıpkın volkanın zirvesine ulaşmak için yola çıktı. Üç dünya, 24 bölüm: ilk durak Orman.</p></div><p class="map-total" id="map-total">★ 0 / 72</p></div>
               <div class="world-tabs" role="tablist" aria-label="Dünyalar">
                 <button type="button" role="tab" data-world="0" aria-selected="true">🌿 Orman</button>
                 <button type="button" role="tab" data-world="1" aria-selected="false">⚙️ Saat Kulesi</button>
@@ -123,7 +123,7 @@
 
         <aside class="goal-card" aria-labelledby="goal-title">
           <h2 id="goal-title">Hedef / Oyun bilgisi</h2>
-          <p>Portala ulaş, üç kristali topla ve hedef sürenin altında kal. Öldüğünde son bayraktan hemen devam edersin.</p>
+          <p>Zıpkın'ı her bölümde portala ulaştır, üç kristali topla ve hedef sürenin altında kal. Öldüğünde son bayraktan hemen devam edersin.</p>
           <div class="goal-equation" aria-label="Bölümü bitir, kristalleri topla ve hedef süreyi geç"><b class="goal-light">◆</b><i>+</i><b class="goal-light">⏱</b><i>=</i><b class="goal-result">★</b></div>
           <p class="goal-note">Kontrolleri ve ipuçlarını sol bölümde bulabilirsin.</p>
         </aside>

@@ -1,4 +1,4 @@
-// Zıp Zıp v2 bölümleri. Her bölüm küçük bir kurucu (builder) ile tile koordinatlarında çizilir
+// Zıpkın: Volkana Yolculuk bölümleri. Her bölüm küçük bir kurucu (builder) ile tile koordinatlarında çizilir
 // ve `parse` ile motorun kullandığı düz veriye dönüşür. 1 tile = 32 px, görünüm 30 × 17 tile.
 export const TILE = 32;
 export const T = { EMPTY: 0, SOLID: 1, ONEWAY: 2, SPIKE_UP: 3, SPIKE_DOWN: 4, SPIKE_LEFT: 5, SPIKE_RIGHT: 6, LAVA: 7, CRUMBLE: 8, STATUE: 9 };
@@ -11,9 +11,9 @@ export const T = { EMPTY: 0, SOLID: 1, ONEWAY: 2, SPIKE_UP: 3, SPIKE_DOWN: 4, SP
 const CHAR_TILES = { '#': T.SOLID, '=': T.ONEWAY, '^': T.SPIKE_UP, v: T.SPIKE_DOWN, '<': T.SPIKE_LEFT, '>': T.SPIKE_RIGHT, '~': T.LAVA, x: T.CRUMBLE, L: T.STATUE, R: T.STATUE };
 
 export const WORLDS = [
-  { id: 0, name: 'Orman', icon: '🌿', description: 'Koş, zıpla, duvarlardan sek ve ilk dash\'ini at.' },
-  { id: 1, name: 'Saat Kulesi', icon: '⚙️', description: 'Hareketli dişliler, çöken zeminler, testereler ve dash küreleri.' },
-  { id: 2, name: 'Volkan', icon: '🌋', description: 'Gayzerler, sıcak rüzgârlar, ateş heykelleri ve yükselen lav.' }
+  { id: 0, name: 'Orman', icon: '🌿', description: 'Yolculuk başlıyor: koşmayı, duvardan sekmeyi ve ilk dash\'i öğren.' },
+  { id: 1, name: 'Saat Kulesi', icon: '⚙️', description: 'Dişlilerin arasından geç, çöken zeminlerde durma, dash kürelerini kullan.' },
+  { id: 2, name: 'Volkan', icon: '🌋', description: 'Son durak: gayzerlerin, ateş heykellerinin ve yükselen lavın üstünden zirveye tırman.' }
 ];
 
 function builder(cols, rows) {
@@ -97,7 +97,7 @@ function level(world, title, par, cols, rows, draw) {
 // ================================================================ 1. Orman
 level(0, 'İlk adımlar', 25, 92, 17, (b, G) => {
   b.floor();
-  b.put(3, G - 1, 'P').sign(6, G - 4, '← →  koş');
+  b.put(3, G - 1, 'P').sign(7, G - 4, 'Volkan seni bekliyor, Zıpkın!  ← → koş');
   b.fill(11, G - 2, 2, 2);
   b.sign(17, G - 6, 'Boşluk: zıpla · basılı tut, daha yükseğe');
   b.pit(16, 3);
@@ -415,7 +415,7 @@ level(2, 'Yükselen lav', 34, 30, 56, (b, G) => {
   b.fill(6, 7, 12, 1).put(10, 6, 'E');
 });
 
-level(2, 'Zıp Zıp finali', 51, 180, 22, (b, G) => {
+level(2, 'Volkanın Kalbi', 51, 180, 22, (b, G) => {
   b.floor();
   b.put(2, G - 1, 'P');
   b.put(8, G - 1, 's').fill(11, 12, 8, 10).fill(13, 4, 2, 5).put(14, 2, 'o');

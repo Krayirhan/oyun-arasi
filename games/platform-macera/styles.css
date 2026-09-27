@@ -1,5 +1,9 @@
-/* Zıp Zıp v2: ortak sayfa kabuğu korunur; oyun dünyası kendi canvas'ında çizilir. */
-body[data-game='platform-macera'] { --frame: #09152d; --title: #f3f7ff; --title-shadow: #3459b8; --accent: #43d4ff; --accent-deep: #273fa0; --accent-soft: #e1f7ff; }
+/* Zıpkın: Volkana Yolculuk — ortak sayfa kabuğu korunur; oyun dünyası kendi canvas'ında çizilir. */
+body[data-game='platform-macera'] { --frame: #09152d; --title: #ff7a2f; --title-shadow: #8f2d0c; --accent: #43d4ff; --accent-deep: #273fa0; --accent-soft: #e1f7ff; }
+
+/* Başlığın altındaki "Volkana Yolculuk" satırı */
+body[data-game='platform-macera'] .title-art .title-sub { display: block; margin-top: 6px; color: #10183a; font-size: .34em; letter-spacing: .02em; text-shadow: none; }
+@media (max-width: 760px) { body[data-game='platform-macera'] .title-art .title-sub { font-size: .38em; } }
 
 .play-panel {
   position: relative; overflow: hidden; isolation: isolate;
@@ -50,6 +54,7 @@ body[data-game='platform-macera'] { --frame: #09152d; --title: #f3f7ff; --title-
 .map-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .map-heading h2 { color: #fff; font: 700 clamp(20px, 3vw, 28px) / 1.1 'Fredoka', sans-serif; }
 .map-heading .overlay-kicker { margin-bottom: 3px; color: #fecf40; font-size: 11px; }
+.map-story { max-width: 46ch; margin-top: 6px; color: rgb(255 255 255 / .8); font-size: 14px; line-height: 1.45; }
 .map-total { color: #ffd84a; font: 700 20px 'Fredoka', sans-serif; white-space: nowrap; }
 .world-tabs { display: flex; flex-wrap: wrap; gap: 7px; }
 .world-tabs button { min-height: 40px; padding: 7px 14px; border: 1px solid rgb(168 197 255 / .2); border-radius: 12px; background: linear-gradient(145deg, rgb(97 127 190 / .2), rgb(30 50 94 / .3)); color: #eef4ff; font-weight: 700; cursor: pointer; transition: border-color .18s, transform .18s; }
