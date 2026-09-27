@@ -85,8 +85,6 @@ body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-
 .game-page :is(.score-card, .stats > div, .counters > div, .scoreboard > div, .turn-card) { border-color: var(--line); background: var(--surface); }
 .game-page .best-card { background: var(--accent-soft); }
 
-/* Harfle (games/harfane) keeps its own layout; the platform header and colors come from here */
-body[data-game='harfane'] .crumbs { padding-inline: 0; }
 .play-extras { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 20px; align-items: start; margin: 32px 0 30px; }
 .play-extras > .how-card, .play-extras > .goal-card, .play-extras > .more-card { grid-area: auto; }
 .play-extras .goal-equation b { min-width: 52px; height: 52px; font-size: 26px; }

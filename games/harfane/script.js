@@ -53,6 +53,12 @@ const gameScreen = document.querySelector('#game-screen');
 const modeLabel = document.querySelector('#mode-label');
 const nextLevelButton = document.querySelector('#next-level-button');
 const seriesCardAction = document.querySelector('#series-card-action');
+const dailyCardAction = document.querySelector('#daily-card-action');
+const menuButton = document.querySelector('#menu-button');
+const statusElement = document.querySelector('#status');
+const resultPanel = document.querySelector('#result-panel');
+const scoreA = { label: document.querySelector('#score-a-label'), value: document.querySelector('#score-a') };
+const scoreB = { label: document.querySelector('#score-b-label'), value: document.querySelector('#score-b') };
 let firebaseBridge = null;
 let authMode = 'signin';
 let cloudSaveQueue = Promise.resolve();
@@ -244,8 +250,7 @@ function restoreCloudData(data, mode = state.mode) {
     state.guesses = []; state.current = ''; state.gameOver = true; state.won = true; state.keyStates = {};
     state.levelCounted = true;
   }
-  refreshModeChrome();
-  buildBoard(); renderKeyboard(); showSavedResult(); saveState();
+  buildBoard(); renderKeyboard(); showSavedResult(); refreshModeChrome(); saveState();
 }
 
 function syncCloudGame(mode = state.mode) {
@@ -307,45 +312,88 @@ function buildBoard() {
   renderBoard();
 }
 
+function countdownText() {
+  const now = new Date(); const tomorrow = new Date(now); tomorrow.setHours(24, 0, 0, 0);
+  const seconds = Math.max(0, Math.floor((tomorrow - now) / 1000));
+  return [Math.floor(seconds / 3600), Math.floor((seconds % 3600) / 60), seconds % 60].map(value => String(value).padStart(2, '0')).join(':');
+}
+
+function setScores(labelA, valueA, labelB, valueB) {
+  scoreA.label.textContent = labelA; scoreA.value.textContent = valueA;
+  scoreB.label.textContent = labelB; scoreB.value.textContent = valueB;
+}
+
+function seriesProgressText() {
+  return state.series.completed ? `${SERIES_TOTAL} / ${SERIES_TOTAL} ✓` : `${state.series.level} / ${SERIES_TOTAL}`;
+}
+
+// Panelin tüm üst/alt bilgileri ve sonuç kartı moda göre buradan güncellenir.
 function refreshModeChrome() {
-  const progressLabel = document.querySelector('#progress-label');
-  const progressUnit = document.querySelector('#progress-unit');
-  const progressNote = document.querySelector('#progress-note');
-  const footerLabel = document.querySelector('#footer-label');
-  const isDaily = state.mode === 'daily';
-  shareButton.hidden = !isDaily;
-  nextLevelButton.classList.toggle('hidden', !(state.gameOver && ['series', 'practice'].includes(state.mode)));
-  document.querySelector('#streak-value').textContent = isDaily ? state.stats.streak : state.mode === 'series' ? state.series.wins : '∞';
-  if (state.mode === 'series') {
-    progressLabel.textContent = 'SEFER İLERLEMESİ'; progressUnit.textContent = '/ 70';
-    progressNote.textContent = state.series.completed ? 'Sefer tamamlandı.' : `${attemptsForMode()} tahmin hakkı · ${state.series.wins} seviye tamamlandı.`;
-    footerLabel.textContent = 'SEFER İLERLEMESİ';
-    document.querySelector('#countdown').textContent = `${state.series.wins} / ${SERIES_TOTAL} seviye`;
-    document.querySelector('#puzzle-number').textContent = state.series.completed ? 'TAMAMLANDI' : seriesLabel();
-    if (state.gameOver) nextLevelButton.textContent = state.series.completed ? 'Yeni sefer başlat ↗' : state.won ? 'Sonraki seviye ↗' : 'Tekrar dene ↗';
-  } else if (state.mode === 'practice') {
-    progressLabel.textContent = 'SERBEST PRATİK'; progressUnit.textContent = 'kelime'; progressNote.textContent = 'Sonuçların istatistiklere eklenmez.';
-    footerLabel.textContent = 'ANTRENMAN'; document.querySelector('#countdown').textContent = '∞';
-    document.querySelector('#puzzle-number').textContent = 'SINIRSIZ';
-    if (state.gameOver) nextLevelButton.textContent = 'Yeni kelime ↗';
+  const home = state.mode === 'home';
+  const remaining = Math.max(0, state.tryLimit - state.guesses.length);
+  menuButton.hidden = home;
+  if (home) {
+    setScores('GÜNLÜK SERİ', `${state.stats.streak}`, 'SEFER', seriesProgressText());
+    statusElement.textContent = 'Bir oyun modu seç.';
+  } else if (state.mode === 'daily') {
+    setScores('GÜNLÜK SERİ', `${state.stats.streak}`, 'YENİ BULMACA', countdownText());
+    modeLabel.textContent = `GÜNLÜK BULMACA · #${String(puzzleNumber()).padStart(3, '0')}`;
+    statusElement.textContent = `Günlük bulmaca · ${state.tryLimit} tahmin hakkı · Herkes aynı kelimeyi arıyor.`;
+  } else if (state.mode === 'series') {
+    setScores('SEVİYE', seriesProgressText(), 'KALAN HAK', `${remaining}`);
+    modeLabel.textContent = state.series.completed ? 'SEFER · TAMAMLANDI' : `SEFER · ${seriesLabel()}`;
+    statusElement.textContent = `Sefer · ${attemptsForMode()} tahmin hakkı · Zorluk seviyelerle artar.`;
   } else {
-    progressLabel.textContent = 'GÜNLÜK SERİ'; progressUnit.textContent = 'gün';
-    progressNote.textContent = 'Her gün yeni bir kelime.'; footerLabel.textContent = 'YENİ GÜNÜN BULMACASINA';
-    document.querySelector('#puzzle-number').textContent = `#${String(puzzleNumber()).padStart(3, '0')}`;
-    updateCountdown();
+    setScores('MOD', 'Antrenman', 'KALAN HAK', `${remaining}`);
+    modeLabel.textContent = 'ANTRENMAN · SINIRSIZ';
+    statusElement.textContent = 'Antrenman · İstediğin kadar oyna; sonuçlar istatistiklere eklenmez.';
   }
-  document.querySelector('#intro-copy').textContent = state.mode === 'series'
-    ? `Beş harf · ${attemptsForMode()} tahmin hakkı · Zorluk seviyelerle artar.`
-    : state.mode === 'practice' ? 'Beş harf · Altı tahmin · İstediğin kadar oyna.' : 'Beş harf · Altı tahmin · Renkli ipuçlarını takip et.';
-  document.querySelector('.streak-card').setAttribute('aria-label',
-    state.mode === 'daily' ? 'Günlük galibiyet serisi' : state.mode === 'series' ? 'Tamamlanan sefer seviyeleri' : 'Sınırsız antrenman');
+  renderResult();
   updateHomeMetadata();
-  shareButton.disabled = !isDaily || !state.gameOver;
+}
+
+// Oyun bitince klavyenin yerinde sonuç kartı: sonuç, sıradaki adım, paylaş ve menü.
+function renderResult() {
+  const over = state.mode !== 'home' && state.gameOver;
+  resultPanel.classList.toggle('hidden', !over);
+  keyboard.classList.toggle('hidden', over);
+  if (!over) return;
+  message.textContent = '';
+  const tries = state.guesses.length;
+  const answer = state.answer.toLocaleUpperCase('tr-TR');
+  let kicker; let title; let copy; let next = '';
+  if (state.mode === 'series' && state.series.completed) {
+    kicker = 'SEFER TAMAMLANDI'; title = 'Tüm seviyeler bitti!';
+    copy = `${SERIES_TOTAL} seviyenin hepsini geçtin. Yeni bir sefere başlayabilirsin.`; next = 'Yeni sefer başlat ↗';
+  } else if (state.won) {
+    title = tries <= 2 ? 'Muhteşem!' : tries <= 4 ? 'Harika!' : 'Buldun!';
+    if (state.mode === 'daily') { kicker = `GÜNLÜK BULMACA · #${String(puzzleNumber()).padStart(3, '0')}`; copy = `${tries} denemede buldun. Yeni bulmacaya ${countdownText()} var.`; }
+    else if (state.mode === 'series') { kicker = `SEVİYE ${state.series.level} / ${SERIES_TOTAL}`; title = `Seviye ${state.series.level} tamam!`; copy = `${tries} denemede buldun.`; next = 'Sonraki seviye ↗'; }
+    else { kicker = 'ANTRENMAN'; copy = `${tries} denemede buldun.`; next = 'Yeni kelime ↗'; }
+  } else {
+    title = 'Bu sefer olmadı';
+    if (state.mode === 'daily') { kicker = `GÜNLÜK BULMACA · #${String(puzzleNumber()).padStart(3, '0')}`; copy = `Cevap: ${answer}. Yeni bulmacaya ${countdownText()} var.`; }
+    else if (state.mode === 'series') { kicker = `SEVİYE ${state.series.level} / ${SERIES_TOTAL}`; copy = 'Tahmin hakların bitti. Aynı kelimeyi yeniden dene; seviyeyi geçince yenisi açılır.'; next = 'Tekrar dene ↗'; }
+    else { kicker = 'ANTRENMAN'; copy = `Cevap: ${answer}.`; next = 'Yeni kelime ↗'; }
+  }
+  document.querySelector('#result-kicker').textContent = kicker;
+  document.querySelector('#result-title').textContent = title;
+  document.querySelector('#result-copy').textContent = copy;
+  nextLevelButton.hidden = !next;
+  nextLevelButton.textContent = next;
+  shareButton.hidden = state.mode !== 'daily';
+  shareButton.disabled = false;
 }
 
 function updateHomeMetadata() {
   seriesCardAction.textContent = state.series.completed
     ? 'Tamamlandı · yeni sefer ↗' : `${state.series.level} / ${SERIES_TOTAL} seviyeye başla ↗`;
+  let dailyDone = false;
+  try {
+    const saved = JSON.parse(localStorage.getItem(`${STORAGE_V2}-daily`) || 'null');
+    dailyDone = Boolean(saved && saved.date === todayKey() && saved.gameOver);
+  } catch { dailyDone = false; }
+  dailyCardAction.textContent = dailyDone ? 'Bugün çözüldü ✓ · sonucu gör ↗' : `#${String(puzzleNumber()).padStart(3, '0')} · başla ↗`;
 }
 
 function renderBoard() {
@@ -423,8 +471,8 @@ function startMode(mode) {
   if (mode === 'series' && legacyGame && validSavedGame) creditSeriesWin();
   homeScreen.classList.add('hidden');
   gameScreen.classList.remove('hidden');
-  modeLabel.textContent = mode === 'daily' ? 'GÜNLÜK BULMACA' : mode === 'series' ? 'SEFER' : 'ANTRENMAN';
-  refreshModeChrome(); buildBoard(); renderKeyboard(); showSavedResult(); saveState();
+  buildBoard(); renderKeyboard(); showSavedResult(); refreshModeChrome(); saveState();
+  window.dispatchEvent(new Event('game:layoutchange'));
   loadCloudMode(mode);
 }
 
@@ -434,8 +482,10 @@ function returnHome() {
   state.mode = 'home';
   homeScreen.classList.remove('hidden');
   gameScreen.classList.add('hidden');
-  updateHomeMetadata();
+  refreshModeChrome();
   saveState();
+  window.dispatchEvent(new Event('game:layoutchange'));
+  homeScreen.querySelector('.mode-card')?.focus({ preventScroll: true });
 }
 
 function advanceMode() {
@@ -459,11 +509,11 @@ function advanceMode() {
     state.answer = drawPracticeAnswer();
     state.guesses = []; state.current = ''; state.gameOver = false; state.won = false; state.keyStates = {};
   }
-  refreshModeChrome(); buildBoard(); renderKeyboard(); showSavedResult(); saveState(); syncCloudGame();
+  buildBoard(); renderKeyboard(); showSavedResult(); refreshModeChrome(); saveState(); syncCloudGame();
 }
 
 function handleKey(key) {
-  if (state.gameOver) return;
+  if (state.mode === 'home' || state.gameOver) return;
   state.invalidGuess = false;
   message.classList.remove('error');
   if (key === 'backspace') state.current = [...state.current].slice(0, -1).join('');
@@ -484,7 +534,7 @@ function submitGuess() {
   const result = scoreGuess(guess);
   [...guess].forEach((letter, index) => updateKeyState(letter, result[index]));
   if (guess === state.answer) finishGame(true); else if (state.guesses.length === state.tryLimit) finishGame(false);
-  renderBoard(); renderKeyboard(); saveState();
+  renderBoard(); renderKeyboard(); refreshModeChrome(); saveState();
   if (state.mode === 'daily' || state.mode === 'series') syncCloudGame();
 }
 
@@ -611,16 +661,14 @@ function shareResult() {
 
 function updateCountdown() {
   if (state.mode !== 'daily') return;
-  const now = new Date(); const tomorrow = new Date(now); tomorrow.setHours(24, 0, 0, 0);
-  const seconds = Math.max(0, Math.floor((tomorrow - now) / 1000));
-  const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
-  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-  const s = String(seconds % 60).padStart(2, '0');
-  document.querySelector('#countdown').textContent = `${h}:${m}:${s}`;
+  scoreB.value.textContent = countdownText();
+  if (state.gameOver) renderResult();
 }
 
 document.addEventListener('keydown', event => {
-  if (typeof event.key !== 'string') return;
+  if (typeof event.key !== 'string' || event.ctrlKey || event.metaKey || event.altKey) return;
+  if (event.target instanceof HTMLElement && event.target.closest('input, textarea, select, [contenteditable="true"], .modal-backdrop:not(.hidden)')) return;
+  if (!document.querySelector('#modal-backdrop').classList.contains('hidden')) return;
   if (event.key === 'Enter') handleKey('enter');
   else if (event.key === 'Backspace') handleKey('backspace');
   else {
@@ -635,6 +683,7 @@ document.querySelector('#modal-close').addEventListener('click', closeModal);
 document.querySelector('#modal-backdrop').addEventListener('click', event => { if (event.target.id === 'modal-backdrop') closeModal(); });
 document.querySelectorAll('.mode-card').forEach(card => card.addEventListener('click', () => startMode(card.dataset.mode)));
 document.querySelector('#back-home-button').addEventListener('click', returnHome);
+menuButton.addEventListener('click', returnHome);
 nextLevelButton.addEventListener('click', advanceMode);
 authButton.addEventListener('click', () => {
   if (state.user && firebaseBridge) firebaseBridge.signOut().catch(() => showToast('Çıkış yapılamadı.'));
@@ -703,9 +752,7 @@ window.addEventListener('firebase-ready', event => connectFirebase(event.detail)
 if (window.firebaseBridge) connectFirebase(window.firebaseBridge);
 
 loadState();
-document.querySelector('#streak-value').textContent = state.stats.streak;
-updateHomeMetadata();
 homeScreen.classList.remove('hidden');
 gameScreen.classList.add('hidden');
-buildBoard(); renderKeyboard(); updateCountdown();
+buildBoard(); renderKeyboard(); refreshModeChrome();
 setInterval(updateCountdown, 1000);

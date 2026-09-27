@@ -135,7 +135,7 @@ if (howCardForControls && shortcutCard) {
 // açılır ve geri tuşu tam ekrandan çıkar. Tahta, oyunların tam ekran kurallarıyla çerçeve genişliğinden
 // boyutlanır; burada çerçeve genişliği tüm içerik ekrana sığacak şekilde hesaplanır.
 const FULLSCREEN_OPTIONS = {
-  harfane: { key: false, fit: '.board-wrap' },
+  harfane: { key: false },
   'mayin-tarlasi': { key: false },
   'platform-macera': { orientation: 'landscape' },
   tetris: { orientation: 'portrait' },
@@ -426,6 +426,14 @@ function setupFullscreen(panel, button, options = {}) {
     if (active) exit(); else enter();
   }, true);
   portrait.addEventListener?.('change', () => { updateHint(); scheduleFit(); });
+  // Oyun ekranı köklü değişince (ör. menüden oyuna geçiş) sığdırma baştan hesaplansın.
+  window.addEventListener('game:layoutchange', () => {
+    if (!active) return;
+    fitWidth = 0;
+    stableKey = '';
+    cancelAnimationFrame(fitFrame);
+    fit();
+  });
   coarse.addEventListener?.('change', updateHint);
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') requestWakeLock(); });
   updateButton();

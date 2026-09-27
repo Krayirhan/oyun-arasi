@@ -1,258 +1,167 @@
-
-:root {
-  color-scheme: light;
-  --ink: #152521;
-  --muted: #71817b;
-  --paper: #f5f6f1;
-  --surface: #fffefa;
-  --line: #e1e7df;
-  --green: #2c8c62;
-  --green-dark: #14553f;
-  --mint: #e0f2e8;
-  --lime: #d8f278;
-  --yellow: #f4c84f;
-  --gray: #87918d;
-  --error: #c94f58;
-  --shadow: 0 20px 60px rgba(23, 54, 43, .09);
+/* Harfle — sayfa ortak oyun şablonunu (play-page.css) kullanır; mod menüsü, tahta, klavye ve sonuç
+   oyun panelinin içinde (.board-frame) aynı akışta gösterilir. Burada yalnızca Harfle'ye özgü parçalar var. */
+body[data-game='harfane'] {
+  --frame: #14553f; --title: #1f7a4d; --title-shadow: #0b3527;
+  --green: #2c8c62; --green-dark: #14553f; --mint: #e0f2e8; --lime: #d8f278;
+  --yellow: #f4c84f; --gray: #87918d; --error: #c94f58;
 }
-
-* { box-sizing: border-box; }
-body {
-  min-width: 0;
-  min-height: 100vh;
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: 'DM Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
-}
-button { font: inherit; }
-button:focus-visible { outline: 3px solid #90bf4d; outline-offset: 3px; }
 .hidden { display: none !important; }
-.app-shell { width: min(100% - 48px, 1560px); margin: auto; padding: 22px 0 44px; }
 
-/* Shared header */
-.topbar { display: flex; min-height: 58px; justify-content: space-between; align-items: center; padding-bottom: 17px; border-bottom: 1px solid var(--line); }
-.brand { display: flex; align-items: center; gap: 11px; color: inherit; text-decoration: none; }
-.brand-mark { display: grid; width: 39px; height: 39px; place-items: center; border-radius: 13px; background: var(--green-dark); color: var(--lime); font-family: 'Manrope', sans-serif; font-size: 16px; font-weight: 800; letter-spacing: -.08em; transform: rotate(-5deg); }
-.brand-name { margin: 0; font-family: 'Manrope', sans-serif; font-size: 17px; font-weight: 800; letter-spacing: -.055em; }
-.brand-tagline { margin: 1px 0 0; color: var(--muted); font-size: 9px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+/* Başlıktaki Harfle düğmeleri (giriş, yardım, istatistik) */
 .topbar-actions { display: flex; align-items: center; gap: 9px; }
-.live-label { display: flex; align-items: center; gap: 7px; margin-right: 8px; color: var(--muted); font-size: 10px; font-weight: 600; }
+.live-label { display: flex; align-items: center; gap: 7px; margin-right: 4px; color: var(--muted); font-size: 11px; font-weight: 600; white-space: nowrap; }
 .live-label span { width: 8px; height: 8px; border-radius: 50%; background: #65b77b; box-shadow: 0 0 0 4px #e4f2e6; }
-.auth-button, .home-auth-button { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 11px; font-weight: 700; transition: .18s ease; }
-.auth-button { padding: 10px 15px; }
+.auth-button, .home-auth-button { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); color: var(--ink); cursor: pointer; font-size: 12px; font-weight: 700; white-space: nowrap; transition: .18s ease; }
+.auth-button { padding: 9px 14px; }
 .auth-button:hover, .home-auth-button:hover { border-color: var(--green); color: var(--green-dark); }
 .icon-button, .modal-close { display: grid; width: 38px; height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 10px; background: transparent; color: var(--muted); cursor: pointer; font-size: 16px; transition: .18s ease; }
 .icon-button:hover, .modal-close:hover { border-color: var(--green); background: var(--mint); color: var(--green-dark); }
 
-/* Landing page */
-.home-screen { max-width: 1120px; margin: 0 auto; padding: 72px 0 0; }
-.home-heading { position: relative; max-width: 740px; }
-.eyebrow, .footer-label, .aside-label, .section-label, .board-caption { font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-.home-heading .eyebrow { margin: 0 0 17px; color: var(--green); }
-.home-heading h1, .game-intro h1 { margin: 0; font-family: 'Manrope', sans-serif; font-size: clamp(44px, 6.2vw, 76px); line-height: .99; letter-spacing: -.075em; font-weight: 800; }
-h1 em { color: var(--green); font-style: normal; }
-.home-heading > p:last-child { max-width: 450px; margin: 21px 0 0; color: var(--muted); font-size: 15px; line-height: 1.65; }
-.mode-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 47px; }
-.mode-card { position: relative; display: flex; min-height: 232px; flex-direction: column; align-items: flex-start; overflow: hidden; padding: 24px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); color: var(--ink); cursor: pointer; text-align: left; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.mode-card::after { position: absolute; right: -46px; bottom: -75px; width: 190px; height: 190px; border: 1px solid rgba(24, 93, 65, .11); border-radius: 50%; box-shadow: 0 0 0 22px rgba(24, 93, 65, .035), 0 0 0 45px rgba(24, 93, 65, .025); content: ''; }
-.mode-card:hover { transform: translateY(-5px); border-color: #accdb8; box-shadow: var(--shadow); }
-.mode-number { position: absolute; top: 25px; right: 25px; color: #9aa69f; font-size: 10px; font-weight: 700; }
-.mode-icon { display: grid; width: 48px; height: 48px; place-items: center; margin-bottom: 28px; border-radius: 15px; background: var(--mint); color: var(--green-dark); font-size: 24px; font-weight: 700; }
-.mode-card strong { font-family: 'Manrope', sans-serif; font-size: 23px; font-weight: 800; letter-spacing: -.055em; }
-.mode-card small { max-width: 230px; margin-top: 6px; color: var(--muted); font-size: 12px; line-height: 1.45; }
-.mode-card i { margin-top: auto; padding-top: 17px; color: var(--green); font-size: 11px; font-style: normal; font-weight: 800; }
-.mode-series { border-color: var(--green-dark); background: var(--green-dark); color: white; }
+/* Panel içi ortak metinler */
+.harfle-kicker { margin: 0 0 8px; color: var(--lime); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.play-panel .board-frame { display: grid; }
+
+/* 1) Mod menüsü */
+.harfle-menu { padding: clamp(14px, 2.2vw, 26px); color: #fff; }
+.harfle-menu h2 { margin: 0; font: 700 clamp(28px, 3.4vw, 42px) / 1.02 'Fredoka', sans-serif; letter-spacing: -.02em; }
+.harfle-menu h2 em { color: var(--lime); font-style: normal; }
+.harfle-menu-copy { max-width: 46ch; margin: 12px 0 0; color: rgb(255 255 255 / .78); font-size: 15px; line-height: 1.5; }
+.mode-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
+.mode-card { position: relative; display: flex; min-height: 200px; flex-direction: column; align-items: flex-start; overflow: hidden; padding: 20px; border: 1px solid rgb(255 255 255 / .14); border-radius: 18px; background: #fffefa; color: var(--ink); cursor: pointer; text-align: left; transition: transform .2s ease, box-shadow .2s ease; }
+.mode-card::after { position: absolute; right: -46px; bottom: -75px; width: 170px; height: 170px; border: 1px solid rgba(24, 93, 65, .11); border-radius: 50%; box-shadow: 0 0 0 22px rgba(24, 93, 65, .035), 0 0 0 45px rgba(24, 93, 65, .025); content: ''; }
+.mode-card:hover { transform: translateY(-4px); box-shadow: 0 16px 34px rgb(0 0 0 / .22); }
+.mode-card:focus-visible { outline: 3px solid var(--lime); outline-offset: 3px; }
+.mode-number { position: absolute; top: 20px; right: 20px; color: #9aa69f; font-size: 11px; font-weight: 700; }
+.mode-icon { display: grid; width: 44px; height: 44px; place-items: center; margin-bottom: 22px; border-radius: 14px; background: var(--mint); color: var(--green-dark); font-size: 22px; font-weight: 700; }
+.mode-card strong { font: 700 23px 'Fredoka', sans-serif; letter-spacing: -.01em; }
+.mode-card small { max-width: 230px; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.mode-card i { margin-top: auto; padding-top: 16px; color: var(--green); font-size: 13px; font-style: normal; font-weight: 800; }
+.mode-series { border-color: var(--lime); background: #0b3527; color: #fff; }
 .mode-series::after { border-color: rgba(255,255,255,.17); box-shadow: 0 0 0 22px rgba(255,255,255,.04), 0 0 0 45px rgba(255,255,255,.03); }
-.mode-series:hover { border-color: var(--green-dark); box-shadow: 0 20px 55px rgba(20,85,63,.23); }
-.mode-series .mode-number, .mode-series small { color: rgba(255,255,255,.68); }
+.mode-series .mode-number, .mode-series small { color: rgba(255,255,255,.7); }
 .mode-series .mode-icon { background: rgba(216,242,120,.16); color: var(--lime); }
 .mode-series i { color: var(--lime); }
 .mode-practice .mode-icon { background: #fff1d2; color: #b5721f; }
-.home-account { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 35px; padding: 18px 0; border-top: 1px solid var(--line); color: var(--muted); font-size: 12px; }
-.home-auth-button { padding: 10px 14px; }
+.home-account { display: flex; justify-content: space-between; align-items: center; gap: 14px; margin-top: 20px; padding-top: 16px; border-top: 1px solid rgb(255 255 255 / .16); color: rgb(255 255 255 / .75); font-size: 13px; }
+.home-auth-button { padding: 9px 14px; }
 
-/* Game layout */
-.game-screen { display: grid; grid-template-columns: minmax(300px, 1fr) minmax(620px, 820px) minmax(300px, 1fr); gap: 20px 26px; align-items: start; width: 100%; margin: 34px auto 0; }
-.game-guide { display: grid; gap: 18px; grid-column: 1; }
-.game-play { display: grid; gap: 0; grid-column: 2; min-width: 0; }
-.game-intro { display: flex; justify-content: space-between; align-items: flex-end; gap: 18px; padding: 0 0 2px; }
-.game-intro .eyebrow { display: flex; gap: 9px; margin: 0 0 11px; color: var(--green); }
-.game-intro .eyebrow span + span { color: #9aa69f; }
-.game-intro h1 { font-size: clamp(34px, 4vw, 49px); }
-.game-intro h1 em { color: var(--green); }
-.intro-copy { margin: 12px 0 0; color: var(--muted); font-size: 12px; line-height: 1.65; }
-.intro-aside { display: flex; flex-direction: column; align-items: flex-start; gap: 9px; padding-bottom: 4px; }
-.aside-label, .aside-note { color: var(--muted); font-size: 9px; }
-.streak-card { display: flex; min-width: 142px; align-items: center; gap: 11px; padding: 10px 13px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface); }
-.streak-icon { color: #e29747; font-size: 19px; }
-.streak-card div { display: flex; align-items: baseline; gap: 6px; }
-.streak-card strong { color: var(--green-dark); font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; }
-.streak-card div span { color: var(--muted); font-size: 10px; }
-.board-wrap { position: relative; display: flex; flex-direction: column; align-items: center; padding: 22px 22px 17px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 12px 34px rgba(23,54,43,.045); }
+/* 2) Oyun: tahta, klavye, sonuç */
+.harfle-game { display: grid; justify-items: center; gap: 14px; padding: 4px 0; }
+.harfle-game > .harfle-kicker { justify-self: stretch; margin: 0; text-align: center; }
+.board-wrap { position: relative; display: flex; flex-direction: column; align-items: center; padding: 20px 20px 14px; border-radius: 18px; background: #fffefa; box-shadow: 0 12px 30px rgb(0 0 0 / .18); }
 .board { display: grid; grid-template-columns: repeat(5, 58px); gap: 7px; }
-.tile { display: grid; width: 58px; height: 58px; place-items: center; border: 2px solid #e2e8e2; border-radius: 13px; background: #fbfcf9; color: var(--ink); font-family: 'Manrope', sans-serif; font-size: 24px; font-weight: 800; text-transform: uppercase; transition: transform .12s ease, background .2s ease, border .2s ease; }
+.tile { display: grid; width: 58px; height: 58px; place-items: center; border: 2px solid #e2e8e2; border-radius: 13px; background: #fbfcf9; color: var(--ink); font: 700 25px 'Fredoka', sans-serif; text-transform: uppercase; transition: transform .12s ease, background .2s ease, border .2s ease; }
 .tile.filled { border-color: #93bca1; background: #fff; transform: scale(1.025); }
-.tile.flip { animation: flip .55s ease both; }
-.tile.pop { animation: pop .14s ease; }
 .tile.correct { border-color: var(--green); background: var(--green); color: white; }
 .tile.present { border-color: var(--yellow); background: var(--yellow); color: #42370f; }
 .tile.absent { border-color: var(--gray); background: var(--gray); color: white; }
-.tile.invalid { border-color: var(--error); background: #fff0f0; color: var(--error); animation: shake .3s ease; }
-@keyframes flip { 0% { transform: rotateX(0); } 45% { transform: rotateX(90deg); } 55% { transform: rotateX(90deg); } 100% { transform: rotateX(0); } }
-@keyframes pop { 50% { transform: scale(1.12); } }
-@keyframes shake { 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
-.message { min-height: 18px; margin: 12px 0 0; color: var(--green-dark); font-size: 12px; font-weight: 700; text-align: center; }
+.tile.invalid { border-color: var(--error); background: #fff0f0; color: var(--error); animation: harfle-shake .3s ease; }
+@keyframes harfle-shake { 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 75% { transform: translateX(-3px); } }
+.message { min-height: 18px; margin: 10px 0 0; color: var(--green-dark); font-size: 13px; font-weight: 700; text-align: center; }
 .message.error { color: var(--error); }
-.message-pulse { animation: message-pulse .3s ease; }
-@keyframes message-pulse { 50% { transform: translateY(-2px); opacity: .55; } }
-.board-caption { display: none; }
-.section-label { display: flex; align-items: center; gap: 10px; margin: 19px 2px 9px; color: var(--muted); font-size: 9px; }
-.section-label i { flex: 1; height: 1px; background: var(--line); }
-.section-label span:last-child { color: #9aa69f; }
-.keyboard { display: flex; flex-direction: column; align-items: center; gap: 7px; width: min(100%, 550px); justify-self: center; }
+.message-pulse { animation: harfle-pulse .3s ease; }
+@keyframes harfle-pulse { 50% { transform: translateY(-2px); opacity: .55; } }
+.keyboard { display: flex; flex-direction: column; align-items: center; gap: 7px; width: min(100%, 560px); }
 .key-row { display: flex; width: 100%; justify-content: center; gap: 5px; }
 .key-row:nth-child(2) { width: 92%; }
 .key-row:nth-child(3) { width: 86%; }
-.key { flex: 1 1 0; min-width: 0; height: 46px; padding: 0 3px; border: 1px solid #e3e8e1; border-radius: 10px; background: #e9ede6; color: #32413b; cursor: pointer; font-size: 12px; font-weight: 700; text-transform: uppercase; transition: .15s ease; }
-.key:hover { border-color: #a7c6af; background: #dfe9df; transform: translateY(-2px); }
-.key.wide { flex: 1.5 1 0; font-size: 9px; }
-.key.correct { border-color: var(--green); background: var(--green); color: #fff; }
-.key.present { border-color: var(--yellow); background: var(--yellow); color: #42370f; }
-.key.absent { border-color: var(--gray); background: var(--gray); color: #fff; }
-.daily-footer { display: flex; grid-column: 3; flex-direction: column; align-items: stretch; gap: 16px; margin-top: 0; padding: 20px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 5px 18px rgba(23,54,43,.045); }
-.footer-label { display: block; margin: 0 0 5px; color: var(--muted); font-size: 9px; }
-#countdown { color: var(--green-dark); font-family: 'Manrope', sans-serif; font-size: 22px; font-weight: 800; letter-spacing: .03em; }
-.footer-actions { display: flex; flex-direction: column; gap: 8px; }
-.back-button, .next-level-button { min-height: 42px; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; background: transparent; color: var(--muted); cursor: pointer; font-size: 11px; font-weight: 700; }
-.back-button:hover { border-color: var(--green); color: var(--green-dark); }
-.next-level-button { border-color: #c4dc83; background: #f1f8df; color: var(--green-dark); }
-.share-button { display: flex; min-height: 44px; justify-content: center; align-items: center; gap: 9px; border: 0; border-radius: 10px; padding: 11px 14px; background: var(--green-dark); color: #fff; cursor: pointer; font-size: 11px; font-weight: 700; transition: .2s ease; }
-.share-button:hover:not(:disabled) { background: #1d6a4d; transform: translateY(-2px); }
-.share-button:disabled { opacity: .38; cursor: not-allowed; }
-.share-button[hidden] { display: none; }
+.key { flex: 1 1 0; min-width: 0; height: 46px; padding: 0 3px; border: 0; border-radius: 10px; background: #eef2ea; color: #26352f; cursor: pointer; font: 700 14px 'Roboto Condensed', sans-serif; text-transform: uppercase; box-shadow: 0 3px 0 rgb(0 0 0 / .18); transition: .15s ease; }
+.key:hover { background: #fff; transform: translateY(-2px); }
+.key.wide { flex: 1.5 1 0; font-size: 11px; }
+.key.correct { background: var(--green); color: #fff; }
+.key.present { background: var(--yellow); color: #42370f; }
+.key.absent { background: #5b6662; color: #e6ebe7; }
+.harfle-result { width: min(100%, 560px); padding: 18px 20px; border-radius: 18px; background: #fffefa; color: var(--ink); text-align: center; box-shadow: 0 12px 30px rgb(0 0 0 / .18); animation: harfle-rise .25s ease-out; }
+.harfle-result .harfle-kicker { color: var(--green); }
+.harfle-result h2 { margin: 0 0 6px; font: 700 28px 'Fredoka', sans-serif; }
+.harfle-result-copy { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.45; }
+.harfle-result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.harfle-result-actions .play-button { flex: 1 1 150px; min-height: 46px; font-size: 17px; }
+.harfle-result-actions .play-undo { border-color: var(--line); }
+@keyframes harfle-rise { from { opacity: 0; transform: translateY(8px); } }
 
-/* Dialogs */
-.modal-backdrop { position: fixed; inset: 0; z-index: 5; display: grid; place-items: center; padding: 20px; background: rgba(18, 38, 30, .44); backdrop-filter: blur(6px); }
-.modal-backdrop.hidden { display: none; }
-.modal { position: relative; width: min(100%, 430px); max-height: 90vh; overflow: auto; border: 1px solid var(--line); border-radius: 22px; padding: 32px; background: var(--surface); box-shadow: var(--shadow); }
+/* Başlıktaki yardım/istatistik pencereleri */
+.modal-backdrop { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 20px; background: rgba(18, 38, 30, .44); backdrop-filter: blur(6px); }
+.modal { position: relative; width: min(100%, 430px); max-height: 90vh; overflow: auto; border: 1px solid var(--line); border-radius: 22px; padding: 32px; background: var(--surface); box-shadow: 0 20px 60px rgba(23, 54, 43, .12); }
 .modal-close { position: absolute; top: 16px; right: 16px; border: 0; font-size: 21px; }
-.modal h2 { margin: 0 40px 10px 0; color: var(--green-dark); font-family: 'Manrope', sans-serif; font-size: 26px; font-weight: 800; letter-spacing: -.06em; }
-.modal h3 { color: var(--ink); font-size: 11px; font-weight: 700; text-transform: uppercase; }
-.modal p { color: var(--muted); font-size: 13px; line-height: 1.7; }
+.modal h2 { margin: 0 40px 10px 0; color: var(--green-dark); font: 700 26px 'Fredoka', sans-serif; }
+.modal h3 { color: var(--ink); font-size: 12px; font-weight: 700; text-transform: uppercase; }
+.modal p { color: var(--muted); font-size: 14px; line-height: 1.6; }
 .auth-form { display: grid; gap: 14px; margin-top: 22px; }
-.auth-form label { display: grid; gap: 7px; color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.auth-form input { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px; outline: 0; background: #fbfcf9; color: var(--ink); font: 13px 'DM Sans', sans-serif; }
+.auth-form label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.auth-form input { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 12px; outline: 0; background: #fbfcf9; color: var(--ink); font: 14px 'Roboto Condensed', sans-serif; }
 .auth-form input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(44,140,98,.1); }
-.auth-submit { margin-top: 3px; border: 0; border-radius: 10px; padding: 13px; background: var(--green-dark); color: #fff; cursor: pointer; font-size: 12px; font-weight: 700; }
-.auth-switch { margin: 16px 0 0; border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 11px; font-weight: 700; }
-.auth-error { min-height: 17px; margin: 10px 0 0 !important; color: var(--error) !important; font-size: 11px !important; }
+.auth-submit { margin-top: 3px; border: 0; border-radius: 10px; padding: 13px; background: var(--green-dark); color: #fff; cursor: pointer; font-size: 13px; font-weight: 700; }
+.auth-switch { margin: 16px 0 0; border: 0; background: transparent; color: var(--green); cursor: pointer; font-size: 12px; font-weight: 700; }
+.auth-error { min-height: 17px; margin: 10px 0 0 !important; color: var(--error) !important; font-size: 12px !important; }
 .rules { margin: 20px 0 0; padding: 0; list-style: none; }
-.rules li { display: flex; gap: 11px; align-items: center; margin: 12px 0; color: var(--muted); font-size: 12px; }
+.rules li { display: flex; gap: 11px; align-items: center; margin: 12px 0; color: var(--muted); font-size: 13px; }
 .rule-tile { display: grid; width: 32px; height: 32px; place-items: center; border-radius: 9px; color: #fff; font-size: 12px; font-weight: 800; }
 .rule-tile.green { background: var(--green); }
 .rule-tile.yellow { background: var(--yellow); color: #42370f; }
 .rule-tile.gray { background: var(--gray); }
 .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin: 22px 0; }
 .stat { padding: 14px 5px; border: 1px solid var(--line); border-radius: 12px; background: #f7f9f5; text-align: center; }
-.stat strong { display: block; color: var(--green-dark); font-family: 'Manrope', sans-serif; font-size: 23px; font-weight: 800; }
-.stat span { color: var(--muted); font-size: 9px; font-weight: 700; text-transform: uppercase; }
+.stat strong { display: block; color: var(--green-dark); font: 700 23px 'Fredoka', sans-serif; }
+.stat span { color: var(--muted); font-size: 10px; font-weight: 700; text-transform: uppercase; }
 .distribution { margin-top: 17px; }
-.distribution-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; color: var(--muted); font-size: 11px; }
+.distribution-row { display: flex; align-items: center; gap: 8px; margin: 6px 0; color: var(--muted); font-size: 12px; }
 .distribution-row b { display: block; min-width: 18px; text-align: right; }
-.distribution-bar { min-width: 20px; height: 20px; border-radius: 5px; padding: 2px 7px; background: var(--green); color: #fff; text-align: right; font-size: 10px; font-weight: 700; }
-.toast { position: fixed; bottom: 25px; left: 50%; z-index: 10; transform: translate(-50%, 20px); padding: 12px 17px; border: 1px solid rgba(255,255,255,.15); border-radius: 11px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; opacity: 0; pointer-events: none; transition: .25s ease; }
+.distribution-bar { min-width: 20px; height: 20px; border-radius: 5px; padding: 2px 7px; background: var(--green); color: #fff; text-align: right; font-size: 11px; font-weight: 700; }
+.toast { position: fixed; bottom: 25px; left: 50%; z-index: 70; transform: translate(-50%, 20px); padding: 12px 17px; border-radius: 11px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: .25s ease; }
 .toast.show { transform: translate(-50%, 0); opacity: 1; }
+.goal-equation b.goal-green { background: var(--green); color: #fff; }
+.goal-equation b.goal-yellow { background: var(--yellow); color: #42370f; }
+.goal-equation b.goal-gray { background: var(--gray); color: #fff; }
 
-@media (min-width: 781px) and (max-width: 1319px) {
-  .game-screen { grid-template-columns: minmax(240px, .8fr) minmax(0, 1.2fr); gap: 20px; }
-  .game-guide { grid-column: 1; }
-  .game-play { grid-column: 2; }
-  .daily-footer { grid-column: 1 / -1; flex-direction: row; align-items: center; justify-content: space-between; }
-  .footer-actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
-}
-
-@media (max-width: 780px) {
-  .app-shell { width: min(100% - 30px, 700px); padding-top: 15px; }
-  .live-label { display: none; }
-  body[data-game='harfane'] .site-search, body[data-game='harfane'] .all-games { display: none; }
-  body[data-game='harfane'] .search-link { display: grid; }
-  body[data-game='harfane'] .topbar { gap: 10px; }
-  .home-screen { padding-top: 52px; }
-  .home-heading h1 { font-size: clamp(43px, 10vw, 62px); }
-  .home-heading > p:last-child { font-size: 14px; }
-  .mode-grid { grid-template-columns: 1fr; gap: 10px; margin-top: 30px; }
-  .mode-card { min-height: 154px; padding: 18px; }
-  .mode-icon { width: 40px; height: 40px; margin-bottom: 13px; border-radius: 12px; font-size: 20px; }
+@media (max-width: 900px) {
+  .mode-grid { grid-template-columns: 1fr; gap: 10px; }
+  .mode-card { min-height: 0; padding: 16px 18px; }
+  .mode-icon { width: 38px; height: 38px; margin-bottom: 10px; border-radius: 12px; font-size: 19px; }
   .mode-card strong { font-size: 20px; }
-  .mode-card i { position: absolute; right: 18px; bottom: 20px; padding: 0; }
-  .home-account { align-items: flex-start; flex-direction: column; margin-top: 22px; }
-  .game-screen { display: flex; flex-direction: column; gap: 0; margin-top: 28px; }
-  .game-guide, .game-play { display: contents; }
-  .game-intro { width: 100%; align-items: flex-start; padding-bottom: 17px; }
-  .game-intro h1 { font-size: clamp(34px, 9vw, 45px); }
-  .intro-copy { font-size: 11px; }
-  .intro-aside { flex: 0 0 auto; align-items: flex-end; padding-top: 22px; }
-  .aside-label, .aside-note { display: none; }
-  .streak-card { min-width: auto; padding: 8px 10px; }
-  .streak-card div span { display: none; }
-  .board-wrap { width: 100%; padding: 15px 8px 11px; border-radius: 17px; }
-  .board-wrap { order: 2; }
-  .board { grid-template-columns: repeat(5, min(16vw, 58px)); gap: 6px; }
-  .tile { width: min(16vw, 58px); height: min(16vw, 58px); border-radius: 11px; font-size: min(7vw, 24px); }
-  .section-label { order: 3; width: 100%; margin-top: 15px; font-size: 8px; }
-  .keyboard { order: 4; width: 100%; gap: 6px; }
-  .key-row { gap: 3px; }
-  .key { height: 42px; border-radius: 8px; font-size: 11px; }
-  .key.wide { font-size: 8px; }
-  .how-card { order: 5; margin-top: 20px; }
-  .daily-footer { order: 6; width: 100%; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; margin-top: 23px; padding: 13px; }
-  #countdown { font-size: 16px; }
-  .footer-label { font-size: 8px; }
-  .footer-actions { flex-direction: row; flex-wrap: wrap; justify-content: flex-end; }
-  .back-button, .next-level-button, .share-button { min-height: 38px; padding: 8px 10px; font-size: 10px; }
+  .mode-card i { position: absolute; right: 18px; bottom: 16px; padding: 0; }
 }
-
-@media (max-width: 390px) {
-  .app-shell { width: calc(100% - 22px); }
-  .brand-tagline { font-size: 8px; }
+@media (max-width: 760px) {
+  .live-label { display: none; }
+  .harfle-menu { padding: 12px 4px; }
+  .home-account { align-items: flex-start; flex-direction: column; }
+  .board-wrap { width: 100%; padding: 14px 8px 10px; }
+  .board { grid-template-columns: repeat(5, min(15vw, 58px)); gap: 6px; }
+  .tile { width: min(15vw, 58px); height: min(15vw, 58px); border-radius: 11px; font-size: min(7vw, 25px); }
+  .keyboard { width: 100%; gap: 6px; }
+  .key-row { gap: 3px; }
+  .key { height: 44px; border-radius: 8px; font-size: 13px; }
+  .key.wide { font-size: 10px; }
+}
+@media (max-width: 400px) {
   .topbar-actions { gap: 5px; }
   .icon-button { width: 34px; height: 34px; }
   .auth-button { padding: 8px 10px; }
-  .game-intro h1 { font-size: 32px; }
-  .game-intro .eyebrow { font-size: 8px; }
-  .keyboard { gap: 5px; }
   .key-row { gap: 2px; }
-  .key { height: 39px; font-size: 10px; }
-  .daily-footer { align-items: flex-start; }
-  .footer-actions { max-width: 205px; }
+  .key { height: 40px; font-size: 12px; }
 }
-
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+  .tile, .key, .mode-card, .harfle-result, .message-pulse { animation: none; transition: none; }
 }
 
-/* Tam ekran: kutu boyutu tahta kutusunun genişliğinden türetilir; game-shell.js bu kutuyu ekrana sığdırır. */
-body[data-game='harfane'] .play-panel.is-fullscreen .board-wrap { width: fit-content; }
-body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(34px, calc((var(--fs-fit-w, 400px) - 72px) / 5), 120px); grid-template-columns: repeat(5, var(--fs-tile)); }
-body[data-game='harfane'] .play-panel.is-fullscreen .tile { width: var(--fs-tile); height: var(--fs-tile); font-size: calc(var(--fs-tile) * .48); }
-body[data-game='harfane'] .play-panel.is-fullscreen .keyboard, body[data-game='harfane'] .play-panel.is-fullscreen .daily-footer { width: min(100%, 640px); }
-@media (max-height: 520px) {
-  body[data-game='harfane'] .play-panel.is-fullscreen .keyboard { gap: 4px; }
+/* Tam ekran: kutu boyutu hesaplanan çerçeve genişliğinden türetilir; game-shell.js çerçeveyi ekrana sığdırır. */
+body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(30px, calc((var(--fs-fit-w, 400px) - 72px) / 5), 104px); grid-template-columns: repeat(5, var(--fs-tile)); }
+body[data-game='harfane'] .play-panel.is-fullscreen .tile { width: var(--fs-tile); height: var(--fs-tile); font-size: calc(var(--fs-tile) * .46); }
+body[data-game='harfane'] .play-panel.is-fullscreen .keyboard, body[data-game='harfane'] .play-panel.is-fullscreen .harfle-result { width: min(100%, 640px); }
+@media (max-height: 560px) {
+  body[data-game='harfane'] .play-panel.is-fullscreen .harfle-game { gap: 8px; }
+  body[data-game='harfane'] .play-panel.is-fullscreen .harfle-game > .harfle-kicker { display: none; }
   body[data-game='harfane'] .play-panel.is-fullscreen .key { height: 32px; }
   body[data-game='harfane'] .play-panel.is-fullscreen .board-wrap { padding: 8px 10px; }
 }
-/* Kısa yatay ekranda (telefon yan) tahta solda, klavye sağda. */
+/* Kısa yatay ekranda (telefon yan) tahta solda, klavye/sonuç sağda. */
 @media (orientation: landscape) and (max-height: 600px) {
-  body[data-game='harfane'] .play-panel.is-fullscreen { display: grid !important; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; align-content: center; column-gap: 16px; }
-  body[data-game='harfane'] .play-panel.is-fullscreen > * { margin: 0 !important; }
-  body[data-game='harfane'] .play-panel.is-fullscreen { padding-top: calc(max(6px, env(safe-area-inset-top)) + 44px); }
-  body[data-game='harfane'] .play-panel.is-fullscreen > .play-panel-head { position: absolute; width: auto; top: max(6px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); left: max(14px, env(safe-area-inset-left)); }
-  body[data-game='harfane'] .play-panel.is-fullscreen > :is(.fs-rotate-hint, .play-panel-footer) { grid-column: 1 / -1; }
-  body[data-game='harfane'] .play-panel.is-fullscreen > .board-wrap { grid-column: 1; }
-  /* Klavye en az 300 px kalsın; kutular kalan genişliğe göre küçülür. */
-  body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(26px, min(calc((var(--fs-fit-w, 400px) - 44px) / 5), calc((100vw - 300px - 110px) / 5)), 120px); }
-  body[data-game='harfane'] .play-panel.is-fullscreen > .keyboard { grid-column: 2; align-self: center; width: 100%; }
-  body[data-game='harfane'] .play-panel.is-fullscreen > .section-label { display: none; }
+  body[data-game='harfane'] .play-panel.is-fullscreen .harfle-game { grid-template-columns: auto minmax(280px, 1fr); align-items: center; column-gap: 16px; }
+  body[data-game='harfane'] .play-panel.is-fullscreen .board-wrap { grid-row: 1 / span 2; }
+  body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(24px, calc((var(--fs-fit-w, 400px) - 330px) / 5), 72px); }
 }
+/* Yeşil panel üzerinde alt çubuk etiketleri okunur kalsın (telefon düzeni vurgu rengini kullanır). */
+body[data-game='harfane'] .play-panel-footer .score-card > span { color: rgb(255 255 255 / .8) !important; }
+/* Tam ekranda mod menüsü sığdırılmaz: tam genişlikte durur, sığmazsa kendi içinde kayar. */
+body[data-game='harfane'] .play-panel.is-fullscreen > .board-frame:has(> .harfle-menu:not(.hidden)) { width: 100% !important; }
+body[data-game='harfane'] .play-panel.is-fullscreen .harfle-menu { max-height: calc(100dvh - 150px); overflow: auto; overscroll-behavior: contain; }
