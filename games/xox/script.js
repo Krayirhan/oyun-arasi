@@ -1,5 +1,5 @@
-import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=202609271811';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271811';
+import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=202609271834';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271834';
 
 const KEY = 'oyunarasi-xox-v1';
 const boardElement = document.querySelector('#board');

@@ -1,7 +1,7 @@
 // Zıpkın: Volkana Yolculuk çizim katmanı: kamera, tile önbelleği, paralaks arka plan, karakter animasyonu, parçacıklar ve HUD.
 // Oyun mantığına dokunmaz; `run` durumunu ve `run.events` olaylarını okur.
-import { TILE, T, WORLDS } from './levels.js?v=202609271811';
-import { PLAYER_H, PLAYER_W, geyserActive } from './logic.js?v=202609271811';
+import { TILE, T, WORLDS } from './levels.js?v=202609271834';
+import { PLAYER_H, PLAYER_W, geyserActive } from './logic.js?v=202609271834';
 
 export const VIEW_W = 960;
 export const VIEW_H = 540;
@@ -552,7 +552,7 @@ export function createRenderer(canvas, getSettings) {
     }
   }
 
-  // Zıpkın: turuncu gövdeli, başında zıpkın ucu tepesi olan kahraman. Dash hakkı varken kor gibi parlar,
+  // Zıpkın: turuncu gövdeli, başında camgöbeği yüzgeç-bıçak tepesi olan kahraman. Dash hakkı varken kor gibi parlar,
   // hak bitince söner; dash sırasında arkasında camgöbeği bir zıpkın izi bırakır. Çarpışma kutusu PLAYER_W × PLAYER_H.
   function drawHero(run, rx, ry, dt) {
     // Esneme/basılma yaylanması
@@ -607,27 +607,20 @@ export function createRenderer(canvas, getSettings) {
     // Gölge
     ctx.fillStyle = 'rgba(0,0,0,0.22)'; ctx.beginPath(); ctx.ellipse(cx, bottom + 1, w * 0.45, 3, 0, 0, Math.PI * 2); ctx.fill();
 
-    // Zıpkın ucu tepe: yaylı sap + sivri uç. Dash sırasında dash yönüne döner.
-    let angle = hero.antenna * 0.9 - run.facing * 0.12;
-    if (dashing && (run.dashDx || run.dashDy)) angle = Math.atan2(run.dashDx, -run.dashDy) * 0.55;
-    const baseX = cx + run.facing * 1.5; const baseY = top + 3;
-    const stem = 9 * scaleIn;
-    const tipX = baseX + Math.sin(angle) * stem; const tipY = baseY - Math.cos(angle) * stem;
-    ctx.strokeStyle = HERO.outline; ctx.lineWidth = 4.5; ctx.lineCap = 'round';
-    ctx.beginPath(); ctx.moveTo(baseX, baseY); ctx.quadraticCurveTo(baseX, baseY - stem * 0.6, tipX, tipY); ctx.stroke();
-    ctx.strokeStyle = c.crestDark; ctx.lineWidth = 2.2;
-    ctx.beginPath(); ctx.moveTo(baseX, baseY); ctx.quadraticCurveTo(baseX, baseY - stem * 0.6, tipX, tipY); ctx.stroke();
-    ctx.lineCap = 'butt';
-    ctx.save(); ctx.translate(tipX, tipY); ctx.rotate(angle);
-    const tip = 7 * scaleIn;
-    ctx.beginPath(); ctx.moveTo(0, -tip * 1.35); ctx.lineTo(tip * 0.8, tip * 0.25); ctx.lineTo(0, -tip * 0.05); ctx.lineTo(-tip * 0.8, tip * 0.25); ctx.closePath();
-    ctx.fillStyle = c.crest; ctx.strokeStyle = HERO.outline; ctx.lineWidth = 1.6; ctx.lineJoin = 'round';
-    ctx.fill(); ctx.stroke();
-    ctx.fillStyle = 'rgba(255,255,255,0.7)'; ctx.beginPath(); ctx.moveTo(0, -tip * 1.1); ctx.lineTo(tip * 0.3, -tip * 0.1); ctx.lineTo(0, -tip * 0.25); ctx.closePath(); ctx.fill();
-    ctx.restore();
+    // Kollar: kapaktaki gibi küçük yuvarlak kollar; koşarken sallanır, havada hafifçe kalkar.
+    const f = run.facing;
+    const swing = run.grounded && Math.abs(run.vx) > 40 && !reduced() ? Math.sin(clock * 22) * 2.2 : 0;
+    const lift = run.grounded ? 0 : -3;
+    const arm = (x, y, tilt) => {
+      ctx.save(); ctx.translate(x, y); ctx.rotate(tilt);
+      ctx.beginPath(); ctx.ellipse(0, 0, 4 * scaleIn, 3.2 * scaleIn, 0, 0, Math.PI * 2);
+      ctx.fillStyle = c.main; ctx.fill(); ctx.strokeStyle = HERO.outline; ctx.lineWidth = 1.6; ctx.stroke();
+      ctx.restore();
+    };
+    arm(cx - f * (w / 2 - 1), top + h * 0.58 + lift - swing, -f * 0.5);
 
     // Gövde: dış hat + kor gradyanı + açık tonlu karın
-    const radii = [w * 0.48, w * 0.48, 7, 7];
+    const radii = [w * 0.5, w * 0.5, w * 0.4, w * 0.4];
     const body = ctx.createLinearGradient(cx - w / 2, top, cx + w / 2, bottom);
     body.addColorStop(0, c.light); body.addColorStop(0.3, c.main); body.addColorStop(1, c.dark);
     ctx.beginPath(); ctx.roundRect(cx - w / 2, top, w, h, radii);
@@ -639,6 +632,28 @@ export function createRenderer(canvas, getSettings) {
     ctx.strokeStyle = HERO.outline; ctx.lineWidth = 2;
     ctx.beginPath(); ctx.roundRect(cx - w / 2, top, w, h, radii); ctx.stroke();
     if (hero.flashWhite > 0) { ctx.globalAlpha = Math.min(1, hero.flashWhite * 6); ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.roundRect(cx - w / 2, top, w, h, radii); ctx.fill(); ctx.globalAlpha = 1; }
+    // Zıpkın tepesi: başın üstüne oturan, arkaya doğru kıvrılan camgöbeği metal bir yüzgeç-bıçak (kapaktaki gibi).
+    // Hareketle hafifçe sallanır, dash sırasında geriye yatar. Yerel koordinatlarda +x karakterin baktığı yön.
+    {
+      const lean = (dashing ? -0.35 : 0) + hero.antenna * 0.18 * f;
+      ctx.save();
+      ctx.translate(cx - f * 0.5, top + 5.5 * scaleIn);
+      ctx.scale(f * hero.sx * scaleIn * 0.85, hero.sy * scaleIn * 0.85);
+      ctx.rotate(lean);
+      const blade = new Path2D('M9 1 C9.5 -5 4 -10 -4 -11.5 C-8 -12 -12 -12.5 -16 -14 C-13.5 -9 -12.5 -4 -11 2 Q-1 4.5 9 1 Z');
+      const metal = ctx.createLinearGradient(8, 0, -14, -12);
+      metal.addColorStop(0, ready ? '#9cf6ff' : '#b7c4c8'); metal.addColorStop(0.45, c.crest); metal.addColorStop(1, c.crestDark);
+      ctx.fillStyle = metal; ctx.fill(blade);
+      ctx.strokeStyle = HERO.outline; ctx.lineWidth = 1.8 / scaleIn; ctx.lineJoin = 'round'; ctx.stroke(blade);
+      // Ön kenarda parlak keskin çizgi, ortada bıçak sırtı
+      ctx.strokeStyle = 'rgba(235,255,255,0.85)'; ctx.lineWidth = 1.3 / scaleIn; ctx.lineCap = 'round';
+      ctx.stroke(new Path2D('M7.5 -0.5 C7.8 -5 3 -9 -4 -10.2'));
+      ctx.strokeStyle = 'rgba(8,40,60,0.35)'; ctx.lineWidth = 1 / scaleIn;
+      ctx.stroke(new Path2D('M1 1 C-1 -4 -6 -8.5 -13 -12.5'));
+      ctx.lineCap = 'butt';
+      ctx.restore();
+    }
+    arm(cx + f * (w / 2 - 1), top + h * 0.6 + lift + swing, f * 0.5);
     // Kor parıltısı: dash hakkı varken gövdeden küçük kıvılcımlar
     if (ready && !reduced() && Math.random() < dt * 6) particles.push({ x: cx + (Math.random() - 0.5) * w * 0.6, y: top + h * 0.3, vx: (Math.random() - 0.5) * 20, vy: -40 - Math.random() * 30, life: 0.4, max: 0.4, size: 2, color: '#ffd27a', gravity: -20, drag: 1 });
     // Ayaklar
