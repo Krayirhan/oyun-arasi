@@ -135,6 +135,7 @@ if (howCardForControls && shortcutCard) {
 // açılır ve geri tuşu tam ekrandan çıkar. Tahta, oyunların tam ekran kurallarıyla çerçeve genişliğinden
 // boyutlanır; burada çerçeve genişliği tüm içerik ekrana sığacak şekilde hesaplanır.
 const FULLSCREEN_OPTIONS = {
+  tavla: { orientation: 'landscape' },
   harfane: { key: false },
   'mayin-tarlasi': { key: false },
   'platform-macera': { orientation: 'landscape' },

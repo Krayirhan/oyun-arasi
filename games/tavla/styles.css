@@ -1,0 +1,65 @@
+/* Tavla — ahşap tahta, pullar, zarlar. Sayfa düzeni play-page.css'ten, menü ve sonuç kartı ortak .game-* sınıflarından gelir. */
+body[data-game='tavla'] { --frame: #4a2c19; --title: #b5462f; --title-shadow: #6b2616; --menu-accent: #f4c35a; }
+
+.play-panel .board-frame { display: grid; }
+.tavla-game { display: grid; justify-items: center; }
+.tavla-table { position: relative; width: min(100%, 780px); }
+.tavla-board { display: block; width: 100%; height: auto; touch-action: none; user-select: none; -webkit-user-select: none; }
+
+.tavla-board .frame { fill: #6b4226; }
+.tavla-board .felt { fill: #e8cf9f; }
+.tavla-board .bar { fill: #5a361f; }
+.tavla-board .tray { fill: #3f2514; stroke: rgb(0 0 0 / .25); stroke-width: 2; }
+.tavla-board .tray.target { fill: #6d5a1c; stroke: #f4c35a; stroke-width: 4; }
+.tavla-board .point.light { fill: #f6ead0; }
+.tavla-board .point.dark { fill: #a5402c; }
+.tavla-board .point.selected { fill: #f4c35a; }
+.tavla-board .point.target { fill: #7fbf6a; }
+.tavla-board .point-number { fill: rgb(255 255 255 / .55); font: 700 13px 'Roboto Condensed', sans-serif; text-anchor: middle; pointer-events: none; }
+
+.tavla-board .checker { transition: none; }
+.tavla-board .checker.sliding { transition: transform .26s cubic-bezier(.3, .7, .3, 1); }
+.tavla-board .checker-body { stroke-width: 3; filter: drop-shadow(0 3px 2px rgb(0 0 0 / .35)); }
+.tavla-board .checker-ring { fill: none; stroke-width: 3; opacity: .55; }
+.tavla-board .p0 .checker-body { fill: #fbf6ea; stroke: #cbb996; }
+.tavla-board .p0 .checker-ring { stroke: #cbb996; }
+.tavla-board .p1 .checker-body { fill: #2d1d15; stroke: #120b07; }
+.tavla-board .p1 .checker-ring { stroke: #6e4a33; }
+.tavla-board .checker.movable .checker-body { stroke: #f4c35a; stroke-width: 5; }
+.tavla-board .checker.selected .checker-body { stroke: #ffde74; stroke-width: 7; }
+.tavla-board .checker.lifted { opacity: .35; }
+.tavla-board .checker.dragging { pointer-events: none; opacity: .92; }
+.tavla-board .stack-count { font: 700 24px 'Fredoka', sans-serif; text-anchor: middle; pointer-events: none; }
+.tavla-board .p0 .stack-count { fill: #6b4226; }
+.tavla-board .p1 .stack-count { fill: #f4c35a; }
+.tavla-board .ghost { fill: rgb(255 255 255 / .35); stroke: #fff; stroke-width: 3; stroke-dasharray: 7 6; pointer-events: none; }
+.tavla-board .slab.p0 { fill: #fbf6ea; }
+.tavla-board .slab.p1 { fill: #2d1d15; stroke: #6e4a33; stroke-width: 2; }
+
+.tavla-board .die rect { stroke-width: 3; }
+.tavla-board .die.p0 rect { fill: #fffdf6; stroke: #cbb996; }
+.tavla-board .die.p0 circle { fill: #2d1d15; }
+.tavla-board .die.p1 rect { fill: #2d1d15; stroke: #120b07; }
+.tavla-board .die.p1 circle { fill: #fbf6ea; }
+.tavla-board .die.used { opacity: .35; }
+.tavla-board .die.rolling { animation: tavla-shake .14s linear infinite; transform-box: fill-box; transform-origin: center; }
+.tavla-board .dice-note { fill: #6b4226; font: 700 20px 'Fredoka', sans-serif; text-anchor: middle; }
+@keyframes tavla-shake { 50% { rotate: 12deg; } }
+
+.tavla-controls { position: absolute; top: 50%; left: 24%; display: flex; flex-direction: column; align-items: stretch; gap: 8px; width: max-content; transform: translate(-50%, -50%); }
+.tavla-controls.side-p1 { left: 71%; }
+.tavla-controls .play-button { min-height: 46px; padding: 0 18px; font-size: 18px; box-shadow: 0 4px 0 rgb(0 0 0 / .25); }
+.tavla-controls .play-undo { border-color: #fff; color: var(--ink); }
+
+.goal-equation .goal-result { min-width: 120px; font-size: 26px; }
+
+@media (max-width: 760px) {
+  .tavla-controls .play-button { min-height: 38px; padding: 0 12px; font-size: 15px; }
+  .tavla-controls { gap: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tavla-board .checker.sliding, .tavla-board .die.rolling { transition: none; animation: none; }
+}
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
+.play-panel.is-fullscreen .tavla-table { width: 100%; }

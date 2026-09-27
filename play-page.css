@@ -403,3 +403,52 @@ html.game-fs-open :is(.modal-backdrop, .toast) { z-index: 1001; }
   .game-confirm, .game-confirm-card { animation: none; }
   .game-confirm.closing { transition: none; }
 }
+
+/* Panel içi oyun menüsü, seçim çipleri ve sonuç kartı (game-flow.js). Mod seçimi, zorluk ve sonuç ayrı bir
+   sayfa gibi değil, oyun panelinin içinde gösterilir. Vurgu rengi oyunun --menu-accent değişkeninden gelir. */
+.play-panel .board-frame:has(> .game-menu) { display: grid; }
+.game-menu { padding: clamp(10px, 2vw, 22px); color: #fff; }
+.game-kicker { margin: 0 0 8px; color: var(--menu-accent, #fecf40); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.game-menu h2 { margin: 0; font: 700 clamp(26px, 3.2vw, 40px) / 1.05 'Fredoka', sans-serif; letter-spacing: -.02em; }
+.game-menu h2 em { color: var(--menu-accent, #fecf40); font-style: normal; }
+.game-menu-copy { max-width: 48ch; margin: 10px 0 0; color: rgb(255 255 255 / .78); font-size: 15px; line-height: 1.5; }
+.game-settings { display: flex; flex-wrap: wrap; gap: 12px 22px; margin-top: 20px; }
+.game-setting { display: grid; gap: 7px; }
+.game-setting > span { color: rgb(255 255 255 / .7); font-size: 12px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.game-chips { display: inline-flex; flex-wrap: wrap; gap: 4px; padding: 4px; border-radius: 14px; background: rgb(0 0 0 / .22); }
+.game-chips button { min-width: 64px; min-height: 38px; padding: 0 14px; border: 0; border-radius: 10px; background: transparent; color: rgb(255 255 255 / .85); font: 700 16px 'Fredoka', sans-serif; cursor: pointer; }
+.game-chips button[aria-pressed='true'] { background: #fff; color: var(--ink); box-shadow: 0 2px 0 rgb(0 0 0 / .15); }
+.game-chips button:focus-visible, .game-mode:focus-visible { outline: 3px solid var(--menu-accent, #fecf40); outline-offset: 3px; }
+.game-modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr)); gap: 12px; margin-top: 20px; }
+.game-mode { position: relative; display: flex; min-height: 170px; flex-direction: column; align-items: flex-start; overflow: hidden; padding: 18px; border: 1px solid rgb(255 255 255 / .14); border-radius: 18px; background: #fffefa; color: var(--ink); text-align: left; cursor: pointer; transition: transform .2s ease, box-shadow .2s ease; }
+.game-mode::after { position: absolute; right: -46px; bottom: -75px; width: 170px; height: 170px; border-radius: 50%; box-shadow: 0 0 0 22px rgb(0 0 0 / .025), 0 0 0 45px rgb(0 0 0 / .02); content: ''; }
+.game-mode:hover:not(:disabled) { transform: translateY(-4px); box-shadow: 0 16px 34px rgb(0 0 0 / .22); }
+.game-mode:disabled { opacity: .6; cursor: not-allowed; }
+.game-mode-icon { display: grid; width: 44px; height: 44px; place-items: center; margin-bottom: 18px; border-radius: 14px; background: var(--accent-soft); color: var(--accent-deep); font-size: 22px; font-weight: 700; }
+.game-mode strong { font: 700 22px 'Fredoka', sans-serif; letter-spacing: -.01em; }
+.game-mode small { max-width: 240px; margin-top: 6px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+.game-mode i { margin-top: auto; padding-top: 14px; color: var(--accent); font-size: 13px; font-style: normal; font-weight: 800; }
+.game-mode.is-featured { border-color: var(--menu-accent, #fecf40); background: color-mix(in srgb, var(--frame) 70%, #000); color: #fff; }
+.game-mode.is-featured small { color: rgb(255 255 255 / .72); }
+.game-mode.is-featured .game-mode-icon { background: rgb(255 255 255 / .12); color: var(--menu-accent, #fecf40); }
+.game-mode.is-featured i { color: var(--menu-accent, #fecf40); }
+.game-result { width: min(100%, 520px); margin: auto; padding: 20px 22px; border-radius: 18px; background: #fffefa; color: var(--ink); text-align: center; box-shadow: 0 12px 30px rgb(0 0 0 / .2); animation: game-result-rise .25s ease-out; }
+.game-result .game-kicker { color: var(--accent); }
+.game-result h2 { margin: 0 0 6px; font: 700 30px 'Fredoka', sans-serif; }
+.game-result-copy { margin: 0 0 16px; color: var(--muted); font-size: 15px; line-height: 1.45; }
+.game-result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.game-result-actions .play-button { flex: 1 1 150px; min-height: 46px; font-size: 17px; }
+.game-result-actions .play-undo { border-color: var(--line); color: var(--ink); }
+@keyframes game-result-rise { from { opacity: 0; transform: translateY(8px); } }
+.play-panel.is-fullscreen > .board-frame:has(> .game-menu:not(.hidden)) { width: 100% !important; }
+.play-panel.is-fullscreen .game-menu { max-height: calc(100dvh - 150px); overflow: auto; overscroll-behavior: contain; }
+@media (max-width: 760px) {
+  .game-menu { padding: 8px 2px; }
+  .game-modes { gap: 10px; }
+  .game-mode { min-height: 0; padding: 14px 16px; }
+  .game-mode-icon { width: 38px; height: 38px; margin-bottom: 10px; font-size: 19px; }
+  .game-mode strong { font-size: 20px; }
+  .game-settings { gap: 10px 16px; }
+  .game-chips button { min-width: 54px; padding: 0 10px; font-size: 15px; }
+}
+@media (prefers-reduced-motion: reduce) { .game-mode, .game-result { transition: none; animation: none; } }

@@ -111,6 +111,7 @@ a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid 
 .cover i span[data-tone='h'] { background: #fff; color: #d62f3a; }
 .cover i span[data-tone='j'] { background: #fff; color: #1f8a3c; }
 .cover-sudoku { background: #f7802f; }
+.cover-tavla { background: #6b4226; color: #fff; }
 .cover-sekil { background: #ff7fa8; }
 .cover-sekil b { font-size: calc(23 * var(--u)); }
 .cover-kelime { background: #c2185b; color: #fff; }

@@ -37,6 +37,7 @@ body[data-game='kelime-avi'] { --accent: #c2185b; --accent-deep: #85103e; --acce
 body[data-game='araba'] { --accent: #d6362b; --accent-deep: #93221a; --accent-soft: #fde2df; }
 body[data-game='sekil'] { --accent: #c43d78; --accent-deep: #892852; --accent-soft: #fbe2ee; }
 body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-soft: #e0f2e8; --green-dark: #14553f; }
+body[data-game='tavla'] { --accent: #b5462f; --accent-deep: #7a2c1c; --accent-soft: #f8e4db; }
 
 .game-page a { text-decoration: none; }
 .game-page :is(a, button, select, input, [tabindex]):focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
