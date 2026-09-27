@@ -1,0 +1,74 @@
+/* Sitenin tek başlığı (açılış sayfasındaki başlık). Her sayfada aynı işaretleme kullanılır
+   (tests/site-header.test.mjs denetler) ve başlık <body>'nin ilk öğesidir.
+   --hu birimi açılış sayfasının 1672 birimlik tuvaline göre ölçeklenir: başlık aynı ekran genişliğinde
+   her sayfada birebir aynı boyutta görünür. */
+.site-header {
+  --hu: clamp(.66px, calc(100vw / 1672), 1.15px);
+  position: relative; z-index: 20;
+  display: flex; align-items: center; justify-content: space-between; gap: calc(24 * var(--hu));
+  box-sizing: border-box; width: 100%; height: calc(62 * var(--hu)); margin: 0;
+  padding: 0 calc(24 * var(--hu));
+  border-bottom: 1px solid #e7e2d6; background: #f8f4ec; color: #0d1b4c;
+  font-family: 'Roboto Condensed', system-ui, sans-serif;
+}
+.site-header a { color: inherit; text-decoration: none; }
+
+/* Logo: turuncu oyun kolu + OYUNARASI */
+.logo-word { font: 700 30px / 1 'Fredoka', sans-serif; letter-spacing: -.02em; background: linear-gradient(90deg, #061a6e, #0a36b5); -webkit-background-clip: text; background-clip: text; color: transparent; white-space: nowrap; }
+.logo-word span { background: none; -webkit-text-fill-color: #f25a1a; }
+.site-header .brand { display: inline-flex; flex: none; align-items: center; gap: calc(10 * var(--hu)); margin: 0; }
+.site-header .brand-icon { --hole: #f8f4ec; width: calc(48 * var(--hu)); height: calc(48 * var(--hu)); flex: none; color: #ffa915; }
+.site-header .logo-word { font-size: calc(44 * var(--hu)); }
+
+/* Arama: logo ile sağ menünün tam ortasında */
+.site-search { display: flex; align-items: center; gap: calc(12 * var(--hu)); flex: 0 1 calc(560 * var(--hu)); min-width: 0; height: calc(39 * var(--hu)); margin: 0; padding: 0 calc(17 * var(--hu)); border: calc(1.5 * var(--hu)) solid #ddd6c6; border-radius: 999px; background: #fff; box-shadow: 0 calc(2 * var(--hu)) calc(8 * var(--hu)) rgb(13 27 76 / .04); }
+.site-search:focus-within { border-color: #0a2fb5; box-shadow: 0 0 0 calc(3 * var(--hu)) rgb(10 47 181 / .12); }
+.site-search svg, .site-header .search-link svg { width: calc(20 * var(--hu)); height: calc(20 * var(--hu)); flex: none; fill: none; stroke: #1b1d2a; stroke-width: 2.2; stroke-linecap: round; }
+.site-search input { min-width: 0; flex: 1; height: 100%; border: 0; outline: 0; padding: 0; background: transparent; color: #0d1b4c; font: 400 calc(14.5 * var(--hu)) 'Roboto', 'Roboto Condensed', sans-serif; }
+.site-search input::placeholder { color: #7d7f8c; }
+.site-search input::-webkit-search-cancel-button { cursor: pointer; }
+
+/* Sağ menü: Hemen oyna, Arkadaşlarınla oyna, hesap */
+.site-nav { display: flex; flex: none; align-items: center; gap: calc(23 * var(--hu)); }
+.site-header .search-link { display: none; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: #ebe7de; }
+.site-header .nav-link { display: flex; align-items: center; gap: calc(11 * var(--hu)); color: #1c2130; font: 700 calc(15 * var(--hu)) 'Roboto Condensed', sans-serif; white-space: nowrap; transition: color .15s; }
+.site-header .nav-link svg { width: calc(24 * var(--hu)); height: calc(24 * var(--hu)); flex: none; color: #0d1b4c; }
+.site-header .nav-link .nav-pad { --hole: #f8f4ec; width: calc(26 * var(--hu)); height: calc(26 * var(--hu)); }
+.site-header .nav-link:hover { color: #0a2fb5; }
+.site-header .account-slot { display: flex; align-items: center; min-width: calc(140 * var(--hu)); height: calc(40 * var(--hu)); margin-left: calc(25 * var(--hu)); padding: 0; border: 0; }
+.site-header .account-slot .account-button { display: flex; align-items: center; gap: calc(10 * var(--hu)); height: 100%; min-height: 0; padding: 0; border: 0; border-radius: 0; background: transparent; color: #1a1d38; font: 700 calc(17 * var(--hu)) 'Roboto Condensed', sans-serif; white-space: nowrap; cursor: pointer; }
+.site-header .account-slot .account-button::before { content: ''; width: calc(39 * var(--hu)); height: calc(39 * var(--hu)); flex: none; border-radius: 50%; background: #0d2272 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23fff'%3E%3Ccircle cx='12' cy='8.6' r='3.6'/%3E%3Cpath d='M5.6 17.6c0-2.7 2.2-4.5 4.9-4.5h3c2.7 0 4.9 1.8 4.9 4.5v.8H5.6z'/%3E%3C/svg%3E") center / 62% no-repeat; }
+.site-header .account-slot .account-button:hover { color: #0a2fb5; }
+.site-header :is(a, button, input):focus-visible { outline: 3px solid #f25a1d; outline-offset: 2px; }
+
+/* Orta genişlik: arama daralır, yazılar sığsın */
+@media (min-width: 761px) and (max-width: 1100px) {
+  .site-header { --hu: .66px; }
+  .site-header .nav-link { font-size: 14px; }
+  .site-header .account-slot .account-button { font-size: 15px; }
+}
+
+/* Telefon: logo, arama simgesi ve hesap tek satırda; açılış sayfasında arama kutusu ikinci satırda */
+@media (max-width: 760px) {
+  .site-header { --hu: 1px; flex-wrap: wrap; gap: 10px; height: auto; min-height: 60px; row-gap: 8px; padding: 8px 12px; }
+  .site-header .brand { gap: 7px; }
+  .site-header .brand-icon { width: 34px; height: 34px; }
+  .site-header .logo-word { font-size: 27px; }
+  .site-header .nav-link, .site-search { display: none; }
+  .site-header .search-link { display: grid; }
+  .site-nav { gap: 10px; }
+  .site-header .account-slot { min-width: 0; height: 40px; margin-left: 0; }
+  .site-header .account-slot .account-button { gap: 0; font-size: 0; }
+  .site-header .account-slot .account-button::before { width: 40px; height: 40px; }
+  .page-home .site-header .search-link { display: none; }
+  .page-home .site-header .site-search { display: flex; order: 5; flex: 1 1 100%; height: 42px; }
+}
+@media (max-width: 400px) {
+  .site-header .logo-word { font-size: 24px; }
+  .site-header .brand-icon { width: 30px; height: 30px; }
+  .site-nav { gap: 8px; }
+}
+@media (max-width: 360px) {
+  .site-header .logo-word { font-size: 21px; }
+  .site-header .brand-icon { width: 30px; height: 30px; }
+}

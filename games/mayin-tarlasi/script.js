@@ -1,5 +1,5 @@
-import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=202609271834';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271834';
+import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=202609271859';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271859';
 
 const KEY = 'oyunarasi-mayin-tarlasi-v1';
 const boardElement = document.querySelector('#board');

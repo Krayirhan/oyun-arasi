@@ -170,6 +170,12 @@ document.querySelector('[data-show-all]').addEventListener('click', event => {
 });
 
 searchInput.addEventListener('input', updateCatalog);
+// Başlıktaki arama bir form (oyun sayfalarında buraya ?q= ile gelir); açılış sayfasında Enter sayfayı yenilemesin, sonuçlara gitsin.
+searchInput.form?.addEventListener('submit', event => {
+  event.preventDefault();
+  updateCatalog();
+  document.querySelector('#tum-oyunlar').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 shortcutLinks.forEach(link => link.addEventListener('click', event => {
   event.preventDefault();
