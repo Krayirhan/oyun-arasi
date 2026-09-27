@@ -1,7 +1,7 @@
-import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=202609272312';
-import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=202609272312';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609272312';
-import { createFlow, botDelay } from '../../game-flow.js?v=202609272312';
+import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=202609272313';
+import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=202609272313';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609272313';
+import { createFlow, botDelay } from '../../game-flow.js?v=202609272313';
 
 const KEY = 'oyunarasi-pisti-v1';
 const $ = selector => document.querySelector(selector);
@@ -79,6 +79,15 @@ function updateRecord(before, after) {
   saved.records.bestScore = Math.max(saved.records.bestScore, ...after.scores);
 }
 
+function updateContinueCard() {
+  const card = $('#continue-card');
+  if (!game || game.status === 'match-over') { card.hidden = true; return; }
+  const dealOver = game.status === 'deal-over';
+  card.hidden = false;
+  card.querySelector('strong').textContent = dealOver ? 'Sonraki ele geç' : 'Maça dön';
+  $('#continue-copy').textContent = `${game.scores[0]}–${game.scores[1]} · ${dealOver ? 'El tamamlandı' : 'Kaldığın yerden devam et'}`;
+}
+
 function render() {
   if (!game) return;
   $('#score-human').textContent = game.scores[0];
@@ -102,7 +111,7 @@ function render() {
     return button;
   }));
   $('#menu-button').hidden = false;
-  $('#continue-card').hidden = ['match-over'].includes(game.status);
+  updateContinueCard();
   const isHumanTurn = game.turn === 0 && game.status === 'playing';
   $('#turn-prompt').classList.toggle('is-your-turn', isHumanTurn);
   $('#turn-title').textContent = isHumanTurn ? 'Sıra sende' : 'Rakip oynuyor';
@@ -164,9 +173,9 @@ $('#continue-card').addEventListener('click', () => {
   if (game.status !== 'playing') return showResult();
   flow.show('game'); render(); runBot();
 });
-$('#menu-button').addEventListener('click', () => { cancelBot(); flow.show('menu'); updateChrome(); });
+$('#menu-button').addEventListener('click', () => { cancelBot(); updateContinueCard(); $('#status').textContent = 'Maça dön veya yeni maç başlat.'; flow.show('menu'); updateChrome(); });
 $('#next-button').addEventListener('click', () => begin(startNextDeal(game)));
-$('#result-menu-button').addEventListener('click', () => { flow.show('menu'); updateChrome(); });
+$('#result-menu-button').addEventListener('click', () => { updateContinueCard(); $('#status').textContent = 'Sonraki ele geç veya yeni maç başlat.'; flow.show('menu'); updateChrome(); });
 
 const mergeRecords = (a = {}, b = {}) => Object.fromEntries(Object.keys(blankSave().records).map(key => [key, Math.max(Number(a[key]) || 0, Number(b[key]) || 0)]));
 const cloudSync = syncGameOnAccountChange('pisti', {
@@ -178,9 +187,6 @@ const cloudSync = syncGameOnAccountChange('pisti', {
   onStatus: message => { $('#save-state').textContent = message; }
 });
 
-if (game) {
-  $('#continue-card').hidden = game.status === 'match-over';
-  $('#continue-copy').textContent = `${game.scores[0]}–${game.scores[1]} · ${game.status === 'deal-over' ? 'Sonraki ele geç' : 'Kaldığın yerden'}`;
-}
+updateContinueCard();
 flow.show('menu'); updateChrome();
 
