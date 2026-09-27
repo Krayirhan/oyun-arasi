@@ -7,13 +7,13 @@ service cloud.firestore {
     }
 
     function knownGame(gameId) {
-      return gameId in ['2048', 'series', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti']
+      return gameId in ['2048', 'series', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas']
         || gameId.matches('^daily-[0-9]{4}-[0-9]{2}-[0-9]{2}$');
     }
 
     function validGameStats(value) {
       return value is map
-        && value.keys().hasOnly(['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti'])
+        && value.keys().hasOnly(['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'])
         && (!('2048' in value) || value['2048'] is map)
         && (!('harfane' in value) || value.harfane is map)
         && (!('xox' in value) || value.xox is map)
@@ -29,7 +29,8 @@ service cloud.firestore {
         && (!('platform-macera' in value) || value['platform-macera'] is map)
         && (!('tavla' in value) || value.tavla is map)
         && (!('okey' in value) || value.okey is map)
-        && (!('pisti' in value) || value.pisti is map);
+        && (!('pisti' in value) || value.pisti is map)
+        && (!('dort-tas' in value) || value['dort-tas'] is map);
     }
 
     // Favoriler ve son oynananlar (library.js); en fazla 12'şer öğe.
@@ -54,7 +55,7 @@ service cloud.firestore {
     }
 
     function validPlatformGame(gameId, data) {
-      return gameId in ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti']
+      return gameId in ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas']
         && data.keys().hasOnly(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt', 'clientUpdatedAt', 'deviceCounters'])
         && data.keys().hasAll(['gameId', 'schemaVersion', 'state', 'stats', 'updatedAt'])
         && data.gameId == gameId && data.schemaVersion == 1
@@ -63,6 +64,28 @@ service cloud.firestore {
         && data.updatedAt is timestamp
         && (!('clientUpdatedAt' in data) || (data.clientUpdatedAt is int && data.clientUpdatedAt >= 0))
         && (!('deviceCounters' in data) || (data.deviceCounters is map && data.deviceCounters.keys().size() <= 20));
+    }
+
+    function roomMember(data) {
+      return request.auth != null && (request.auth.uid == data.hostUid || request.auth.uid == data.guestUid);
+    }
+
+    function validRoom(data) {
+      return data.keys().hasOnly(['gameId', 'code', 'hostUid', 'guestUid', 'status', 'state', 'turn', 'version', 'createdAt', 'updatedAt'])
+        && data.keys().hasAll(['gameId', 'code', 'hostUid', 'guestUid', 'status', 'state', 'turn', 'version', 'createdAt', 'updatedAt'])
+        && data.gameId == 'dort-tas' && data.code is string && data.code.matches('^[A-Z0-9]{6}$')
+        && data.hostUid is string && data.guestUid is string && data.hostUid != data.guestUid
+        && data.status in ['waiting', 'playing', 'complete'] && data.turn in [0, 1]
+        && data.version is int && data.version >= 0 && data.version < 10000
+        && data.createdAt is timestamp && data.updatedAt is timestamp
+        && (data.state == null || (data.state is map && data.state.keys().hasOnly(['board', 'current', 'starter', 'winner', 'winningLine', 'scores', 'draws', 'status', 'mode', 'level', 'moveCount'])
+          && data.state.board is list && data.state.board.size() == 42 && data.state.current in [0, 1]
+          && data.state.moveCount is int && data.state.moveCount >= 0 && data.state.moveCount <= 42
+          && data.state.mode == 'online' && data.state.status in ['playing', 'won', 'draw']));
+    }
+
+    function roomSeat(data) {
+      return request.auth.uid == data.hostUid ? 0 : request.auth.uid == data.guestUid ? 1 : -1;
     }
 
     function validHarfaneGame(gameId, data) {
@@ -93,6 +116,36 @@ service cloud.firestore {
               && validHarfaneGame(gameId, request.resource.data));
         allow delete: if signedInAs(userId);
       }
+    }
+
+    match /rooms/{roomId} {
+      allow get: if request.auth != null && (roomMember(resource.data) || resource.data.status == 'waiting');
+      allow list: if false;
+      allow create: if request.auth != null && validRoom(request.resource.data)
+        && roomId == request.resource.data.code && request.resource.data.hostUid == request.auth.uid
+        && request.resource.data.guestUid == '' && request.resource.data.status == 'waiting'
+        && request.resource.data.state == null && request.resource.data.turn == 0 && request.resource.data.version == 0;
+      allow update: if request.auth != null && validRoom(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['guestUid', 'status', 'state', 'turn', 'version', 'updatedAt'])
+        && request.resource.data.gameId == resource.data.gameId && request.resource.data.code == resource.data.code
+        && request.resource.data.hostUid == resource.data.hostUid && request.resource.data.createdAt == resource.data.createdAt
+        && request.resource.data.version == resource.data.version + 1
+        && ((resource.data.status == 'waiting' && resource.data.guestUid == ''
+            && request.resource.data.guestUid == request.auth.uid && request.auth.uid != resource.data.hostUid
+            && request.resource.data.status == 'playing' && request.resource.data.turn == 0
+            && request.resource.data.state.status == 'playing' && request.resource.data.state.moveCount == 0)
+          || (resource.data.status == 'playing' && roomMember(resource.data)
+            && resource.data.turn == roomSeat(resource.data)
+            && request.resource.data.guestUid == resource.data.guestUid
+            && request.resource.data.state.moveCount == resource.data.state.moveCount + 1
+            && request.resource.data.state.current == request.resource.data.turn
+            && request.resource.data.turn in [roomSeat(resource.data), 1 - roomSeat(resource.data)]
+            && request.resource.data.status in ['playing', 'complete']
+            && ((request.resource.data.status == 'playing' && request.resource.data.turn == 1 - roomSeat(resource.data)
+                && request.resource.data.state.status == 'playing')
+              || (request.resource.data.status == 'complete' && request.resource.data.turn == roomSeat(resource.data)
+                && request.resource.data.state.status in ['won', 'draw']))));
+      allow delete: if false;
     }
   }
 }

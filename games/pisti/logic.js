@@ -1,5 +1,5 @@
 // Pişti rules, scoring and bot decisions. Cards use stable 0–51 ids from games/cards.js.
-import { shuffleDeck, rankOf } from '../cards.js?v=202609272311';
+import { shuffleDeck, rankOf } from '../cards.js?v=202609280017';
 
 export const TARGET_SCORE = 101;
 

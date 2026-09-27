@@ -10,8 +10,8 @@ import {
 
 setLogLevel('silent'); // Beklenen izin reddi hatalarını günlüğe basmasın.
 
-const PLATFORM_GAMES = ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti'];
-const STAT_KEYS = ['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti'];
+const PLATFORM_GAMES = ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'];
+const STAT_KEYS = ['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'];
 
 let env;
 
@@ -159,6 +159,39 @@ describe('platform oyunları', () => {
     const db = as('alice');
     const snapshot = await assertSucceeds(getDocs(collection(db, 'users/alice/games')));
     for (const entry of snapshot.docs) await assertSucceeds(deleteDoc(entry.ref));
+  });
+});
+
+describe('Dört Taş online odaları', () => {
+  const openRoom = { gameId: 'dort-tas', code: 'AB2345', hostUid: 'alice', guestUid: '', status: 'waiting', state: null,
+    turn: 0, version: 0, createdAt: new Date(), updatedAt: new Date() };
+  const onlineState = () => ({ board: Array(42).fill(null), current: 0, starter: 0, winner: null, winningLine: [], scores: [0, 0], draws: 0,
+    status: 'playing', mode: 'online', level: 'medium', moveCount: 0 });
+
+  test('oda sahibi kodlu bekleme odası kurar; yalnız giriş yapanlar bekleme odasını okuyabilir', async () => {
+    await assertSucceeds(setDoc(doc(as('alice'), 'rooms/AB2345'), openRoom));
+    await assertSucceeds(getDoc(doc(as('bob'), 'rooms/AB2345')));
+    await assertFails(getDoc(doc(anon(), 'rooms/AB2345')));
+    await assertFails(setDoc(doc(anon(), 'rooms/XY6789'), { ...openRoom, code: 'XY6789' }));
+    await assertFails(setDoc(doc(as('alice'), 'rooms/AB2345'), { ...openRoom, code: 'ZZ9999' }));
+  });
+
+  test('ikinci oyuncu açık odaya oturur; oda dolduktan sonra yeni üye alamaz', async () => {
+    await seed('rooms/AB2345', openRoom);
+    const ref = doc(as('bob'), 'rooms/AB2345');
+    await assertSucceeds(updateDoc(ref, { guestUid: 'bob', status: 'playing', state: onlineState(), turn: 0, version: 1, updatedAt: new Date() }));
+    await assertFails(updateDoc(doc(as('carol'), 'rooms/AB2345'), { guestUid: 'carol', status: 'playing', state: onlineState(), turn: 0, version: 2, updatedAt: new Date() }));
+  });
+
+  test('hamle yalnız sıradaki oda üyesince bir sürüm artırılarak eşitlenebilir', async () => {
+    const state = onlineState();
+    await seed('rooms/AB2345', { ...openRoom, guestUid: 'bob', status: 'playing', state, turn: 0, version: 1 });
+    const after = { ...state, board: [...state.board], current: 1, moveCount: 1 };
+    after.board[35] = 0;
+    await assertSucceeds(updateDoc(doc(as('alice'), 'rooms/AB2345'), { state: after, turn: 1, status: 'playing', version: 2, updatedAt: new Date() }));
+    await assertFails(updateDoc(doc(as('bob'), 'rooms/AB2345'), { state: { ...after, moveCount: 2 }, turn: 0, status: 'playing', version: 3, updatedAt: new Date() }));
+    await assertFails(updateDoc(doc(as('bob'), 'rooms/AB2345'), { state: { ...after, moveCount: 2 }, turn: 0, status: 'playing', version: 8, updatedAt: new Date() }));
+    await assertFails(getDoc(doc(as('carol'), 'rooms/AB2345')));
   });
 });
 

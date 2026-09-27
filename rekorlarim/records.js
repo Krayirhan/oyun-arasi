@@ -1,6 +1,6 @@
 // Rekorlarım: her oyunun en iyi sonuçları. Bu cihazdaki kayıtlar okunur; giriş yapılmışsa
 // profildeki (tüm cihazlardan birleşik) istatistiklerle birleştirilir, en iyi değer gösterilir.
-import { loadFirebaseClient } from '../cloud-sync.js?v=202609272311';
+import { loadFirebaseClient } from '../cloud-sync.js?v=202609280017';
 
 const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
 const byLevel = records => ({
@@ -40,6 +40,7 @@ const LOCAL = {
   tavla: () => read('oyunarasi-tavla-v1')?.records || {},
   okey: () => read('oyunarasi-okey-v1')?.records || {},
   pisti: () => read('oyunarasi-pisti-v1')?.records || {},
+  'dort-tas': () => read('oyunarasi-dort-tas-v1')?.records || {},
   'platform-macera': () => {
     const campaign = read('oyunarasi-platform-macera-v2')?.campaign || {};
     return { furthestLevel: campaign.furthestLevel || 0, completedLevels: campaign.completed?.length || 0,
@@ -72,6 +73,7 @@ const FIELDS = {
   tavla: [['Maç galibiyeti', 'matchWins', number], ['Mars', 'marsWins', number], ['Zor bota karşı', 'hardWins', number]],
   okey: [['Maç galibiyeti', 'matchWins', number], ['El galibiyeti', 'roundWins', number], ['Zor bota karşı', 'hardWins', number]],
   pisti: [['Maç galibiyeti', 'matchWins', number], ['Pişti sayısı', 'pistiCount', number], ['En yüksek skor', 'bestScore', number]],
+  'dort-tas': [['Toplam galibiyet', 'wins', number], ['Bot galibiyeti', 'botWins', number], ['Zor bot galibiyeti', 'hardWins', number], ['Aynı cihaz galibiyeti', 'localWins', number], ['Beraberlik', 'draws', number]],
   'platform-macera': [['En ileri bölüm', 'furthestLevel', value => `${number(value)} / 24`], ['Tamamlanan bölüm', 'completedLevels', number], ['Toplam yıldız', 'totalStars', value => `${number(value)} / 72`], ['En iyi skor', 'bestScore', number]]
 };
 

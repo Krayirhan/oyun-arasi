@@ -138,6 +138,7 @@ const FULLSCREEN_OPTIONS = {
   tavla: { orientation: 'landscape' },
   okey: { orientation: 'landscape' },
   pisti: { orientation: 'landscape' },
+  'dort-tas': { orientation: 'landscape' },
   harfane: { key: false },
   'mayin-tarlasi': { key: false },
   'platform-macera': { orientation: 'landscape' },

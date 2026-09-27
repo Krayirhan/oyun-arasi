@@ -16,6 +16,7 @@ Her hesap `users/{uid}` belgesinde açılır. Hesap oluşturulurken `gameStats` 
 - `soliter`: toplam galibiyet ve tek/üç kart rekorları.
 - `okey`: maç galibiyeti, el galibiyeti ve zor bot galibiyeti.
 - `pisti`: maç galibiyeti, Pişti sayısı ve en yüksek skor.
+- `dort-tas`: toplam galibiyet, bot/zor bot galibiyeti, aynı cihaz galibiyeti ve beraberlik.
 
 Profilde ayrıca `library` alanı tutulur: `favorites` (en fazla 12 oyun kimliği), `favoritesUpdatedAt` ve `recent` (`{id, at}`, en fazla 12). Girişte cihazdaki favoriler ve son oynananlarla birleştirilir; favorilerde en son değiştirilen taraf kazanır.
 
@@ -34,7 +35,7 @@ Profil bir oturumda bir kez güncellenir; eski hesaplarda eksik olan oyunların 
 - **E-posta doğrulama:** kayıt sonrası otomatik gönderilir; hesap penceresinden yeniden gönderilebilir. Oynamayı engellemez.
 - **Hesap silme:** hesap penceresindeki "Hesabımı sil". Şifreyle yeniden doğrulama ister; `users/{uid}` altındaki tüm oyun belgelerini, profili ve Firebase Auth kullanıcısını siler. Cihazdaki oyun kayıtları kalır.
 
-Aktif oyun ve ayrıntılı kayıtlar `users/{uid}/games/{gameId}` belgelerinde tutulur. Platform oyunlarının kimlikleri `2048`, `xox`, `hafiza`, `mayin-tarlasi`, `sudoku`, `sekil`, `kelime-avi`, `tetris`, `soliter`, `mahjong`, `araba`, `platform-macera`, `tavla`, `okey` ve `pisti`; Harfle'nin (`harfane`) günlük bulmacaları `daily-YYYY-MM-DD`, Sefer kaydı `series` kimliğini kullanır. Oyun belgesi ilk oyun kaydedildiğinde oluşur. Harfle Antrenman torbası cihazda kalır. Hesap açmak oyunları veya Firebase hesabını herkese açık yapmaz.
+Aktif oyun ve ayrıntılı kayıtlar `users/{uid}/games/{gameId}` belgelerinde tutulur. Platform oyunlarının kimlikleri `2048`, `xox`, `hafiza`, `mayin-tarlasi`, `sudoku`, `sekil`, `kelime-avi`, `tetris`, `soliter`, `mahjong`, `araba`, `platform-macera`, `tavla`, `okey`, `pisti` ve `dort-tas`; Harfle'nin (`harfane`) günlük bulmacaları `daily-YYYY-MM-DD`, Sefer kaydı `series` kimliğini kullanır. Dört Taş arkadaş odaları `rooms/{code}` belgelerinde tutulur; oda kodu 6 karakterlidir ve oda listesi herkese açık değildir. Oyun mantığı istemcide doğrulanır, bu nedenle oda modu gündelik arkadaş maçları içindir. Oyun belgesi ilk oyun kaydedildiğinde oluşur. Harfle Antrenman torbası cihazda kalır. Hesap açmak oyunları veya Firebase hesabını herkese açık yapmaz.
 
 Her kullanıcı yalnızca kendi profilini ve oyun belgelerini okuyup değiştirebilir. `firestore.rules` bu erişimi tanımlar; herkese açık skor tablosu yoktur. Önceki `kelimeoyunharf` Firebase projesindeki kullanıcılar ve kayıtlar bu yeni projeye aktarılmaz. Yeni projede hesap açılmalıdır.
 
