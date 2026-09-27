@@ -1,4 +1,4 @@
-import { loadFirebaseClient } from './cloud-sync.js?v=202609272031';
+import { loadFirebaseClient } from './cloud-sync.js?v=202609272056';
 
 const slot = document.querySelector('[data-account-root]');
 if (slot) {

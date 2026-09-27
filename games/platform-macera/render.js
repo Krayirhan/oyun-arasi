@@ -1,7 +1,7 @@
 // Zıpkın: Volkana Yolculuk çizim katmanı: kamera, tile önbelleği, paralaks arka plan, karakter animasyonu, parçacıklar ve HUD.
 // Oyun mantığına dokunmaz; `run` durumunu ve `run.events` olaylarını okur.
-import { TILE, T, WORLDS } from './levels.js?v=202609272031';
-import { PLAYER_H, PLAYER_W, geyserActive } from './logic.js?v=202609272031';
+import { TILE, T, WORLDS } from './levels.js?v=202609272056';
+import { PLAYER_H, PLAYER_W, geyserActive } from './logic.js?v=202609272056';
 
 export const VIEW_W = 960;
 export const VIEW_H = 540;
