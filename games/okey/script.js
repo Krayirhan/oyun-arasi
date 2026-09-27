@@ -1,6 +1,6 @@
-import { createRound, nextRound, drawFromWall, drawDiscard, discardTile, botTurn, canFinish, sortHand, isValidRound } from './logic.js?v=202609272122';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609272122';
-import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=202609272122';
+import { createRound, nextRound, drawFromWall, drawDiscard, discardTile, botTurn, canFinish, sortHand, isValidRound } from './logic.js?v=okeydesign';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=okeydesign';
+import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=okeydesign';
 
 const KEY = 'oyunarasi-okey-v1';
 const LEVEL_NAMES = { easy: 'Kolay', medium: 'Orta', hard: 'Zor' };
@@ -31,36 +31,37 @@ function persist() {
   cloudSync.save(saved);
 }
 
+// Etkileşimsiz taşlar (rakip sırtı, atık, gösterge) <div>, tıklanabilir ıstaka taşları <button> olur;
+// böylece atık taşının görseli bir düğmenin (Atılanı al) içine de sorunsuz yerleştirilebilir.
 function tileView(tile, { hidden = false, selected = false, draggable = false, onClick } = {}) {
-  const button = document.createElement('button');
-  button.type = 'button';
+  const tag = onClick || draggable ? 'button' : 'div';
+  const node = document.createElement(tag);
+  if (tag === 'button') node.type = 'button';
   if (hidden) {
-    button.className = 'tile tile-back';
-    button.textContent = '◆';
-    button.tabIndex = -1;
-    button.setAttribute('aria-hidden', 'true');
-    return button;
+    node.className = 'tile tile-back';
+    node.setAttribute('aria-hidden', 'true');
+    return node;
   }
   const face = tile.fake ? game.joker : tile;
   const wild = !tile.fake && tile.color === game.joker.color && tile.number === game.joker.number;
-  button.className = `tile ${COLORS[face.color]}${tile.fake ? ' fake' : ''}${wild ? ' joker' : ''}${selected ? ' is-selected' : ''}`;
-  button.dataset.tileId = tile.id;
-  button.draggable = draggable;
-  button.setAttribute('aria-label', tile.fake ? `Sahte okey, ${face.number} ${COLORS[face.color]}` : `${face.number} ${COLORS[face.color]}${wild ? ', okey' : ''}`);
-  button.innerHTML = `<span>${tile.fake ? '✦' : face.number}</span><i class="tile-dot"></i>`;
-  if (onClick) button.addEventListener('click', onClick);
+  node.className = `tile ${COLORS[face.color]}${tile.fake ? ' fake' : ''}${wild ? ' joker' : ''}${selected ? ' is-selected' : ''}`;
+  node.dataset.tileId = tile.id;
+  node.setAttribute('aria-label', tile.fake ? `Sahte okey, ${face.number} ${COLORS[face.color]}` : `${face.number} ${COLORS[face.color]}${wild ? ', okey' : ''}`);
+  node.innerHTML = `<span>${tile.fake ? '✦' : face.number}</span><i class="tile-dot"></i>`;
+  if (onClick) node.addEventListener('click', onClick);
   if (draggable) {
-    button.addEventListener('dragstart', event => { draggedTile = tile.id; button.classList.add('dragging'); event.dataTransfer?.setData('text/plain', String(tile.id)); });
-    button.addEventListener('dragend', () => { draggedTile = null; button.classList.remove('dragging'); });
-    button.addEventListener('dragover', event => { event.preventDefault(); button.classList.add('drag-over'); });
-    button.addEventListener('dragleave', () => button.classList.remove('drag-over'));
-    button.addEventListener('drop', event => {
-      event.preventDefault(); button.classList.remove('drag-over');
+    node.draggable = true;
+    node.addEventListener('dragstart', event => { draggedTile = tile.id; node.classList.add('dragging'); event.dataTransfer?.setData('text/plain', String(tile.id)); });
+    node.addEventListener('dragend', () => { draggedTile = null; node.classList.remove('dragging'); });
+    node.addEventListener('dragover', event => { event.preventDefault(); node.classList.add('drag-over'); });
+    node.addEventListener('dragleave', () => node.classList.remove('drag-over'));
+    node.addEventListener('drop', event => {
+      event.preventDefault(); node.classList.remove('drag-over');
       const fromId = Number(event.dataTransfer?.getData('text/plain') || draggedTile);
       reorderRack(fromId, tile.id);
     });
   }
-  return button;
+  return node;
 }
 
 function reorderRack(fromId, toId) {
@@ -77,6 +78,8 @@ function reorderRack(fromId, toId) {
   persist(); refresh();
 }
 
+const SEAT_POSITION = { 1: 'seat-left', 2: 'seat-top', 3: 'seat-right' };
+
 function render() {
   const opponents = $('#opponents');
   opponents.replaceChildren();
@@ -84,25 +87,38 @@ function render() {
   for (const seat of [1, 2, 3]) {
     const hand = game.hands[seat];
     const card = document.createElement('div');
-    card.className = `opponent${game.phase === 'draw' && game.turn === seat ? ' is-turn' : ''}`;
-    card.innerHTML = `<strong>Bot ${seat} · ${LEVEL_NAMES[saved.level]}</strong><small>${hand.length} taş${game.wins[seat] ? ` · ${game.wins[seat]} el` : ''}</small>`;
-    const backs = document.createElement('div'); backs.className = 'opponent-tiles';
-    for (let i = 0; i < Math.min(hand.length, 15); i += 1) backs.append(tileView(null, { hidden: true }));
-    card.append(backs); opponents.append(card);
+    card.className = `opponent ${SEAT_POSITION[seat]}${game.phase === 'draw' && game.turn === seat ? ' is-turn' : ''}`;
+    const head = document.createElement('div');
+    head.className = 'seat-head';
+    head.innerHTML = `<span class="seat-avatar">B${seat}</span><span class="seat-info"><strong>Bot ${seat}</strong><small>${LEVEL_NAMES[saved.level]} · ${hand.length} taş${game.wins[seat] ? ` · ${game.wins[seat]} el` : ''}</small></span>`;
+    const fan = document.createElement('div');
+    fan.className = 'seat-fan';
+    for (let i = 0; i < Math.min(hand.length, 8); i += 1) fan.append(tileView(null, { hidden: true }));
+    const lastTile = game.discards[seat].at(-1);
+    const justDiscarded = game.lastAction?.type === 'discard' && game.lastAction.player === seat;
+    const discardSlot = document.createElement('div');
+    discardSlot.className = `seat-discard${lastTile ? '' : ' is-empty'}${justDiscarded ? ' just-discarded' : ''}`;
+    discardSlot.title = `Bot ${seat} tarafından atılan`;
+    if (lastTile) discardSlot.append(tileView(lastTile));
+    card.append(head, fan, discardSlot);
+    opponents.append(card);
   }
 
-  const lastDiscard = game.discards[(game.turn + 3) % 4].at(-1);
-  $('#discard-area').replaceChildren(...game.discards.map((pile, seat) => {
-    const wrap = document.createElement('div'); wrap.className = 'discard-pile';
-    if (pile.length) wrap.append(tileView(pile.at(-1)));
-    wrap.title = `${seat === 0 ? 'Sen' : `Bot ${seat}`} tarafından atılan`;
-    return wrap;
-  }));
+  const prevSeat = (game.turn + 3) % 4;
+  const lastDiscard = game.discards[prevSeat].at(-1);
+  const drawDiscardButton = $('#draw-discard');
+  drawDiscardButton.replaceChildren();
+  if (lastDiscard) {
+    drawDiscardButton.append(tileView(lastDiscard));
+    drawDiscardButton.append(Object.assign(document.createElement('small'), { textContent: prevSeat === 0 ? 'Senin attığın' : `Bot ${prevSeat}'in attığı` }));
+  } else {
+    drawDiscardButton.innerHTML = '<span class="stack-empty">—</span><small>Atılanı al</small>';
+  }
+  $('#wall-count').textContent = `${game.wall.length} taş kaldı`;
   $('#indicator-tile').replaceChildren(tileView(game.indicator));
   const humanTurn = game.turn === 0;
   $('#draw-wall').disabled = game.phase !== 'draw' || !humanTurn || !game.wall.length;
   $('#draw-discard').disabled = game.phase !== 'draw' || !humanTurn || !lastDiscard;
-  $('#draw-discard').querySelector('span').textContent = lastDiscard ? `${lastDiscard.fake ? '✦' : lastDiscard.number}` : '—';
   $('#discard-button').disabled = game.phase !== 'discard' || !humanTurn || selectedTile === null;
   $('#finish-button').hidden = game.phase !== 'discard' || !humanTurn || selectedTile === null
     || !canFinish(game.hands[0].filter(tile => tile.id !== selectedTile), game.indicator);
@@ -114,6 +130,11 @@ function render() {
     onClick: () => { if (game.phase !== 'discard' || !humanTurn) return; selectedTile = selectedTile === tile.id ? null : tile.id; render(); }
   })));
   $('#rack-count').textContent = `${game.hands[0].length} taş`;
+  const humanDiscard = $('#human-discard');
+  humanDiscard.replaceChildren();
+  const myLastDiscard = game.discards[0].at(-1);
+  humanDiscard.classList.toggle('is-empty', !myLastDiscard);
+  if (myLastDiscard) humanDiscard.append(tileView(myLastDiscard));
   $('#score-human').textContent = game.wins[0];
   $('#score-bots').textContent = game.wins.slice(1).reduce((sum, value) => sum + value, 0);
   $('#menu-button').hidden = false;

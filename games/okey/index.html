@@ -7,16 +7,16 @@
     <meta name="description" content="Klasik Okey oyna: taşlarını diz, bota karşı el kazan ve beş galibiyete ulaş. Oyun Arası&#x27;nda ücretsiz." />
     <title>Okey | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../account.css?v=202609272122" />
-    <link rel="stylesheet" href="../../site-header.css?v=202609272122" />
-    <link rel="stylesheet" href="../../game-shell.css?v=202609272122" />
-    <link rel="stylesheet" href="../../play-page.css?v=202609272122" />
-    <link rel="stylesheet" href="styles.css?v=202609272122" />
-    <script type="module" src="../../account.js?v=202609272122"></script>
-    <script type="module" src="script.js?v=202609272122"></script>
-    <script defer src="../../catalog.js?v=202609272122"></script>
-    <script defer src="../../library.js?v=202609272122"></script>
-    <script defer src="../../game-shell.js?v=202609272122"></script>
+    <link rel="stylesheet" href="../../account.css?v=okeydesign" />
+    <link rel="stylesheet" href="../../site-header.css?v=okeydesign" />
+    <link rel="stylesheet" href="../../game-shell.css?v=okeydesign" />
+    <link rel="stylesheet" href="../../play-page.css?v=okeydesign" />
+    <link rel="stylesheet" href="styles.css?v=okeydesign" />
+    <script type="module" src="../../account.js?v=okeydesign"></script>
+    <script type="module" src="script.js?v=okeydesign"></script>
+    <script defer src="../../catalog.js?v=okeydesign"></script>
+    <script defer src="../../library.js?v=okeydesign"></script>
+    <script defer src="../../game-shell.js?v=okeydesign"></script>
   </head>
   <body class="game-page" data-game="okey">
     <header class="site-header">
@@ -87,11 +87,15 @@
               <div class="okey-table">
                 <div class="opponents" id="opponents" aria-label="Bot oyuncular"></div>
                 <div class="okey-center">
-                  <div class="okey-discard" id="discard-area" aria-label="Atılan taşlar"></div>
-                  <div class="okey-pile"><button class="tile-stack" id="draw-wall" type="button" aria-label="Ortadaki desteden taş çek"><span>▦</span><small>Taş çek</small></button><button class="tile-stack tile-stack-open" id="draw-discard" type="button" aria-label="Önceki oyuncunun attığı taşı çek"><span>—</span><small>Atılanı al</small></button><div class="indicator-slot"><span>GÖSTERGE</span><div id="indicator-tile"></div></div></div>
+                  <button class="tile-stack" id="draw-wall" type="button" aria-label="Ortadaki desteden taş çek"><span class="stack-glyph" aria-hidden="true"></span><small>Taş çek</small><small id="wall-count" class="stack-count"></small></button>
+                  <div class="indicator-slot"><span>GÖSTERGE</span><div id="indicator-tile"></div></div>
+                  <button class="tile-stack tile-stack-open" id="draw-discard" type="button" aria-label="Önceki oyuncunun attığı taşı çek"><span>—</span><small>Atılanı al</small></button>
                 </div>
                 <div class="okey-actions"><button class="tool-button" id="sort-series" type="button">Seri diz</button><button class="tool-button" id="sort-pairs" type="button">Çift diz</button><button class="play-button play-new" id="discard-button" type="button" disabled>Taşı at</button><button class="play-button play-undo" id="finish-button" type="button" hidden>Bitir</button></div>
-                <div class="human-rack"><div class="rack-head"><strong>Senin ıstakan</strong><span id="rack-count">15 taş</span></div><div class="rack-tiles" id="rack" role="group" aria-label="Taşların"></div></div>
+                <div class="human-rack">
+                  <div class="rack-head"><strong>Senin ıstakan</strong><div class="rack-meta"><span class="human-discard is-empty" id="human-discard" title="Son attığın taş" aria-label="Son attığın taş"></span><span id="rack-count">15 taş</span></div></div>
+                  <div class="rack-tiles" id="rack" role="group" aria-label="Taşların"></div>
+                </div>
               </div>
             </section>
 

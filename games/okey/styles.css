@@ -1,60 +1,109 @@
-/* Okey — colorful numbered tiles on a felt table. Shared page, menu and result styles live in play-page.css. */
+/* Okey — gerçek bir okey masası gibi: çapraz koltuk düzeni (üst/sol/sağ rakip), fildişi taşlar,
+   ahşap ıstaka kızağı. Sayfa şablonu, menü ve sonuç kartı play-page.css'ten gelir. */
 body[data-game='okey'] { --frame: #54215f; --title: #9f3eaa; --title-shadow: #602665; --menu-accent: #ffd354; }
 
 .okey-game { display: grid; justify-items: center; }
-.okey-table { display: grid; gap: 14px; width: min(100%, 860px); padding: 18px; border: 8px solid #8a4b27; border-radius: 24px; background: radial-gradient(ellipse at center, #17845b, #07523d 75%); box-shadow: inset 0 0 0 3px #b8773d, 0 10px 24px rgb(0 0 0 / .18); }
-.opponents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-.opponent { display: grid; justify-items: center; gap: 5px; min-width: 0; padding: 8px; border-radius: 12px; background: rgb(0 0 0 / .16); color: #fffdf4; text-align: center; }
-.opponent.is-turn { outline: 3px solid #ffd354; background: rgb(255 211 84 / .18); }
-.opponent strong { font: 700 14px 'Fredoka', sans-serif; }
-.opponent small { font-size: 12px; opacity: .82; }
-.opponent-tiles { display: grid; grid-template-columns: repeat(7, 12px); justify-content: center; gap: 2px; width: 100%; height: 28px; overflow: hidden; }
-.opponent-tiles .tile-back { width: 12px; min-width: 0; height: 24px; padding: 0; border: 1px solid #e9d8a6; border-radius: 3px; box-shadow: 0 2px 0 rgb(0 0 0 / .22); font-size: 8px; }
-.okey-center { display: grid; grid-template-columns: 1fr; gap: 10px; justify-items: center; min-height: 118px; }
-.okey-discard { display: flex; justify-content: center; gap: 4px; min-height: 38px; }
-.discard-pile { display: flex; width: 32px; justify-content: center; }
-.discard-pile .tile { width: 30px; height: 38px; font-size: 13px; }
-.okey-pile { display: flex; flex-wrap: wrap; justify-content: center; align-items: end; gap: 10px; }
-.tile-stack { display: grid; justify-items: center; gap: 4px; min-width: 76px; padding: 6px 10px; border: 2px solid #f4e4bc; border-radius: 10px; background: #1766ad; color: #fff; cursor: pointer; box-shadow: 0 4px 0 #123d62; }
-.tile-stack span { font-size: 24px; font-weight: 900; }
-.tile-stack small { font-weight: 700; }
-.tile-stack-open { background: #8c337f; box-shadow: 0 4px 0 #56204f; }
-.tile-stack:disabled { opacity: .42; cursor: default; }
-.indicator-slot { display: grid; justify-items: center; gap: 4px; color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .06em; }
+.okey-table {
+  position: relative; display: grid; gap: 10px 14px; width: min(100%, 880px); padding: 18px;
+  grid-template-columns: minmax(78px, 128px) 1fr minmax(78px, 128px);
+  grid-template-areas: '.    top     .' 'left center right' 'actions actions actions' 'rack rack rack';
+  border: 9px solid #7a4525; border-radius: 26px;
+  background: radial-gradient(ellipse at 50% 34%, #1f8f63, #0a5a41 62%, #063f2e 100%);
+  box-shadow: inset 0 0 0 3px #b8783d, inset 0 0 44px rgb(0 0 0 / .35), 0 14px 30px rgb(0 0 0 / .28);
+}
+.okey-table::before { position: absolute; inset: 5px; border: 1px dashed rgb(255 255 255 / .09); border-radius: 18px; content: ''; pointer-events: none; }
+#opponents { display: contents; }
+
+/* Rakip koltukları */
+.opponent { display: grid; align-content: start; gap: 6px; padding: 9px; border: 1px solid rgb(255 255 255 / .1); border-radius: 14px; background: linear-gradient(160deg, rgb(0 0 0 / .3), rgb(0 0 0 / .14)); color: #fdf6e3; }
+.opponent.seat-top { grid-area: top; }
+.opponent.seat-left { grid-area: left; align-self: center; }
+.opponent.seat-right { grid-area: right; align-self: center; }
+.opponent.is-turn { outline: 2px solid #ffd354; box-shadow: 0 0 0 4px rgb(255 211 84 / .18), 0 0 18px rgb(255 211 84 / .35); animation: okey-seat-pulse 1.6s ease-in-out infinite; }
+.seat-head { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.seat-avatar { display: grid; flex: none; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: #ffd354; color: #54215f; font: 800 12px 'Fredoka', sans-serif; }
+.seat-info { min-width: 0; }
+.seat-info strong { display: block; font: 700 13px 'Fredoka', sans-serif; }
+.seat-info small { display: block; overflow: hidden; color: rgb(255 255 255 / .78); font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
+.seat-fan { display: flex; justify-content: center; padding: 3px 0; }
+.seat-fan .tile-back { width: 18px; height: 27px; margin-left: -8px; box-shadow: 1px 2px 4px rgb(0 0 0 / .4); }
+.seat-fan .tile-back:first-child { margin-left: 0; }
+.seat-fan .tile-back:nth-child(odd) { transform: rotate(-5deg); }
+.seat-fan .tile-back:nth-child(even) { transform: rotate(5deg); }
+.seat-discard { display: flex; align-items: center; justify-content: center; min-height: 42px; }
+.seat-discard.is-empty::after { display: block; width: 28px; height: 38px; border: 1px dashed rgb(255 255 255 / .28); border-radius: 6px; content: ''; }
+.seat-discard .tile { width: 28px; height: 38px; font-size: 12px; }
+.seat-discard.just-discarded .tile { outline: 2px solid #ffd354; animation: okey-tile-drop .25s ease-out; }
+
+/* Orta: destelerden çekme ve gösterge */
+.okey-center { grid-area: center; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 16px; min-height: 118px; padding: 6px 0; }
+.tile-stack { display: grid; justify-items: center; gap: 5px; padding: 4px 8px; border: 0; background: transparent; color: #fdf6e3; cursor: pointer; }
+.tile-stack:disabled { cursor: default; opacity: .45; }
+.stack-glyph { position: relative; width: 44px; height: 58px; border-radius: 7px; background: linear-gradient(160deg, #fffdf6, #e9dba0); box-shadow: 3px 3px 0 -1px #cbb877, 3px 3px 0 1px rgb(0 0 0 / .25), 6px 6px 0 -1px #cbb877, 6px 6px 0 1px rgb(0 0 0 / .18), 9px 9px 0 -1px #cbb877, 9px 9px 0 1px rgb(0 0 0 / .12); }
+.tile-stack small { font: 700 12px 'Fredoka', sans-serif; }
+.tile-stack .stack-count { color: rgb(255 255 255 / .68); font-size: 10px; }
+.tile-stack-open { padding-top: 0; }
+.tile-stack-open .tile { pointer-events: none; }
+.tile-stack-open .stack-empty { display: grid; width: 44px; height: 58px; place-items: center; border: 2px dashed rgb(255 255 255 / .3); border-radius: 7px; font-size: 22px; opacity: .6; }
+.indicator-slot { display: grid; justify-items: center; gap: 6px; padding: 8px 10px; border-radius: 14px; background: linear-gradient(160deg, #6d3fa0, #3f1f5c); box-shadow: inset 0 0 0 2px rgb(255 255 255 / .12); color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .08em; }
 .indicator-slot > div { display: flex; }
-.tile { position: relative; display: grid; justify-items: center; align-content: center; gap: 1px; width: clamp(31px, 5vw, 46px); height: clamp(54px, 8vw, 68px); padding: 3px; border: 2px solid #d9caa6; border-radius: 7px; background: linear-gradient(135deg,#fffdf3,#f0e5c9); color: #19213e; box-shadow: 0 3px 0 rgb(0 0 0 / .22); font: 800 clamp(15px, 2.4vw, 21px) 'Fredoka',sans-serif; cursor: pointer; user-select: none; }
-.tile.red { color: #e43b37; }
-.tile.blue { color: #1974cf; }
-.tile.yellow { color: #d49300; }
-.tile.black { color: #252330; }
-.tile.tile-back { border-color: #fff0c9; background: repeating-linear-gradient(45deg,#1766ad 0 4px,#f6eacb 4px 6px); color: #fff; text-shadow: 0 1px 3px #0b3150; }
-.tile .tile-dot { width: 11px; height: 4px; border-radius: 5px; background: currentColor; }
-.tile.fake { color: #c63242; font-size: 12px; }
-.tile.joker { border-color: #ffcf3f; background: linear-gradient(135deg,#fff8dc,#ffda68); box-shadow: 0 3px 0 #a56e0b; }
-.tile.is-selected { transform: translateY(-8px); outline: 3px solid #ffd354; }
-.okey-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
-.okey-actions .play-button, .okey-actions .tool-button { min-height: 40px; }
-.human-rack { display: grid; gap: 7px; padding: 10px; border-radius: 14px; background: rgb(0 0 0 / .17); }
-.rack-head { display: flex; justify-content: space-between; align-items: center; color: #fff; font: 700 14px 'Fredoka', sans-serif; }
-.rack-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 72px; }
+.indicator-slot .tile { pointer-events: none; }
+
+/* Taş görünümü: fildişi kaplama, kabartma sayı, alt renk çizgisi */
+.tile { position: relative; display: grid; justify-items: center; align-content: center; gap: 2px; width: clamp(32px, 5.2vw, 46px); height: clamp(52px, 8vw, 68px); padding: 4px 2px 6px; border: 1px solid #d8c894; border-radius: 8px; background: linear-gradient(160deg, #fffdf6 0%, #f3e8c8 55%, #e9dba0 100%); box-shadow: inset 0 1px 0 rgb(255 255 255 / .9), inset 0 -2px 3px rgb(0 0 0 / .08), 0 3px 0 rgb(0 0 0 / .22), 0 4px 7px rgb(0 0 0 / .22); color: #19213e; font: 800 clamp(15px, 2.4vw, 21px) 'Fredoka', sans-serif; cursor: pointer; user-select: none; }
+.tile.red { color: #d1352f; }
+.tile.blue { color: #175fa8; }
+.tile.yellow { color: #b87400; }
+.tile.black { color: #21243a; }
+.tile.tile-back { border-color: #cbb877; background: repeating-linear-gradient(135deg, #1766ad 0 5px, #245e91 5px 10px); box-shadow: inset 0 1px 0 rgb(255 255 255 / .18), 0 3px 0 rgb(0 0 0 / .3); cursor: default; }
+.tile.tile-back::after { position: absolute; inset: 0; display: grid; place-items: center; color: rgb(255 255 255 / .55); font: 800 9px 'Fredoka', sans-serif; letter-spacing: .04em; content: 'OA'; }
+.tile .tile-dot { width: 11px; height: 4px; border-radius: 5px; background: currentColor; box-shadow: 0 1px 1px rgb(0 0 0 / .25); }
+.tile.fake { color: #b23345; }
+.tile.joker { border-color: #c98a0c; background: linear-gradient(160deg, #fff6d8, #ffd76b 60%, #f0b429); box-shadow: inset 0 1px 0 rgb(255 255 255 / .9), 0 0 0 2px #ffcf3f, 0 4px 10px rgb(240 164 20 / .45); color: #5b3b00; }
+.tile.is-selected { transform: translateY(-9px); box-shadow: inset 0 1px 0 rgb(255 255 255 / .9), 0 0 0 3px #ffd354, 0 6px 12px rgb(0 0 0 / .3); }
+
+.okey-actions { grid-area: actions; display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.tool-button { min-height: 40px; padding: 0 16px; border: 1px solid rgb(255 211 84 / .55); border-radius: 999px; background: rgb(0 0 0 / .25); color: #ffe9ab; font: 700 14px 'Fredoka', sans-serif; cursor: pointer; transition: .15s ease; }
+.tool-button:hover { background: rgb(255 211 84 / .18); border-color: #ffd354; }
+.okey-actions .play-button { min-height: 40px; }
+
+/* Istaka: ahşap kızak, taşlar üstünde dizili */
+.human-rack { grid-area: rack; display: grid; gap: 9px; padding: 12px 12px 8px; border-radius: 16px; background: linear-gradient(180deg, #3a2413, #241408); box-shadow: inset 0 3px 0 rgb(255 255 255 / .06), inset 0 -6px 10px rgb(0 0 0 / .5), 0 6px 14px rgb(0 0 0 / .35); }
+.rack-head { display: flex; align-items: center; justify-content: space-between; color: #f4e4bc; font: 700 14px 'Fredoka', sans-serif; }
+.rack-meta { display: flex; align-items: center; gap: 10px; color: #e8d9b0; font-size: 12px; font-weight: 600; }
+.human-discard { display: inline-flex; }
+.human-discard.is-empty { opacity: .35; }
+.human-discard .tile { width: 24px; height: 32px; font-size: 10px; }
+.rack-tiles { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 74px; padding: 10px 8px 16px; border-radius: 10px; background: linear-gradient(180deg, rgb(255 255 255 / .05), rgb(0 0 0 / .16)); box-shadow: inset 0 -10px 14px -6px rgb(0 0 0 / .55), inset 0 1px 0 rgb(255 255 255 / .06); }
+.rack-tiles::after { position: absolute; right: 8px; bottom: 6px; left: 8px; height: 8px; border-radius: 0 0 8px 8px; background: linear-gradient(180deg, rgb(0 0 0 / 0), rgb(0 0 0 / .35)); content: ''; pointer-events: none; }
 .rack-tiles .tile { transition: transform .12s, box-shadow .12s; }
 .rack-tiles .tile[draggable='true'] { cursor: grab; }
 .rack-tiles .tile.dragging { opacity: .42; }
 .rack-tiles .tile.drag-over { outline: 2px dashed #ffd354; }
-.okey-game .hidden { display: none !important; }
-.play-panel.is-fullscreen .okey-table { width: 100%; max-width: 1100px; gap: 10px; padding: 12px; }
 
+.okey-game .hidden { display: none !important; }
+.play-panel.is-fullscreen .okey-table { width: 100%; max-width: 1100px; gap: 8px 10px; padding: 12px; }
+
+@keyframes okey-seat-pulse { 50% { box-shadow: 0 0 0 6px rgb(255 211 84 / .1), 0 0 26px rgb(255 211 84 / .45); } }
+@keyframes okey-tile-drop { from { transform: translateY(-10px); opacity: 0; } }
+
+@media (max-width: 900px) {
+  .okey-table { grid-template-columns: 1fr 1fr; grid-template-areas: 'top top' 'left right' 'center center' 'actions actions' 'rack rack'; }
+  .opponent.seat-left, .opponent.seat-right { align-self: stretch; }
+}
 @media (max-width: 760px) {
-  .okey-table { gap: 10px; padding: 10px; border-width: 5px; border-radius: 16px; }
-  .opponents { gap: 5px; }
-  .opponent { padding: 6px 3px; }
-  .opponent strong { font-size: 12px; }
-  .opponent small { font-size: 10px; }
-  .opponent-tiles { grid-template-columns: repeat(7, 9px); height: 22px; }
-  .opponent-tiles .tile-back { height: 19px; width: 9px; }
-  .okey-center { min-height: 94px; }
+  .okey-table { gap: 7px 8px; padding: 10px; border-width: 5px; border-radius: 16px; }
+  .opponent { padding: 6px; }
+  .seat-info strong { font-size: 12px; }
+  .seat-info small { font-size: 10px; }
+  .seat-fan .tile-back { width: 14px; height: 21px; margin-left: -6px; }
+  .okey-center { gap: 8px; min-height: 92px; }
+  .stack-glyph, .tile-stack-open .stack-empty { width: 36px; height: 48px; }
   .okey-actions { gap: 5px; }
-  .okey-actions .play-button, .okey-actions .tool-button { min-height: 36px; padding-inline: 9px; }
+  .okey-actions .play-button, .tool-button { min-height: 36px; padding-inline: 10px; font-size: 13px; }
   .rack-tiles { gap: 3px; }
 }
-@media (prefers-reduced-motion: reduce) { .tile, .rack-tiles .tile { transition: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .tile, .rack-tiles .tile { transition: none; }
+  .opponent.is-turn, .seat-discard.just-discarded .tile { animation: none; }
+}
