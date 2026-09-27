@@ -136,6 +136,7 @@ if (howCardForControls && shortcutCard) {
 // boyutlanır; burada çerçeve genişliği tüm içerik ekrana sığacak şekilde hesaplanır.
 const FULLSCREEN_OPTIONS = {
   tavla: { orientation: 'landscape' },
+  okey: { orientation: 'landscape' },
   harfane: { key: false },
   'mayin-tarlasi': { key: false },
   'platform-macera': { orientation: 'landscape' },

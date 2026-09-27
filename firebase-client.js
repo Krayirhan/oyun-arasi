@@ -25,8 +25,8 @@ import {
   setDoc,
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
-import { firebaseConfig } from './firebase-config.js?v=202609272056';
-import { decodeState, encodeState } from './firestore-codec.js?v=202609272056';
+import { firebaseConfig } from './firebase-config.js?v=202609272122';
+import { decodeState, encodeState } from './firestore-codec.js?v=202609272122';
 
 const existingApp = getApps().find(candidate => candidate.name === '[DEFAULT]');
 export const app = existingApp || initializeApp(firebaseConfig);
@@ -85,6 +85,7 @@ export const EMPTY_GAME_STATS = Object.freeze({
   mahjong: EMPTY_BY_LEVEL,
   araba: { bestScore: 0, bestDistance: 0 },
   tavla: { matchWins: 0, marsWins: 0, hardWins: 0 },
+  okey: { matchWins: 0, roundWins: 0, hardWins: 0 },
   'platform-macera': { furthestLevel: 1, completedLevels: 0, totalStars: 0, bestScore: 0 }
 });
 

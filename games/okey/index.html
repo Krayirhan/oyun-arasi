@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f8f4ec" />
-    <meta name="description" content="Türk kurallarıyla tavla oyna: bota karşı ya da aynı cihazda arkadaşınla, mars ve maç puanlı. Oyun Arası&#x27;nda ücretsiz ve reklamsız." />
-    <title>Tavla | Oyun Arası</title>
+    <meta name="description" content="Klasik Okey oyna: taşlarını diz, bota karşı el kazan ve beş galibiyete ulaş. Oyun Arası&#x27;nda ücretsiz." />
+    <title>Okey | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="../../account.css?v=202609272122" />
     <link rel="stylesheet" href="../../site-header.css?v=202609272122" />
@@ -18,7 +18,7 @@
     <script defer src="../../library.js?v=202609272122"></script>
     <script defer src="../../game-shell.js?v=202609272122"></script>
   </head>
-  <body class="game-page" data-game="tavla">
+  <body class="game-page" data-game="okey">
     <header class="site-header">
       <a class="brand" href="../../" aria-label="Oyun Arası ana sayfa"><svg class="brand-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M15 12h18c6.5 0 9.6 4 11 10.5l2 9.5c1.1 5.2-1.9 8.5-5.6 8.5-2.7 0-4.5-1.7-6.1-4.2L32.7 34H15.3l-1.6 2.3c-1.6 2.5-3.4 4.2-6.1 4.2-3.7 0-6.7-3.3-5.6-8.5l2-9.5C5.4 16 8.5 12 15 12z" fill="currentColor" /><path d="M13 20.5h3.4v3.8h3.8v3.4h-3.8v3.8H13v-3.8H9.2v-3.4H13z" fill="var(--hole, #fff)" /><g fill="var(--hole, #fff)"><circle cx="33.5" cy="21.5" r="2.3" /><circle cx="38" cy="26" r="2.3" /><circle cx="33.5" cy="30.5" r="2.3" /><circle cx="29" cy="26" r="2.3" /></g></svg><span class="logo-word">OYUN<span>ARASI</span></span></a>
       <form class="site-search" action="../../" role="search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" /><path d="m15.5 15.5 5 5" /></svg><input id="game-search" name="q" type="search" placeholder="Oyun ara..." autocomplete="off" aria-label="Oyunlarda ara" /></form>
@@ -35,44 +35,40 @@
         <a href="../../" aria-label="Ana sayfa"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 11.2 12 4l9 7.2V20a1 1 0 0 1-1 1h-5.5v-6h-5v6H4a1 1 0 0 1-1-1z" /></svg></a>
         <span aria-hidden="true">›</span><a href="../../#tum-oyunlar">Oyunlar</a>
         <span aria-hidden="true">›</span><a href="../../?kategori=classic#tum-oyunlar">Klasikler</a>
-        <span aria-hidden="true">›</span><span aria-current="page">Tavla</span>
+        <span aria-hidden="true">›</span><span aria-current="page">Okey</span>
       </nav>
 
       <main class="play-layout">
         <section class="play-intro" aria-labelledby="game-title">
-          <h1 id="game-title" class="title-art">Tavla<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
-          <p class="tagline">Zarı at, pullarını topla, maçı al!</p>
+          <h1 id="game-title" class="title-art">Okey<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1>
+          <p class="tagline">Taşlarını diz, beş eli kazan!</p>
         </section>
 
         <details class="how-card" id="how-card" open>
           <summary>
             <svg class="how-book" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1v13c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z M12 6.5v13" /></svg>
-            <span><strong>Nasıl oynanır?</strong><small>Türk tavlası kuralları</small></span>
+            <span><strong>Nasıl oynanır?</strong><small>Klasik Okey kuralları</small></span>
             <svg class="how-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
           </summary>
           <ol class="how-steps">
-            <li>Zarı at; pulunu seç ve parlayan haneye taşı. Çift atarsan dört hamle yaparsın.</li>
-            <li>Tek duran rakip pulu kırarsan bara gider; bardaki pul girmeden başka pul oynanmaz.</li>
-            <li>Tüm pulların evine gelince toplamaya başla. İlk 15 pulu toplayan kazanır; rakip hiç toplamadıysa mars, 2 puan!</li>
+            <li>Sıranda ya ortadaki kapalı taştan çek ya da senden önce oynayanın attığı taşı al.</li>
+            <li>Taşlarını aynı renkte sıralı seriler veya aynı sayıdan farklı renk grupları yaparak diz.</li>
+            <li>Bir taş attıktan sonra elindeki 14 taşın tamamı diziliyse eli kazanırsın. Yedi çift de bitiş sayılır.</li>
           </ol>
         </details>
 
-        <section class="shortcuts" id="board-help" aria-label="Klavye kısayolları">
-          <h2>Klavye kısayolları</h2>
-          <div class="shortcut-keys">
-            <div class="key-note"><kbd class="k-wide">Boşluk</kbd><span>Zar at / Onayla</span></div>
-            <div class="key-note"><kbd class="k-wide">⌫</kbd><span>Geri al</span></div>
-            <div class="key-note"><kbd class="k-wide">Esc</kbd><span>Seçimi bırak</span></div>
-          </div>
+        <section class="shortcuts" id="board-help" aria-label="Oyun bilgisi">
+          <h2>Taşlarını düzenle</h2>
+          <div class="shortcut-keys"><div class="key-note"><kbd>Seri diz</kbd><span>Renk ve sayı</span></div><div class="key-note"><kbd>Çift diz</kbd><span>Aynı taşları yan yana</span></div></div>
           <p class="save-state" id="save-state">Maç bu cihazda saklanır.</p>
         </section>
 
-        <section class="play-panel" aria-label="Tavla oyunu">
+        <section class="play-panel" aria-label="Okey oyunu">
           <div class="play-bar">
-            <div class="scores" aria-label="Maç skoru">
-              <div class="score-card"><span id="score-a-label">SEN</span><strong id="score-a">0</strong></div>
-              <div class="score-card"><span id="score-b-label">RAKİP</span><strong id="score-b">0</strong></div>
-              <div class="score-card"><span>MAÇ</span><strong id="score-target">5</strong></div>
+            <div class="scores" aria-label="El galibiyetleri">
+              <div class="score-card"><span>SEN</span><strong id="score-human">0</strong></div>
+              <div class="score-card"><span>BOTLAR</span><strong id="score-bots">0</strong></div>
+              <div class="score-card"><span>HEDEF</span><strong>5</strong></div>
             </div>
             <div class="actions">
               <button class="play-button play-undo" id="menu-button" type="button" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>Menü</button>
@@ -80,49 +76,42 @@
           </div>
           <div class="board-frame">
             <section class="game-menu" id="menu-screen" aria-labelledby="menu-title">
-              <p class="game-kicker">TAVLA · OYUN MENÜSÜ</p>
-              <h2 id="menu-title">Zarlar hazır, <em>rakibini</em> seç.</h2>
-              <p class="game-menu-copy">Bilgisayara karşı oyna ya da yanındaki arkadaşınla aynı cihazda maç yap.</p>
-              <div class="game-settings">
-                <div class="game-setting"><span id="level-label">Bot zorluğu</span><div class="game-chips" data-choice="level" role="group" aria-labelledby="level-label"><button type="button" data-value="easy">Kolay</button><button type="button" data-value="medium">Orta</button><button type="button" data-value="hard">Zor</button></div></div>
-                <div class="game-setting"><span id="target-label">Maç</span><div class="game-chips" data-choice="target" role="group" aria-labelledby="target-label"><button type="button" data-value="3">3 puan</button><button type="button" data-value="5">5 puan</button><button type="button" data-value="7">7 puan</button></div></div>
-              </div>
-              <div class="game-modes">
-                <button class="game-mode is-featured" type="button" id="continue-card" hidden><span class="game-mode-icon">↻</span><strong>Devam et</strong><small id="continue-copy">Yarım kalan maçına dön.</small><i>Kaldığın yerden ↗</i></button>
-                <button class="game-mode" type="button" data-mode="bot"><span class="game-mode-icon">⚀</span><strong>Bota karşı</strong><small>Seçtiğin zorlukta bilgisayarla maç yap.</small><i>Maça başla ↗</i></button>
-                <button class="game-mode" type="button" data-mode="local"><span class="game-mode-icon">⚁</span><strong>Aynı cihaz</strong><small>İki kişi, tek ekran. Sırayla zar atın.</small><i>Arkadaşınla oyna ↗</i></button>
-                <button class="game-mode" type="button" data-mode="online" disabled><span class="game-mode-icon">⚂</span><strong>Online</strong><small>Arkadaşına link at, uzaktan oynayın.</small><i>Çok yakında</i></button>
-              </div>
+              <p class="game-kicker">OKEY · OYUN MENÜSÜ</p>
+              <h2 id="menu-title">Istaka hazır, <em>rakipler</em> masada.</h2>
+              <p class="game-menu-copy">Üç bota karşı oyna. İlk beş el galibiyetine ulaşan maçı alır.</p>
+              <div class="game-settings"><div class="game-setting"><span id="level-label">Bot zorluğu</span><div class="game-chips" data-choice="level" role="group" aria-labelledby="level-label"><button type="button" data-value="easy">Kolay</button><button type="button" data-value="medium">Orta</button><button type="button" data-value="hard">Zor</button></div></div></div>
+              <div class="game-modes"><button class="game-mode is-featured" type="button" id="continue-card" hidden><span class="game-mode-icon">↻</span><strong>Maça dön</strong><small id="continue-copy">Kaldığın yerden devam et.</small><i>Devam et ↗</i></button><button class="game-mode" type="button" id="start-button"><span class="game-mode-icon">🀄</span><strong>Yeni maç</strong><small>Üç botla beş el galibiyeti için yarış.</small><i>Maça başla ↗</i></button></div>
             </section>
 
-            <section class="tavla-game hidden" id="game-screen" aria-label="Tavla tahtası" aria-describedby="board-help">
-              <div class="tavla-table" id="table">
-                <svg class="tavla-board" id="board" viewBox="0 0 1020 760" role="img" aria-label="Tavla tahtası"></svg>
-                <div class="tavla-controls" id="controls">
-                  <button class="play-button play-new" id="roll-button" type="button">Zar at</button>
-                  <button class="play-button play-new" id="confirm-button" type="button" hidden>Onayla</button>
-                  <button class="play-button play-undo" id="undo-button" type="button" hidden>Geri al</button>
+            <section class="okey-game hidden" id="game-screen" aria-label="Okey masası" aria-describedby="board-help">
+              <div class="okey-table">
+                <div class="opponents" id="opponents" aria-label="Bot oyuncular"></div>
+                <div class="okey-center">
+                  <div class="okey-discard" id="discard-area" aria-label="Atılan taşlar"></div>
+                  <div class="okey-pile"><button class="tile-stack" id="draw-wall" type="button" aria-label="Ortadaki desteden taş çek"><span>▦</span><small>Taş çek</small></button><button class="tile-stack tile-stack-open" id="draw-discard" type="button" aria-label="Önceki oyuncunun attığı taşı çek"><span>—</span><small>Atılanı al</small></button><div class="indicator-slot"><span>GÖSTERGE</span><div id="indicator-tile"></div></div></div>
                 </div>
+                <div class="okey-actions"><button class="tool-button" id="sort-series" type="button">Seri diz</button><button class="tool-button" id="sort-pairs" type="button">Çift diz</button><button class="play-button play-new" id="discard-button" type="button" disabled>Taşı at</button><button class="play-button play-undo" id="finish-button" type="button" hidden>Bitir</button></div>
+                <div class="human-rack"><div class="rack-head"><strong>Senin ıstakan</strong><span id="rack-count">15 taş</span></div><div class="rack-tiles" id="rack" role="group" aria-label="Taşların"></div></div>
               </div>
             </section>
 
             <section class="game-result hidden" id="result-screen" aria-live="polite">
-              <p class="game-kicker" id="result-kicker">OYUN BİTTİ</p>
-              <h2 id="result-title">Kazandın!</h2>
+              <p class="game-kicker" id="result-kicker">EL BİTTİ</p>
+              <h2 id="result-title">Eli kazandın!</h2>
               <p class="game-result-copy" id="result-copy"></p>
               <div class="game-result-actions">
-                <button class="play-button play-new" id="next-button" type="button">Sonraki oyun ↗</button>
+                <button class="play-button play-new" id="next-button" type="button">Sonraki el ↗</button>
                 <button class="play-button play-undo" id="result-menu-button" type="button">Menü</button>
               </div>
             </section>
           </div>
-          <p class="status" id="status" role="status" aria-live="polite">Bir oyun modu seç.</p>
+          <p class="status" id="status" role="status" aria-live="polite">Bir maç başlat.</p>
         </section>
 
         <aside class="goal-card" aria-labelledby="goal-title">
           <h2 id="goal-title">Hedef ne?</h2>
-          <p>15 pulunu rakibinden önce evine getir ve topla. Maçı ilk seçtiğin puana ulaşan kazanır.</p>
-          <div class="goal-equation" aria-label="Rakip hiç toplamadıysa mars iki puan"><b class="goal-light">⚅</b><b class="goal-light">⚄</b><i>→</i><b class="goal-result">Mars ×2</b></div>
+          <p>Aynı renkte ardışık taşlar veya aynı sayıdan farklı renkler yap. Elini 14 dizili taşla ya da yedi çiftle tamamla.</p>
+          <div class="goal-equation" aria-label="Üç taş seri oluşturur"><b class="goal-light">3</b><b class="goal-light">4</b><b class="goal-light">5</b><i>→</i><b class="goal-result">SERİ</b></div>
         </aside>
 
         <aside class="more-card" aria-labelledby="more-games-title">

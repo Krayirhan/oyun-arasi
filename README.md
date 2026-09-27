@@ -18,6 +18,7 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `games/tetris/`: Blok Düşür (düşen blok oyunu; klasör ve kayıt kimliği `tetris` olarak kaldı); 7'li torba, döndürme ve duvar tekmeleri, gölge parça, tutma, sıradaki 3 parça ve her 10 satırda hızlanma.
 - `games/soliter/`: Solitaire (Klondike; klasör ve kayıt kimliği `soliter`); 1 ya da 3 kart çekiş, sürükle-bırak ve dokununca otomatik taşıma, geri alma ve otomatik bitirme.
 - `games/mahjong/`: Mahjong (eşleştirmeli solitaire); 46, 102 ve 144 taşlık üç dizilim, her zaman çözülebilir dağıtım, ipucu, karıştırma ve geri alma.
+- `games/okey/`: Klasik Okey; üç bota karşı, jokerli taş düzenleri, yedi çift ve beş el galibiyetli maç.
 - `games/araba/`: Araba Yarışı; 4 şeritli sonsuz yol, hızlanan trafik (her dalgada geçilebilir bir şerit açık kalır), jetonlar ve skor rekoru.
 - `games/platform-macera/`: Zıpkın: Volkana Yolculuk; orman, saat kulesi ve volkan dünyalarında 24 el yapımı bölümlük hızlı platform oyunu. Değişken zıplama, duvardan sekme, 8 yönlü dash, anında yeniden doğma, sabit adımlı fizik (`logic.js`), canvas çizimi (`render.js`) ve WebAudio sesleri (`audio.js`); bölümler `levels.js` içindeki kurucuyla tile koordinatlarında tanımlanır.
 - `games/harfane/`: Harfle oyununun arayüzü, oyun mantığı ve kelime listeleri.

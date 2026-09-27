@@ -1,6 +1,6 @@
 // Rekorlarım: her oyunun en iyi sonuçları. Bu cihazdaki kayıtlar okunur; giriş yapılmışsa
 // profildeki (tüm cihazlardan birleşik) istatistiklerle birleştirilir, en iyi değer gösterilir.
-import { loadFirebaseClient } from '../cloud-sync.js?v=202609272056';
+import { loadFirebaseClient } from '../cloud-sync.js?v=202609272122';
 
 const read = key => { try { return JSON.parse(localStorage.getItem(key)); } catch { return null; } };
 const byLevel = records => ({
@@ -38,6 +38,7 @@ const LOCAL = {
   mahjong: () => byLevel(read('oyunarasi-mahjong-v1')?.records),
   araba: () => read('oyunarasi-araba-v1')?.records || {},
   tavla: () => read('oyunarasi-tavla-v1')?.records || {},
+  okey: () => read('oyunarasi-okey-v1')?.records || {},
   'platform-macera': () => {
     const campaign = read('oyunarasi-platform-macera-v2')?.campaign || {};
     return { furthestLevel: campaign.furthestLevel || 0, completedLevels: campaign.completed?.length || 0,
@@ -68,6 +69,7 @@ const FIELDS = {
   mahjong: levelTimes,
   araba: [['En iyi skor', 'bestScore', number], ['En uzun yol', 'bestDistance', value => `${number(value)} m`]],
   tavla: [['Maç galibiyeti', 'matchWins', number], ['Mars', 'marsWins', number], ['Zor bota karşı', 'hardWins', number]],
+  okey: [['Maç galibiyeti', 'matchWins', number], ['El galibiyeti', 'roundWins', number], ['Zor bota karşı', 'hardWins', number]],
   'platform-macera': [['En ileri bölüm', 'furthestLevel', value => `${number(value)} / 24`], ['Tamamlanan bölüm', 'completedLevels', number], ['Toplam yıldız', 'totalStars', value => `${number(value)} / 72`], ['En iyi skor', 'bestScore', number]]
 };
 

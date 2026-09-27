@@ -1,0 +1,60 @@
+/* Okey — colorful numbered tiles on a felt table. Shared page, menu and result styles live in play-page.css. */
+body[data-game='okey'] { --frame: #54215f; --title: #9f3eaa; --title-shadow: #602665; --menu-accent: #ffd354; }
+
+.okey-game { display: grid; justify-items: center; }
+.okey-table { display: grid; gap: 14px; width: min(100%, 860px); padding: 18px; border: 8px solid #8a4b27; border-radius: 24px; background: radial-gradient(ellipse at center, #17845b, #07523d 75%); box-shadow: inset 0 0 0 3px #b8773d, 0 10px 24px rgb(0 0 0 / .18); }
+.opponents { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.opponent { display: grid; justify-items: center; gap: 5px; min-width: 0; padding: 8px; border-radius: 12px; background: rgb(0 0 0 / .16); color: #fffdf4; text-align: center; }
+.opponent.is-turn { outline: 3px solid #ffd354; background: rgb(255 211 84 / .18); }
+.opponent strong { font: 700 14px 'Fredoka', sans-serif; }
+.opponent small { font-size: 12px; opacity: .82; }
+.opponent-tiles { display: grid; grid-template-columns: repeat(7, 12px); justify-content: center; gap: 2px; width: 100%; height: 28px; overflow: hidden; }
+.opponent-tiles .tile-back { width: 12px; min-width: 0; height: 24px; padding: 0; border: 1px solid #e9d8a6; border-radius: 3px; box-shadow: 0 2px 0 rgb(0 0 0 / .22); font-size: 8px; }
+.okey-center { display: grid; grid-template-columns: 1fr; gap: 10px; justify-items: center; min-height: 118px; }
+.okey-discard { display: flex; justify-content: center; gap: 4px; min-height: 38px; }
+.discard-pile { display: flex; width: 32px; justify-content: center; }
+.discard-pile .tile { width: 30px; height: 38px; font-size: 13px; }
+.okey-pile { display: flex; flex-wrap: wrap; justify-content: center; align-items: end; gap: 10px; }
+.tile-stack { display: grid; justify-items: center; gap: 4px; min-width: 76px; padding: 6px 10px; border: 2px solid #f4e4bc; border-radius: 10px; background: #1766ad; color: #fff; cursor: pointer; box-shadow: 0 4px 0 #123d62; }
+.tile-stack span { font-size: 24px; font-weight: 900; }
+.tile-stack small { font-weight: 700; }
+.tile-stack-open { background: #8c337f; box-shadow: 0 4px 0 #56204f; }
+.tile-stack:disabled { opacity: .42; cursor: default; }
+.indicator-slot { display: grid; justify-items: center; gap: 4px; color: #fff; font-size: 10px; font-weight: 800; letter-spacing: .06em; }
+.indicator-slot > div { display: flex; }
+.tile { position: relative; display: grid; justify-items: center; align-content: center; gap: 1px; width: clamp(31px, 5vw, 46px); height: clamp(54px, 8vw, 68px); padding: 3px; border: 2px solid #d9caa6; border-radius: 7px; background: linear-gradient(135deg,#fffdf3,#f0e5c9); color: #19213e; box-shadow: 0 3px 0 rgb(0 0 0 / .22); font: 800 clamp(15px, 2.4vw, 21px) 'Fredoka',sans-serif; cursor: pointer; user-select: none; }
+.tile.red { color: #e43b37; }
+.tile.blue { color: #1974cf; }
+.tile.yellow { color: #d49300; }
+.tile.black { color: #252330; }
+.tile.tile-back { border-color: #fff0c9; background: repeating-linear-gradient(45deg,#1766ad 0 4px,#f6eacb 4px 6px); color: #fff; text-shadow: 0 1px 3px #0b3150; }
+.tile .tile-dot { width: 11px; height: 4px; border-radius: 5px; background: currentColor; }
+.tile.fake { color: #c63242; font-size: 12px; }
+.tile.joker { border-color: #ffcf3f; background: linear-gradient(135deg,#fff8dc,#ffda68); box-shadow: 0 3px 0 #a56e0b; }
+.tile.is-selected { transform: translateY(-8px); outline: 3px solid #ffd354; }
+.okey-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.okey-actions .play-button, .okey-actions .tool-button { min-height: 40px; }
+.human-rack { display: grid; gap: 7px; padding: 10px; border-radius: 14px; background: rgb(0 0 0 / .17); }
+.rack-head { display: flex; justify-content: space-between; align-items: center; color: #fff; font: 700 14px 'Fredoka', sans-serif; }
+.rack-tiles { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px; min-height: 72px; }
+.rack-tiles .tile { transition: transform .12s, box-shadow .12s; }
+.rack-tiles .tile[draggable='true'] { cursor: grab; }
+.rack-tiles .tile.dragging { opacity: .42; }
+.rack-tiles .tile.drag-over { outline: 2px dashed #ffd354; }
+.okey-game .hidden { display: none !important; }
+.play-panel.is-fullscreen .okey-table { width: 100%; max-width: 1100px; gap: 10px; padding: 12px; }
+
+@media (max-width: 760px) {
+  .okey-table { gap: 10px; padding: 10px; border-width: 5px; border-radius: 16px; }
+  .opponents { gap: 5px; }
+  .opponent { padding: 6px 3px; }
+  .opponent strong { font-size: 12px; }
+  .opponent small { font-size: 10px; }
+  .opponent-tiles { grid-template-columns: repeat(7, 9px); height: 22px; }
+  .opponent-tiles .tile-back { height: 19px; width: 9px; }
+  .okey-center { min-height: 94px; }
+  .okey-actions { gap: 5px; }
+  .okey-actions .play-button, .okey-actions .tool-button { min-height: 36px; padding-inline: 9px; }
+  .rack-tiles { gap: 3px; }
+}
+@media (prefers-reduced-motion: reduce) { .tile, .rack-tiles .tile { transition: none; } }
