@@ -137,6 +137,7 @@ if (howCardForControls && shortcutCard) {
 const FULLSCREEN_OPTIONS = {
   tavla: { orientation: 'landscape' },
   okey: { orientation: 'landscape' },
+  pisti: { orientation: 'landscape' },
   harfane: { key: false },
   'mayin-tarlasi': { key: false },
   'platform-macera': { orientation: 'landscape' },

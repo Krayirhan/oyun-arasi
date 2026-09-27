@@ -39,6 +39,7 @@ body[data-game='sekil'] { --accent: #c43d78; --accent-deep: #892852; --accent-so
 body[data-game='harfane'] { --accent: #1f7a4d; --accent-deep: #14553f; --accent-soft: #e0f2e8; --green-dark: #14553f; }
 body[data-game='tavla'] { --accent: #b5462f; --accent-deep: #7a2c1c; --accent-soft: #f8e4db; }
 body[data-game='okey'] { --accent: #9f3eaa; --accent-deep: #602665; --accent-soft: #f3e2f5; }
+body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-soft: #f9e6dd; }
 
 .game-page a { text-decoration: none; }
 .game-page :is(a, button, select, input, [tabindex]):focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }

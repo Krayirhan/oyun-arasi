@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js';
+import { createDeck, shuffleDeck } from '../cards.js';
 
 // Deterministic random numbers so every run deals the same cards.
 function seeded(seed) {
@@ -21,6 +22,7 @@ function position(parts) {
 }
 
 test('cards know their suit, rank and color', () => {
+  assert.deepEqual(createDeck(), Array.from({ length: 52 }, (_, index) => index));
   assert.equal(cardName(card(1, 0)), 'A♠');
   assert.equal(cardName(card(13, 1)), 'K♥');
   assert.equal(suitOf(card(10, 2)), 2);
@@ -34,6 +36,7 @@ test('the deal builds seven columns with one face-up card each', () => {
   assert.deepEqual(game.down, [0, 1, 2, 3, 4, 5, 6]);
   assert.equal(game.stock.length, 24);
   assert.ok(isValidGame(game));
+  assert.deepEqual(game.stock, shuffleDeck(seeded(3)).slice(28));
 });
 
 test('drawing one or three cards and recycling the waste', () => {

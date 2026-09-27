@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#f8f4ec" />
+    <meta name="description" content="Pişti oyna: kartları topla, pişti yap ve 101 puana ulaş. Oyun Arası'nda ücretsiz." />
+    <title>Pişti | Oyun Arası</title>
+    <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="../../account.css?v=202609272311" />
+    <link rel="stylesheet" href="../../site-header.css?v=202609272311" />
+    <link rel="stylesheet" href="../../game-shell.css?v=202609272311" />
+    <link rel="stylesheet" href="../../play-page.css?v=202609272311" />
+    <link rel="stylesheet" href="styles.css?v=202609272311" />
+    <script type="module" src="../../account.js?v=202609272311"></script>
+    <script type="module" src="script.js?v=202609272311"></script>
+    <script defer src="../../catalog.js?v=202609272311"></script>
+    <script defer src="../../library.js?v=202609272311"></script>
+    <script defer src="../../game-shell.js?v=202609272311"></script>
+  </head>
+  <body class="game-page" data-game="pisti">
+    <header class="site-header">
+      <a class="brand" href="../../" aria-label="Oyun Arası ana sayfa"><svg class="brand-icon" viewBox="0 0 48 48" aria-hidden="true"><path d="M15 12h18c6.5 0 9.6 4 11 10.5l2 9.5c1.1 5.2-1.9 8.5-5.6 8.5-2.7 0-4.5-1.7-6.1-4.2L32.7 34H15.3l-1.6 2.3c-1.6 2.5-3.4 4.2-6.1 4.2-3.7 0-6.7-3.3-5.6-8.5l2-9.5C5.4 16 8.5 12 15 12z" fill="currentColor"/><path d="M13 20.5h3.4v3.8h3.8v3.4h-3.8v3.8H13v-3.8H9.2v-3.4H13z" fill="var(--hole,#fff)"/><g fill="var(--hole,#fff)"><circle cx="33.5" cy="21.5" r="2.3"/><circle cx="38" cy="26" r="2.3"/><circle cx="33.5" cy="30.5" r="2.3"/><circle cx="29" cy="26" r="2.3"/></g></svg><span class="logo-word">OYUN<span>ARASI</span></span></a>
+      <form class="site-search" action="../../" role="search"><input id="game-search" name="q" type="search" placeholder="Oyun ara..." autocomplete="off" aria-label="Oyunlarda ara" /></form>
+      <nav class="site-nav" aria-label="Ana gezinme"><a class="nav-link" href="../../games/2048/">Hemen oyna</a><a class="nav-link" href="../../games/xox/">Arkadaşlarınla oyna</a><div class="account-slot" data-account-root></div></nav>
+    </header>
+    <div class="play-page">
+      <nav class="crumbs" aria-label="Sayfa konumu"><a href="../../">Ana sayfa</a><span aria-hidden="true">›</span><a href="../../#tum-oyunlar">Oyunlar</a><span aria-hidden="true">›</span><span aria-current="page">Pişti</span></nav>
+      <main class="play-layout">
+        <section class="play-intro" aria-labelledby="game-title"><h1 id="game-title" class="title-art">Pişti<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z"/></svg></h1><p class="tagline">Kartı yakala, piştiyi patlat!</p></section>
+        <details class="how-card" id="how-card" open><summary><span><strong>Nasıl oynanır?</strong><small>Bir karta dokun, masaya bırak</small></span></summary><ol class="how-steps"><li>Aynı değerde kart atarak masadaki kartları al. Vale her kartı toplar.</li><li>Masada tek kart varken aynı değeri atarsan Pişti yaparsın: 10 puan. Vale Pişti 20 puan.</li><li>As, Vale, Sinek 2 ve Karo 10 ek puan getirir. En çok kartı toplayan 3 puan alır.</li><li>İlk 101 puana ulaşan maçı kazanır.</li></ol></details>
+        <section class="shortcuts" id="board-help" aria-label="Oyun bilgisi"><h2>Masa notu</h2><div class="shortcut-keys"><div class="key-note"><kbd>♠ ♥ ♦ ♣</kbd><span>Dört takım, 52 kart</span></div><div class="key-note"><kbd>J</kbd><span>Masayı toplar</span></div></div><p class="save-state" id="save-state">Maç bu cihazda saklanır.</p></section>
+        <section class="play-panel" aria-label="Pişti oyunu">
+          <div class="play-bar"><div class="scores" aria-label="Maç skoru"><div class="score-card"><span>SEN</span><strong id="score-human">0</strong></div><div class="score-card"><span>BOT</span><strong id="score-bot">0</strong></div><div class="score-card"><span>HEDEF</span><strong>101</strong></div></div><div class="actions"><button class="play-button play-undo" id="menu-button" type="button" hidden>Menü</button></div></div>
+          <div class="board-frame">
+            <section class="game-menu" id="menu-screen" aria-labelledby="menu-title"><p class="game-kicker">PİŞTİ · OYUN MASASI</p><h2 id="menu-title">Kartlar hazır, <em>masa senin.</em></h2><p class="game-menu-copy">Bota karşı kartları topla, Pişti yap ve 101 puana ulaş.</p><div class="game-modes"><button class="game-mode is-featured" id="continue-card" type="button" hidden><span class="game-mode-icon">↻</span><strong>Maça dön</strong><small id="continue-copy">Kaldığın yerden devam et.</small><i>Devam et ↗</i></button><button class="game-mode" id="start-button" type="button"><span class="game-mode-icon">🂡</span><strong>Yeni maç</strong><small>Tek bota karşı 101 puan.</small><i>Maça başla ↗</i></button></div></section>
+            <section class="pisti-game hidden" id="game-screen" aria-label="Pişti masası" aria-describedby="board-help">
+              <div class="felt-table">
+                <div class="table-rail" aria-hidden="true"></div>
+                <div class="opponent-zone"><div class="player-badge bot-badge"><span class="avatar-chip">B</span><span><strong>Rakip</strong><small id="bot-state">Üç kartı kaldı</small></span></div><div id="bot-hand" class="bot-hand" aria-label="Botun kapalı kartları"></div></div>
+                <div class="table-center"><div class="capture-zone capture-bot" id="capture-bot" aria-label="Botun topladığı kartlar"></div><div class="middle-play"><div class="stock-stack" id="stock-stack"><button id="deck-button" type="button" class="card card-back deck-button" aria-label="Deste, kart sayısını görmek için"></button><span class="deck-count" id="deck-count">40</span></div><div class="table-pile" id="table-pile" aria-label="Masadaki kartlar"></div><div class="capture-zone capture-human" id="capture-human" aria-label="Senin topladığın kartlar"></div></div></div>
+                <div class="table-message" id="table-message" role="status" aria-live="polite">İlk kartını masaya bırak.</div>
+                <div class="human-zone"><div id="human-hand" class="human-hand" aria-label="Senin kartların"></div><div class="player-badge human-badge"><span class="avatar-chip">S</span><span><strong>Sen</strong><small id="human-state">Sıra sende</small></span><span class="captured-score" id="human-captured-count">0 kart</span></div></div>
+              </div>
+            </section>
+            <section class="game-result hidden" id="result-screen" aria-live="polite"><p class="game-kicker" id="result-kicker">EL BİTTİ</p><h2 id="result-title">Eli kazandın!</h2><p class="game-result-copy" id="result-copy"></p><div class="game-result-actions"><button class="play-button play-new" id="next-button" type="button">Sonraki el ↗</button><button class="play-button play-undo" id="result-menu-button" type="button">Menü</button></div></section>
+          </div>
+          <p class="status" id="status" role="status" aria-live="polite">Yeni maç başlat.</p>
+        </section>
+        <aside class="goal-card" aria-labelledby="goal-title"><h2 id="goal-title">Puan nasıl gelir?</h2><p>As ve Vale 1, Sinek 2 iki, Karo 10 üç puan değerinde. Pişti 10, Vale Pişti 20 puan kazandırır.</p><div class="goal-equation" aria-label="İlk 101 puan kazanır"><b class="goal-light">10</b><i>+</i><b class="goal-result">101</b></div></aside>
+        <aside class="more-card" aria-labelledby="more-games-title"><a class="more-card-head" href="../../#tum-oyunlar"><h2 id="more-games-title">Başka oyun dene</h2></a><div class="more-card-grid" data-more-games data-limit="3"></div></aside>
+      </main>
+      <footer class="footer"><a href="../../" aria-label="Oyun Arası ana sayfa"><span class="logo-word">OYUN<span>ARASI</span></span></a><span>Biraz oyna, iyi hisset.</span></footer>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,88 @@
+/* Pişti: branded Turkish card table, custom vector deck and tactile table feedback. */
+body[data-game='pisti'] { --frame: #14553f; --title: #178052; --title-shadow: #104d37; --menu-accent: #f6c649; }
+body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-soft: #f9e6dd; }
+
+.pisti-game { display: grid; justify-items: center; width: 100%; }
+.felt-table { --card-w: clamp(56px, 8vw, 94px); --card-h: calc(var(--card-w) * 1.4); position: relative; isolation: isolate; display: grid; grid-template-rows: auto 1fr auto auto; gap: 15px; width: min(100%, 960px); min-height: 540px; padding: clamp(18px, 3vw, 32px); overflow: hidden; border: 12px solid #704426; border-radius: 35px; background: radial-gradient(ellipse at 50% 42%, #238762 0, #116346 56%, #0b4937 100%); box-shadow: inset 0 0 0 3px #bf8750, inset 0 0 35px rgb(0 0 0 / .19), 0 20px 38px rgb(29 31 25 / .24); color: #fff8df; }
+.table-rail { position: absolute; z-index: -1; inset: 9px; border: 1px solid rgb(255 225 164 / .25); border-radius: 22px; pointer-events: none; }
+.opponent-zone, .human-zone { display: grid; justify-items: center; gap: 9px; }
+.player-badge { display: flex; align-items: center; gap: 9px; padding: 7px 13px 7px 8px; border: 1px solid rgb(255 244 216 / .24); border-radius: 999px; background: rgb(4 47 35 / .42); box-shadow: 0 4px 10px rgb(0 0 0 / .14); }
+.player-badge > span:nth-child(2) { display: grid; gap: 1px; }
+.player-badge strong { color: #fff8df; font: 700 14px 'Fredoka', sans-serif; }
+.player-badge small { color: rgb(255 248 223 / .75); font-size: 11px; }
+.avatar-chip { display: grid; width: 30px; height: 30px; place-items: center; border: 2px solid #fff2c9; border-radius: 50%; background: linear-gradient(145deg, #ff744a, #df3e37); color: white; font: 900 14px 'Fredoka', sans-serif; box-shadow: 0 2px 5px rgb(0 0 0 / .2); }
+.human-badge .avatar-chip { background: linear-gradient(145deg, #ffc94d, #ed8e28); color: #56341f; }
+.captured-score { margin-left: 8px; padding: 5px 9px; border-radius: 999px; background: rgb(255 255 255 / .1); color: #fff4ce; font: 700 11px 'Fredoka', sans-serif; }
+.bot-hand { display: flex; justify-content: center; min-height: 46px; }
+.bot-hand .playing-card { width: 34px; height: 48px; margin-inline: -5px; border-radius: 6px; }
+.table-center { display: grid; align-items: center; width: 100%; min-height: 194px; }
+.middle-play { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(8px, 2vw, 22px); width: min(100%, 590px); margin-inline: auto; }
+.stock-stack { position: relative; justify-self: center; width: var(--card-w); height: var(--card-h); }
+.stock-stack::before, .stock-stack::after { position: absolute; inset: 3px 5px -3px -5px; border: 1px solid #e6d5ab; border-radius: 9px; background: repeating-linear-gradient(45deg,#15543d 0 5px,#eac55e 5px 7px,#17664a 7px 12px); content: ''; box-shadow: 0 3px 4px rgb(0 0 0 / .22); }
+.stock-stack::after { inset: 1px 3px -1px -3px; filter: brightness(1.08); }
+.deck-button { position: relative; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: default; }
+.deck-count { position: absolute; z-index: 3; right: -9px; bottom: -9px; display: grid; min-width: 27px; height: 27px; place-items: center; border: 2px solid #fff4d6; border-radius: 50%; background: #e24d3e; color: #fff; font: 800 11px 'Fredoka',sans-serif; box-shadow: 0 3px 6px rgb(0 0 0 / .3); }
+.table-pile { position: relative; display: flex; align-items: center; justify-content: center; width: calc(var(--card-w) * 1.25); height: calc(var(--card-h) * 1.18); }
+.table-pile .playing-card { position: absolute; width: var(--card-w); height: var(--card-h); animation: card-arrive .24s cubic-bezier(.2,.8,.2,1) both; }
+.table-pile .playing-card:nth-child(1) { transform: translate(-10px, 5px) rotate(-9deg); }
+.table-pile .playing-card:nth-child(2) { transform: translate(9px, 3px) rotate(7deg); }
+.table-pile .playing-card:nth-child(3) { transform: translate(-4px, -5px) rotate(3deg); }
+.table-pile .playing-card:nth-child(4) { transform: translate(4px, -7px) rotate(-2deg); }
+.table-pile .playing-card:last-child { z-index: 4; }
+.capture-zone { position: relative; display: flex; align-items: center; justify-content: center; justify-self: center; width: calc(var(--card-w) * 1.28); height: calc(var(--card-h) * .85); border: 1px dashed rgb(255 245 211 / .28); border-radius: 12px; background: rgb(0 34 25 / .12); }
+.capture-zone::after { position: absolute; top: calc(100% + 5px); color: rgb(255 243 207 / .68); font: 700 9px 'Fredoka',sans-serif; letter-spacing: .09em; white-space: nowrap; }
+.capture-bot::after { content: 'RAKİP TOPLADI'; }
+.capture-human::after { content: 'SEN TOPLADIN'; }
+.capture-zone .playing-card { position: absolute; width: 43px; height: 60px; transform: rotate(var(--capture-rotation, 0deg)); }
+.capture-zone .playing-card:nth-child(2) { --capture-rotation: -8deg; margin-left: -12px; }
+.capture-zone .playing-card:nth-child(3) { --capture-rotation: 9deg; margin-left: 12px; }
+.capture-zone .playing-card:nth-child(4) { --capture-rotation: -4deg; margin-top: -4px; }
+.capture-zone .playing-card:nth-child(5) { --capture-rotation: 6deg; margin-top: 3px; }
+.table-message { justify-self: center; min-height: 25px; padding: 4px 14px; border-radius: 999px; color: #fff1c7; font: 700 13px 'Fredoka',sans-serif; text-align: center; text-shadow: 0 1px 4px rgb(0 0 0 / .25); }
+.table-message.is-pisti { animation: pisti-pop .65s cubic-bezier(.16,.9,.2,1.2) both; color: #ffe071; text-shadow: 0 2px 12px #ff9d39, 0 0 20px rgb(255 235 133 / .7); }
+.human-hand { display: flex; justify-content: center; align-items: end; min-height: calc(var(--card-h) + 16px); padding: 3px 4px 9px; }
+.playing-card { position: relative; flex: none; display: block; width: var(--card-w); height: var(--card-h); padding: 0; overflow: visible; border: 0; border-radius: 10px; background: #f9f2df; box-shadow: 0 4px 8px rgb(0 0 0 / .24), 0 13px 20px rgb(0 0 0 / .16); }
+.face-art, .back-art { display: block; width: 100%; height: 100%; overflow: visible; }
+.face-art { filter: drop-shadow(0 1px 0 rgb(255 255 255 / .35)); }
+.corner-rank, .corner-suit { fill: #182547; font-family: Georgia, serif; font-weight: 900; font-size: 20px; }
+.corner-suit { font-size: 17px; }
+.face-art.red .corner-rank, .face-art.red .corner-suit, .face-art.red .pip-mark, .face-art.red .ace-pip { fill: #d93c42; }
+.corner-bottom { text-anchor: end; }
+.pip-mark { fill: #182547; font-family: Georgia,serif; font-size: 25px; }
+.ace-pip { fill: #182547; font-family: Georgia,serif; font-size: 54px; font-weight: 700; }
+.court-art { overflow: visible; }
+.hand-card { width: clamp(64px, 9vw, 94px); height: calc(clamp(64px, 9vw, 94px) * 1.4); margin-inline: clamp(-8px, -.5vw, -2px); cursor: pointer; transform: rotate(calc((var(--hand-index) - 1.5) * 2.2deg)) translateY(5px); transform-origin: 50% 100%; transition: transform .18s cubic-bezier(.2,.8,.2,1), filter .18s; }
+.hand-card:hover, .hand-card:focus-visible { z-index: 6; transform: rotate(0deg) translateY(-13px); filter: drop-shadow(0 8px 8px rgb(0 0 0 / .26)); }
+.hand-card:disabled { cursor: default; }
+.human-hand .playing-card:not(:first-child) { margin-left: clamp(-10px, -.55vw, -4px); }
+.hidden { display: none !important; }
+
+@keyframes card-arrive { from { opacity: .2; translate: 0 -18px; scale: .94; } to { opacity: 1; translate: 0 0; scale: 1; } }
+@keyframes pisti-pop { 0% { opacity: 0; scale: .55; } 45% { opacity: 1; scale: 1.18; } 70% { scale: .96; } 100% { opacity: 1; scale: 1; } }
+
+.play-panel.is-fullscreen .felt-table { width: min(100%, 1240px); min-height: min(82vh, 800px); --card-w: clamp(82px, 10vh, 118px); }
+.play-panel.is-fullscreen .human-hand .playing-card { width: clamp(88px, 10vh, 118px); height: calc(clamp(88px, 10vh, 118px) * 1.4); }
+@media (max-width: 760px) {
+  .felt-table { --card-w: clamp(53px, 16vw, 74px); min-height: 500px; gap: 12px; padding: 15px 10px; border-width: 8px; border-radius: 25px; }
+  .middle-play { grid-template-columns: .75fr auto .75fr; gap: 4px; }
+  .table-center { min-height: 170px; }
+  .capture-zone { width: 55px; height: 76px; }
+  .capture-zone .playing-card { width: 30px; height: 42px; }
+  .capture-zone::after { font-size: 7px; }
+  .table-pile { width: calc(var(--card-w) * 1.35); }
+  .bot-hand .playing-card { width: 29px; height: 41px; margin-inline: -6px; }
+  .human-hand { min-height: calc(clamp(64px, 20vw, 76px) * 1.4 + 12px); }
+  .hand-card { width: clamp(62px, 19vw, 75px); height: calc(clamp(62px, 19vw, 75px) * 1.4); margin-inline: clamp(-17px, -4vw, -7px); }
+  .human-hand .playing-card:not(:first-child) { margin-left: clamp(-18px, -4vw, -7px); }
+  .table-message { font-size: 12px; }
+}
+@media (max-width: 380px) {
+  .felt-table { min-height: 460px; }
+  .capture-zone { width: 43px; }
+  .middle-play { gap: 0; }
+  .hand-card { width: 64px; height: 90px; margin-inline: -11px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .table-pile .playing-card, .table-message.is-pisti { animation: none; }
+  .hand-card { transition: none; }
+}

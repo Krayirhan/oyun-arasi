@@ -1,24 +1,15 @@
 // Solitaire (Klondike) — pure game rules. Every function returns a new game object (or null for an
 // illegal move); nothing here touches the DOM.
 // Cards are numbers 0–51: suit = Math.floor(card / 13) (0 ♠, 1 ♥, 2 ♦, 3 ♣), rank = card % 13 + 1.
+import { SUITS, RANKS, suitOf, rankOf, isRed, cardName, shuffleDeck } from '../cards.js?v=202609272311';
 
-export const SUITS = ['♠', '♥', '♦', '♣'];
-export const RANKS = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+export { SUITS, RANKS, suitOf, rankOf, isRed, cardName };
 export const DRAW_MODES = { 1: { label: '1 kart' }, 3: { label: '3 kart' } };
 const HISTORY_LIMIT = 200;
 
-export const suitOf = card => Math.floor(card / 13);
-export const rankOf = card => (card % 13) + 1;
-export const isRed = card => suitOf(card) === 1 || suitOf(card) === 2;
-export const cardName = card => `${RANKS[rankOf(card) - 1]}${SUITS[suitOf(card)]}`;
-
 // Tableau columns keep their cards bottom to top; the first `down[i]` cards of column i are face down.
 export function createGame(draw = 1, random = Math.random, now = Date.now()) {
-  const deck = Array.from({ length: 52 }, (_, card) => card);
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j], deck[i]];
-  }
+  const deck = shuffleDeck(random);
   const tableau = Array.from({ length: 7 }, (_, column) => deck.splice(0, column + 1));
   return {
     version: 1,
