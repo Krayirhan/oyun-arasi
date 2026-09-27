@@ -1,5 +1,6 @@
-import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-sekil-v1';
 const boardElement = document.querySelector('#board');
@@ -277,8 +278,8 @@ document.addEventListener('keydown', event => {
   else if (event.key === 'Escape') { selected = -1; renderTray(); showPreview(); }
 });
 
-function newGame() {
-  if (game.status === 'playing' && game.score > 0 && !window.confirm('Devam eden oyun silinsin ve yeni oyun başlasın mı? En iyi skorun korunacak.')) return;
+async function newGame() {
+  if (game.status === 'playing' && game.score > 0 && !(await confirmDialog({ title: 'Yeni oyun başlasın mı?', message: 'Bu oyundaki puanın silinecek; en iyi skorun korunur.', confirmLabel: 'Yeni oyun' }))) return;
   game = createGame(Math.random, game.best);
   selected = -1;
   statusElement.textContent = 'Yeni oyun başladı. Parçaları tahtaya sürükle.';

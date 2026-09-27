@@ -7,6 +7,7 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `index.html`, `styles.css`, `home.js`: platformun ana sayfası, oyun kataloğu, arama ve kategori filtreleri.
 - `catalog.js`: ana sayfadaki "Tüm Oyunlar" ızgarasını ve oyun sayfalarındaki "Diğer oyunlar" şeridini besleyen oyun listesi.
 - `site-header.css`: sitenin tek başlığı (açılış sayfasındaki başlık: oyun kollu logo, ortada arama, Hemen oyna, Arkadaşlarınla oyna, hesap). Her sayfada `<body>`'nin ilk öğesi olarak aynı işaretlemeyle bulunur; ölçüsü açılış sayfasının tuvaline göre ölçeklenir. Aynılığı `tests/site-header.test.mjs` denetler.
+- `game-dialog.js`: oyun içi onay kartı (`confirmDialog`). Oyunlar tarayıcının `confirm()` penceresi yerine bunu kullanır; kart oyun panelinin içinde, oyunun renkleriyle açılır ve tam ekranda da görünür.
 - `game-shell.css`, `game-shell.js`: oyun sayfalarının ortak panel alanını, oyun başlığı/durum/tam ekran araçlarını, kategori ve öneri kartlarını, ayrıca alt bilgi sekmelerini üretir. Menüdeki arama ana sayfaya `?q=` ile, konum bağlantıları `?kategori=` ile gider.
 - `assets/landing/`: ana sayfadaki hero, kart ve oyun kapağı görselleri.
 - `play-page.css`: oyun sayfalarının ortak görsel şablonu. Masaüstünde üç sütun (oyun tanıtımı ve kontroller · oyun alanı · hedef ve öneriler), tablette uyarlanmış ızgara, telefonda oyun alanı önce gelecek şekilde tek sütun.

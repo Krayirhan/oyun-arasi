@@ -1,5 +1,6 @@
-import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-kelime-avi-v1';
 const gridElement = document.querySelector('#board');
@@ -176,9 +177,9 @@ gridElement.addEventListener('keydown', event => {
   }
 });
 
-function startNew(level) {
+async function startNew(level) {
   const inProgress = game.status === 'playing' && game.words.some(entry => entry.found);
-  if (inProgress && !window.confirm('Devam eden bulmaca silinsin ve yeni bulmaca başlasın mı?')) { difficultyPicker.value = game.level; return; }
+  if (inProgress && !(await confirmDialog({ title: 'Yeni bulmaca başlasın mı?', message: 'Bulduğun kelimeler silinecek.', confirmLabel: 'Yeni bulmaca' }))) { difficultyPicker.value = game.level; return; }
   game = createGame(level);
   anchor = -1; selection = []; cursor = 0;
   buildGrid();

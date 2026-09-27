@@ -1,5 +1,6 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-sudoku-v1';
 const boardElement = document.querySelector('#board');
@@ -188,9 +189,9 @@ function onKey(event) {
   if (key === 'z' || key === 'Z') { event.preventDefault(); apply(undo(game), 'Son hamle geri alındı.'); }
 }
 
-function startNew(level) {
+async function startNew(level) {
   const inProgress = game.status === 'playing' && game.board.some((value, index) => value && !game.puzzle[index]);
-  if (inProgress && !window.confirm('Devam eden bulmaca silinsin ve yeni bulmaca başlasın mı?')) { difficultyPicker.value = game.level; return; }
+  if (inProgress && !(await confirmDialog({ title: 'Yeni bulmaca başlasın mı?', message: 'Yazdığın rakamlar ve notlar silinecek.', confirmLabel: 'Yeni bulmaca' }))) { difficultyPicker.value = game.level; return; }
   game = createGame(level);
   selected = game.board.indexOf(0);
   notesMode = false;

@@ -1,5 +1,6 @@
-import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-hafiza-v1';
 const FACES = ['🍋','🍒','🍉','🍇','🍊','🍍','🥝','🍓','🥑','🥕','🍄','🌽','🥥','🍑','🫐','🥨','🍪','🍰'];
@@ -96,9 +97,9 @@ function navigate(event, index) {
   boardElement.children[target].focus();
 }
 
-function startNewGame(pairCount = game.pairCount) {
+async function startNewGame(pairCount = game.pairCount) {
   if (game.status === 'playing' && (game.moves > 0 || game.revealed.length > 0)
-    && !window.confirm('Devam eden oyun silinsin ve yeni oyun başlasın mı?')) {
+    && !(await confirmDialog({ title: 'Yeni oyun başlasın mı?', message: 'Açtığın kartlar ve hamlelerin silinecek.', confirmLabel: 'Yeni oyun' }))) {
     sizePicker.value = String(game.pairCount);
     return;
   }

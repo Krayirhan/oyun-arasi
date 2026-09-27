@@ -1,5 +1,6 @@
-import { COLS, ROWS, HIDDEN_ROWS, SHAPES, createGame, startGame, pauseGame, move, rotate, softDrop, hardDrop, holdPiece, tick, ghostPiece, pieceCells, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { COLS, ROWS, HIDDEN_ROWS, SHAPES, createGame, startGame, pauseGame, move, rotate, softDrop, hardDrop, holdPiece, tick, ghostPiece, pieceCells, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-tetris-v1';
 const REPEAT_DELAY_MS = 170;
@@ -162,9 +163,13 @@ function pause() {
   saveGame();
 }
 
-function newGame() {
+async function newGame() {
   const inProgress = game.pieces > 0 && game.status !== 'over';
-  if (inProgress && !window.confirm('Devam eden oyun silinsin ve yeni oyun başlasın mı?')) return;
+  if (inProgress) {
+    // Onay kartı açıkken taşlar düşmesin; vazgeçilirse oyun duraklatılmış kalır.
+    pause();
+    if (!(await confirmDialog({ title: 'Yeni oyun başlasın mı?', message: 'Devam eden oyunun silinecek; en iyi skorun korunur.', confirmLabel: 'Yeni oyun' }))) return;
+  }
   held.clear();
   game = startGame(createGame());
   rendered = null;
@@ -299,7 +304,7 @@ function frame(now) {
 
 overlayButton.addEventListener('click', play);
 pauseButton.addEventListener('click', () => (game.status === 'playing' ? pause() : play()));
-document.querySelector('#new-game').addEventListener('click', () => { newGame(); document.activeElement?.blur(); });
+document.querySelector('#new-game').addEventListener('click', async () => { await newGame(); document.activeElement?.blur(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pause(); saveGame(); } });
 window.addEventListener('pagehide', saveGame);
 

@@ -1,4 +1,5 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 (() => {
   'use strict';
@@ -262,8 +263,8 @@ import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
     persistAndRender();
   }
 
-  function newGame(force = false) {
-    if (!force && !state.over && !window.confirm('Mevcut oyunun sıfırlansın mı? En iyi skorun korunacak.')) return;
+  async function newGame(force = false) {
+    if (!force && !state.over && !(await confirmDialog({ title: 'Yeniden başlansın mı?', message: 'Tahtadaki taşlar silinecek; en iyi skorun korunur.', confirmLabel: 'Yeniden başlat' }))) return;
     const best = state.best;
     state = defaultState();
     state.best = best;

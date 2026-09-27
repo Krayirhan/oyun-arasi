@@ -1,5 +1,6 @@
-import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-xox-v1';
 const boardElement = document.querySelector('#board');
@@ -78,15 +79,15 @@ function navigate(event, index) {
   target.focus();
 }
 
-document.querySelector('#round-button').addEventListener('click', () => {
-  if (game.status === 'playing' && game.board.some(Boolean) && !window.confirm('Bu tur silinsin ve yeni tur başlasın mı?')) return;
+document.querySelector('#round-button').addEventListener('click', async () => {
+  if (game.status === 'playing' && game.board.some(Boolean) && !(await confirmDialog({ title: 'Yeni tur başlasın mı?', message: 'Bu turdaki hamleler silinecek; skorlar korunur.', confirmLabel: 'Yeni tur' }))) return;
   game = newRound(game);
   render();
   boardElement.querySelector('.cell[tabindex="0"]')?.focus();
 });
 
-document.querySelector('#scores-button').addEventListener('click', () => {
-  if (!window.confirm('X, O ve beraberlik skorları sıfırlansın mı?')) return;
+document.querySelector('#scores-button').addEventListener('click', async () => {
+  if (!(await confirmDialog({ title: 'Skorlar sıfırlansın mı?', message: 'X, O ve beraberlik skorları sıfırlanacak.', confirmLabel: 'Sıfırla' }))) return;
   game = resetScores(game);
   render();
 });

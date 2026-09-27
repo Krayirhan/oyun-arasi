@@ -1,5 +1,6 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');
@@ -333,9 +334,9 @@ function autoComplete() {
   render();
 }
 
-function startNew(draw) {
+async function startNew(draw) {
   const inProgress = game.status === 'playing' && game.moves > 0;
-  if (inProgress && !window.confirm('Devam eden oyun silinsin ve yeni oyun başlasın mı?')) { drawPicker.value = String(game.draw); return; }
+  if (inProgress && !(await confirmDialog({ title: 'Yeni el dağıtılsın mı?', message: 'Bu eldeki hamlelerin silinecek.', confirmLabel: 'Yeni el' }))) { drawPicker.value = String(game.draw); return; }
   stopAuto();
   game = createGame(Number(draw));
   statusElement.textContent = `Yeni oyun: ${DRAW_MODES[game.draw].label} çekiş. Kartları sürükle ya da dokun.`;

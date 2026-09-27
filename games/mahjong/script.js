@@ -1,5 +1,6 @@
-import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271922';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
+import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271940';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271940';
+import { confirmDialog } from '../../game-dialog.js?v=202609271940';
 
 const KEY = 'oyunarasi-mahjong-v1';
 const boardElement = document.querySelector('#board');
@@ -244,9 +245,9 @@ function undoMove() {
   afterChange('Son eş geri kondu.');
 }
 
-function startNew(level) {
+async function startNew(level) {
   const inProgress = game.status === 'playing' && remainingTiles(game) < game.faces.length;
-  if (inProgress && !window.confirm('Devam eden oyun silinsin ve yeni oyun başlasın mı?')) { difficultyPicker.value = game.level; return; }
+  if (inProgress && !(await confirmDialog({ title: 'Yeni oyun başlasın mı?', message: 'Eşleştirdiğin taşlar silinecek.', confirmLabel: 'Yeni oyun' }))) { difficultyPicker.value = game.level; return; }
   game = createGame(level);
   selected = -1;
   hinted = [];
