@@ -1,6 +1,6 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=okeydesign';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=okeydesign';
-import { confirmDialog } from '../../game-dialog.js?v=okeydesign';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=okeymasa';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=okeymasa';
+import { confirmDialog } from '../../game-dialog.js?v=okeymasa';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');

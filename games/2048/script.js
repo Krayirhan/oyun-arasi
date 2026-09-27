@@ -1,5 +1,5 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=okeydesign';
-import { confirmDialog } from '../../game-dialog.js?v=okeydesign';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=okeymasa';
+import { confirmDialog } from '../../game-dialog.js?v=okeymasa';
 
 (() => {
   'use strict';
