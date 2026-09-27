@@ -1,7 +1,7 @@
-import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=202609272311';
-import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=202609272311';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609272311';
-import { createFlow, botDelay } from '../../game-flow.js?v=202609272311';
+import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=202609272312';
+import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=202609272312';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609272312';
+import { createFlow, botDelay } from '../../game-flow.js?v=202609272312';
 
 const KEY = 'oyunarasi-pisti-v1';
 const $ = selector => document.querySelector(selector);
@@ -103,16 +103,20 @@ function render() {
   }));
   $('#menu-button').hidden = false;
   $('#continue-card').hidden = ['match-over'].includes(game.status);
+  const isHumanTurn = game.turn === 0 && game.status === 'playing';
+  $('#turn-prompt').classList.toggle('is-your-turn', isHumanTurn);
+  $('#turn-title').textContent = isHumanTurn ? 'Sıra sende' : 'Rakip oynuyor';
+  $('#turn-hint').textContent = isHumanTurn ? 'Elinden bir kart seçip masaya bırak.' : 'Rakip kartını seçiyor; birazdan sıra sende.';
   if (game.lastAction?.pisti) {
     $('#table-message').textContent = game.lastAction.card % 13 === 10 ? 'VALE PİŞTİ! +20' : 'PİŞTİ! +10';
     $('#table-message').classList.remove('is-pisti');
     requestAnimationFrame(() => $('#table-message').classList.add('is-pisti'));
   } else if (game.turn === 0) {
-    $('#table-message').textContent = 'Sıra sende · Bir kart seç.';
+    $('#table-message').textContent = 'Bir kart seç';
   } else {
-    $('#table-message').textContent = 'Rakip düşünüyor…';
+    $('#table-message').textContent = 'Rakibin hamlesi';
   }
-  $('#status').textContent = game.turn === 0 ? 'Bir kartını masaya bırak.' : 'Bot sıradaki kartını seçiyor.';
+  $('#status').textContent = game.turn === 0 ? 'Bir kart seç: eşleşen değer masayı alır, Vale her kartı toplar.' : 'Rakip hamle yapıyor; kartın oynanınca sıran gelecek.';
 }
 
 function showResult() {
@@ -179,3 +183,4 @@ if (game) {
   $('#continue-copy').textContent = `${game.scores[0]}–${game.scores[1]} · ${game.status === 'deal-over' ? 'Sonraki ele geç' : 'Kaldığın yerden'}`;
 }
 flow.show('menu'); updateChrome();
+

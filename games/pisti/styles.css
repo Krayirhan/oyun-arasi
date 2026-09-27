@@ -3,6 +3,12 @@ body[data-game='pisti'] { --frame: #14553f; --title: #178052; --title-shadow: #1
 body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-soft: #f9e6dd; }
 
 .pisti-game { display: grid; justify-items: center; width: 100%; }
+.start-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; max-width: 720px; margin: 22px auto; padding: 0; list-style: none; text-align: left; }
+.start-steps li { display: flex; align-items: flex-start; gap: 10px; padding: 12px; border: 1px solid #e9e1d4; border-radius: 15px; background: #fffdf8; }
+.start-steps li > b { display: grid; flex: none; width: 27px; height: 27px; place-items: center; border-radius: 50%; background: #176448; color: #fff4d6; font: 800 14px 'Fredoka',sans-serif; }
+.start-steps li span { display: grid; gap: 4px; }
+.start-steps li strong { color: #182547; font: 700 13px 'Fredoka',sans-serif; }
+.start-steps li small { color: #746d60; font-size: 11px; line-height: 1.4; }
 .felt-table { --card-w: clamp(56px, 8vw, 94px); --card-h: calc(var(--card-w) * 1.4); position: relative; isolation: isolate; display: grid; grid-template-rows: auto 1fr auto auto; gap: 15px; width: min(100%, 960px); min-height: 540px; padding: clamp(18px, 3vw, 32px); overflow: hidden; border: 12px solid #704426; border-radius: 35px; background: radial-gradient(ellipse at 50% 42%, #238762 0, #116346 56%, #0b4937 100%); box-shadow: inset 0 0 0 3px #bf8750, inset 0 0 35px rgb(0 0 0 / .19), 0 20px 38px rgb(29 31 25 / .24); color: #fff8df; }
 .table-rail { position: absolute; z-index: -1; inset: 9px; border: 1px solid rgb(255 225 164 / .25); border-radius: 22px; pointer-events: none; }
 .opponent-zone, .human-zone { display: grid; justify-items: center; gap: 9px; }
@@ -17,11 +23,14 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 .bot-hand .playing-card { width: 34px; height: 48px; margin-inline: -5px; border-radius: 6px; }
 .table-center { display: grid; align-items: center; width: 100%; min-height: 194px; }
 .middle-play { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(8px, 2vw, 22px); width: min(100%, 590px); margin-inline: auto; }
+.table-pile-wrap { display: grid; justify-items: center; gap: 3px; }
+.area-caption, .deck-caption { color: rgb(255 245 211 / .76); font: 700 9px 'Fredoka',sans-serif; letter-spacing: .08em; text-transform: uppercase; white-space: nowrap; }
 .stock-stack { position: relative; justify-self: center; width: var(--card-w); height: var(--card-h); }
 .stock-stack::before, .stock-stack::after { position: absolute; inset: 3px 5px -3px -5px; border: 1px solid #e6d5ab; border-radius: 9px; background: repeating-linear-gradient(45deg,#15543d 0 5px,#eac55e 5px 7px,#17664a 7px 12px); content: ''; box-shadow: 0 3px 4px rgb(0 0 0 / .22); }
 .stock-stack::after { inset: 1px 3px -1px -3px; filter: brightness(1.08); }
 .deck-button { position: relative; z-index: 1; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: default; }
 .deck-count { position: absolute; z-index: 3; right: -9px; bottom: -9px; display: grid; min-width: 27px; height: 27px; place-items: center; border: 2px solid #fff4d6; border-radius: 50%; background: #e24d3e; color: #fff; font: 800 11px 'Fredoka',sans-serif; box-shadow: 0 3px 6px rgb(0 0 0 / .3); }
+.deck-caption { position: absolute; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); }
 .table-pile { position: relative; display: flex; align-items: center; justify-content: center; width: calc(var(--card-w) * 1.25); height: calc(var(--card-h) * 1.18); }
 .table-pile .playing-card { position: absolute; width: var(--card-w); height: var(--card-h); animation: card-arrive .24s cubic-bezier(.2,.8,.2,1) both; }
 .table-pile .playing-card:nth-child(1) { transform: translate(-10px, 5px) rotate(-9deg); }
@@ -39,6 +48,13 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 .capture-zone .playing-card:nth-child(4) { --capture-rotation: -4deg; margin-top: -4px; }
 .capture-zone .playing-card:nth-child(5) { --capture-rotation: 6deg; margin-top: 3px; }
 .table-message { justify-self: center; min-height: 25px; padding: 4px 14px; border-radius: 999px; color: #fff1c7; font: 700 13px 'Fredoka',sans-serif; text-align: center; text-shadow: 0 1px 4px rgb(0 0 0 / .25); }
+.turn-prompt { display: flex; justify-self: center; align-items: center; gap: 10px; min-width: 230px; padding: 9px 16px; border: 1px solid rgb(255 245 211 / .24); border-radius: 14px; background: rgb(2 48 35 / .35); }
+.turn-prompt > div { display: grid; gap: 2px; }
+.turn-prompt strong { color: #fff6da; font: 800 14px 'Fredoka',sans-serif; }
+.turn-prompt small { color: rgb(255 246 219 / .74); font-size: 11px; }
+.turn-dot { width: 11px; height: 11px; flex: none; border-radius: 50%; background: #ffbd49; box-shadow: 0 0 0 4px rgb(255 189 73 / .16); }
+.turn-prompt.is-your-turn { border-color: rgb(255 218 117 / .75); background: rgb(123 78 19 / .36); box-shadow: 0 0 20px rgb(255 193 79 / .12); }
+.turn-prompt.is-your-turn .turn-dot { animation: turn-pulse 1.4s ease-in-out infinite; }
 .table-message.is-pisti { animation: pisti-pop .65s cubic-bezier(.16,.9,.2,1.2) both; color: #ffe071; text-shadow: 0 2px 12px #ff9d39, 0 0 20px rgb(255 235 133 / .7); }
 .human-hand { display: flex; justify-content: center; align-items: end; min-height: calc(var(--card-h) + 16px); padding: 3px 4px 9px; }
 .playing-card { position: relative; flex: none; display: block; width: var(--card-w); height: var(--card-h); padding: 0; overflow: visible; border: 0; border-radius: 10px; background: #f9f2df; box-shadow: 0 4px 8px rgb(0 0 0 / .24), 0 13px 20px rgb(0 0 0 / .16); }
@@ -59,6 +75,7 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 
 @keyframes card-arrive { from { opacity: .2; translate: 0 -18px; scale: .94; } to { opacity: 1; translate: 0 0; scale: 1; } }
 @keyframes pisti-pop { 0% { opacity: 0; scale: .55; } 45% { opacity: 1; scale: 1.18; } 70% { scale: .96; } 100% { opacity: 1; scale: 1; } }
+@keyframes turn-pulse { 50% { box-shadow: 0 0 0 8px rgb(255 189 73 / 0); } }
 
 .play-panel.is-fullscreen .felt-table { width: min(100%, 1240px); min-height: min(82vh, 800px); --card-w: clamp(82px, 10vh, 118px); }
 .play-panel.is-fullscreen .human-hand .playing-card { width: clamp(88px, 10vh, 118px); height: calc(clamp(88px, 10vh, 118px) * 1.4); }
@@ -75,6 +92,10 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
   .hand-card { width: clamp(62px, 19vw, 75px); height: calc(clamp(62px, 19vw, 75px) * 1.4); margin-inline: clamp(-17px, -4vw, -7px); }
   .human-hand .playing-card:not(:first-child) { margin-left: clamp(-18px, -4vw, -7px); }
   .table-message { font-size: 12px; }
+  .start-steps { grid-template-columns: 1fr; gap: 7px; max-width: 420px; margin: 16px auto; }
+  .start-steps li { align-items: center; padding: 9px 11px; }
+  .turn-prompt { min-width: min(230px, 90%); padding: 8px 12px; }
+  .area-caption, .deck-caption { font-size: 7px; letter-spacing: .02em; }
 }
 @media (max-width: 380px) {
   .felt-table { min-height: 460px; }
@@ -83,6 +104,6 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
   .hand-card { width: 64px; height: 90px; margin-inline: -11px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .table-pile .playing-card, .table-message.is-pisti { animation: none; }
+  .table-pile .playing-card, .table-message.is-pisti, .turn-prompt.is-your-turn .turn-dot { animation: none; }
   .hand-card { transition: none; }
 }
