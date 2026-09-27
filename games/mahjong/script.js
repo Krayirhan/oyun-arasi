@@ -1,5 +1,5 @@
-import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609270203';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270203';
+import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271320';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271320';
 
 const KEY = 'oyunarasi-mahjong-v1';
 const boardElement = document.querySelector('#board');
@@ -82,16 +82,18 @@ function layoutBoard() {
   const layers = Math.max(...positions.map(p => p.z));
   const mobile = window.matchMedia('(max-width: 760px)').matches;
   const width = frameElement.clientWidth - (mobile ? 24 : 28) - 8;
-  const height = mobile ? Infinity : Math.max(320, window.innerHeight - 330);
+  const fullscreen = frameElement.closest('.play-panel')?.classList.contains('is-fullscreen');
+  const maxUnit = fullscreen ? Infinity : 34;
+  const height = mobile || fullscreen ? Infinity : Math.max(320, window.innerHeight - 330);
   const depth = 0.22;
-  const fit = Math.max(9, Math.min(34, width / (spanX + layers * depth), height / (spanY * 1.3 + layers * depth)));
+  const fit = Math.max(9, Math.min(maxUnit, width / (spanX + layers * depth), height / (spanY * 1.3 + layers * depth)));
   const zoomable = fit < ZOOM_BELOW;
   zoomRow.hidden = !zoomable;
   const factor = zoomable ? zoom : 1;
   zoomLevelElement.textContent = `%${Math.round(factor * 100)}`;
   document.querySelector('#zoom-out').disabled = factor <= ZOOMS[0];
   document.querySelector('#zoom-in').disabled = factor >= ZOOMS[ZOOMS.length - 1];
-  const u = Math.min(34, fit * factor);
+  const u = Math.min(maxUnit, fit * factor);
   const v = u * 1.3;
   boardElement.style.setProperty('--u', `${u}px`);
   boardElement.style.setProperty('--v', `${v}px`);
@@ -282,11 +284,16 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pagehide', saveGame);
 setInterval(() => { if (game.status === 'playing') timerElement.textContent = formatTime(elapsedMilliseconds(game)); }, 500);
 let lastWidth = 0;
+// Düzen bir sonraki karede güncellenir; aynı karede boyut değiştirmek ResizeObserver döngü uyarısı üretir.
+let layoutFrame = 0;
 new ResizeObserver(() => {
   const width = frameElement.clientWidth;
-  if (width !== lastWidth) { lastWidth = width; layoutBoard(); }
+  if (width === lastWidth || layoutFrame) return;
+  layoutFrame = requestAnimationFrame(() => { layoutFrame = 0; lastWidth = frameElement.clientWidth; layoutBoard(); });
 }).observe(frameElement);
 window.addEventListener('resize', layoutBoard);
+// Tam ekranda game-shell.js her genişlik denemesinde bu olayı yayınlar; tahta hemen yeniden ölçülür.
+window.addEventListener('game:fullscreenfit', () => { lastWidth = frameElement.clientWidth; layoutBoard(); });
 
 // Zooming keeps the middle of what you were looking at in view.
 function setZoom(next) {

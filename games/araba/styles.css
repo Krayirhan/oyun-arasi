@@ -21,3 +21,16 @@ body[data-game='araba'] .goal-equation b.goal-light { background: #3d4250; }
   .steer-pad { display: grid; }
   .steer-pad button { background: rgb(255 255 255 / .22); }
 }
+
+/* Tam ekran: yol çerçeve genişliğini doldurur (sabit en-boy oranıyla); script.js çizim çözünürlüğünü bu boyuttan alır.
+   Dokunmatik yatay ekranda direksiyon tuşları yolun iki yanına geçer. */
+.play-panel.is-fullscreen .road-wrap { width: 100%; }
+.play-panel.is-fullscreen .road { width: 100% !important; height: auto !important; aspect-ratio: 9 / 14; }
+@media (pointer: coarse) and (orientation: landscape) {
+  .play-panel.is-fullscreen .board-frame { grid-template-columns: 96px minmax(0, 1fr) 96px; align-items: stretch; justify-items: stretch; column-gap: 12px; }
+  .play-panel.is-fullscreen .road-wrap { grid-column: 2; grid-row: 1; }
+  .play-panel.is-fullscreen .steer-pad { display: contents; }
+  .play-panel.is-fullscreen .steer-pad button { grid-row: 1; height: auto; min-height: 0; }
+  .play-panel.is-fullscreen .steer-pad button:first-child { grid-column: 1; }
+  .play-panel.is-fullscreen .steer-pad button:last-child { grid-column: 3; }
+}

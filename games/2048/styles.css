@@ -52,3 +52,6 @@ body[data-game='2048'] {
 @media (prefers-reduced-motion: reduce) {
   .tile.new-tile, .tile.merged { animation: none; }
 }
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
+.play-panel.is-fullscreen .board { width: 100%; }

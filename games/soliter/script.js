@@ -1,5 +1,5 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609270203';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270203';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202609271320';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271320';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');
@@ -66,7 +66,8 @@ function measure() {
   const gap = mobile ? 5 : 10;
   const width = frameElement.clientWidth - (mobile ? 24 : 28);
   const minCardWidth = mobile ? 30 : 38;
-  const w = Math.max(minCardWidth, Math.min(96, Math.floor((width - gap * 6) / 7)));
+  const maxCardWidth = frameElement.closest('.play-panel')?.classList.contains('is-fullscreen') ? Infinity : 96;
+  const w = Math.max(minCardWidth, Math.min(maxCardWidth, Math.floor((width - gap * 6) / 7)));
   size = { w, h: Math.round(w * 1.4), gap, mobile };
   tableElement.style.setProperty('--card-w', `${w}px`);
   tableElement.style.setProperty('--card-h', `${size.h}px`);
@@ -366,7 +367,16 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('pagehide', saveGame);
 setInterval(() => { if (game.status === 'playing') timerElement.textContent = formatTime(elapsedMilliseconds(game)); }, 500);
-new ResizeObserver(() => { const before = size.w; measure(); if (size.w !== before || !tableElement.children.length) render(); }).observe(frameElement);
+// Ölçüm bir sonraki karede yapılır; aynı karede boyut değiştirmek ResizeObserver döngü uyarısı üretir.
+let measureFrame = 0;
+new ResizeObserver(() => {
+  if (measureFrame) return;
+  measureFrame = requestAnimationFrame(() => { measureFrame = 0; const before = size.w; measure(); if (size.w !== before || !tableElement.children.length) render(); });
+}).observe(frameElement);
+// Tam ekrana giriş/çıkışta ve tam ekrandaki her genişlik denemesinde kartlar hemen yeniden ölçülür.
+const remeasure = () => { const before = size.w; measure(); if (size.w !== before) render(); };
+window.addEventListener('game:fullscreenchange', remeasure);
+window.addEventListener('game:fullscreenfit', remeasure);
 
 // Firestore cannot store arrays inside arrays (the columns), so the cloud copy keeps the game as JSON text.
 function cloudState() {

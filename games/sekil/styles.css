@@ -48,3 +48,11 @@ body[data-game='sekil'] { --frame: #c43d78; --title: #c43d78; --title-shadow: #8
   .tray-slot { height: clamp(72px, 13svh, 112px); }
 }
 @media (prefers-reduced-motion: reduce) { .block-cell, .tray-slot { transition: none; } .block-cell.clearing { animation: none; } }
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
+.play-panel.is-fullscreen .block-board, .play-panel.is-fullscreen .tray { width: 100%; }
+@media (orientation: landscape) {
+  .play-panel.is-fullscreen .board-frame { grid-template-columns: minmax(0, 1fr) minmax(90px, 26%); align-items: stretch; justify-items: stretch; column-gap: clamp(12px, 2vw, 24px); }
+  .play-panel.is-fullscreen .tray { grid-template-columns: minmax(0, 1fr); grid-template-rows: repeat(3, minmax(0, 1fr)); }
+  .play-panel.is-fullscreen .tray-slot { height: auto; min-height: 0; }
+}

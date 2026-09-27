@@ -128,6 +128,309 @@ if (howCardForControls && shortcutCard) {
   howCardForControls.append(sample);
 }
 
+// ---------------------------------------------------------------- Tam ekran
+// Görünüm her zaman bizim sabit konumlu yerleşimimizle yapılır (panel.is-fullscreen). Tarayıcı tam ekranı
+// destekleniyorsa ek olarak <html> üzerinde istenir; böylece adres çubuğu gizlenir ama panel dışındaki pencereler
+// (sonuç penceresi, bildirim) de görünmeye devam eder. Desteklenmiyorsa (iPhone) aynı yerleşim yedek mod olarak
+// açılır ve geri tuşu tam ekrandan çıkar. Tahta, oyunların tam ekran kurallarıyla çerçeve genişliğinden
+// boyutlanır; burada çerçeve genişliği tüm içerik ekrana sığacak şekilde hesaplanır.
+const FULLSCREEN_OPTIONS = {
+  harfane: { key: false, fit: '.board-wrap' },
+  'mayin-tarlasi': { key: false },
+  'platform-macera': { orientation: 'landscape' },
+  tetris: { orientation: 'portrait' },
+  araba: { orientation: 'portrait' }
+};
+const FULLSCREEN_ICONS = {
+  enter: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><path d="M8 8 3 3m13 5 5-5M8 16l-5 5m13-5 5 5"/></svg>',
+  exit: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 8h5V3m8 0v5h5M3 16h5v5m8 0v-5h5"/><path d="M3 3l5 5m13-5-5 5M3 21l5-5m13 5-5-5"/></svg>'
+};
+const FULLSCREEN_MAX_WIDTH = 1600;
+const FULLSCREEN_MIN_WIDTH = 120;
+
+function setupFullscreen(panel, button, options = {}) {
+  const settings = { fit: '.board-frame', key: true, orientation: null, ...options };
+  const root = document.documentElement;
+  const coarse = matchMedia('(pointer: coarse)');
+  const portrait = matchMedia('(orientation: portrait)');
+  let active = false;
+  let native = false;
+  let historyEntry = false;
+  let wakeLock = null;
+  let fitFrame = 0;
+  let stableKey = '';
+  let fitWidth = 0;
+  let savedScroll = 0;
+  let restoreUntil = 0;
+  let previousRestoration = null;
+  let hint = null;
+  let hintDismissed = false;
+
+  const nativeElement = () => document.fullscreenElement || document.webkitFullscreenElement || null;
+  const target = () => panel.querySelector(settings.fit);
+  const typing = element => element instanceof HTMLElement && (element.isContentEditable || element.matches('input:not([type="button"], [type="checkbox"], [type="radio"], [type="range"]), textarea, select'));
+  const innerSize = () => {
+    const style = getComputedStyle(panel);
+    return {
+      width: panel.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight),
+      height: panel.clientHeight - parseFloat(style.paddingTop) - parseFloat(style.paddingBottom),
+      gap: parseFloat(style.rowGap) || 0
+    };
+  };
+
+  function updateButton() {
+    button.innerHTML = active ? FULLSCREEN_ICONS.exit : FULLSCREEN_ICONS.enter;
+    button.setAttribute('aria-pressed', String(active));
+    button.setAttribute('aria-label', active ? 'Tam ekrandan çık' : 'Tam ekran');
+    button.title = active ? 'Tam ekrandan çık (Esc)' : settings.key ? 'Tam ekran (F)' : 'Tam ekran';
+  }
+
+  function notify() {
+    window.dispatchEvent(new CustomEvent('game:fullscreenchange', { detail: { active } }));
+    requestAnimationFrame(() => window.dispatchEvent(new Event('resize')));
+  }
+
+  // Sığdırılan öğenin genişliğini, başlık + tahta + alt çubuk panelin iç yüksekliğini tam dolduracak şekilde ayarla.
+  // Tahta yüksekliği genişlikle (yaklaşık) doğrusal değişir: iki ölçüm varsa eğimle (sekant), yoksa oranla yaklaşılır.
+  // Tahta bir üst ya da alt sınıra takılırsa birkaç adım denenir; sonunda sığan en geniş değer seçilir.
+  function fit() {
+    fitFrame = 0;
+    const element = target();
+    if (!active || !element) return;
+    const { width: availableWidth, height: availableHeight, gap } = innerSize();
+    const maxWidth = Math.max(FULLSCREEN_MIN_WIDTH, Math.min(availableWidth, FULLSCREEN_MAX_WIDTH));
+    const clampWidth = value => Math.min(maxWidth, Math.max(FULLSCREEN_MIN_WIDTH, value));
+    const flowChildren = [...panel.children].filter(child => {
+      const position = getComputedStyle(child).position;
+      return child.getClientRects().length && position !== 'absolute' && position !== 'fixed';
+    });
+    // Sütun düzeninde yükseklikler toplanır; bir oyun tam ekranı ızgaraya çevirdiyse (yan yana düzen) kapladığı alan ölçülür.
+    const grid = getComputedStyle(panel).display === 'grid';
+    const contentHeight = () => {
+      if (grid) {
+        const rects = flowChildren.map(child => child.getBoundingClientRect());
+        return Math.max(...rects.map(r => r.bottom)) - Math.min(...rects.map(r => r.top));
+      }
+      return flowChildren.reduce((sum, child) => sum + child.getBoundingClientRect().height, 0) + gap * Math.max(0, flowChildren.length - 1);
+    };
+    // Tahtasını JS ile ölçen oyunlar (Mahjong, Soliter, Araba) bu olayı dinleyip hemen yeniden ölçer; böylece
+    // her deneme aynı karede doğru yüksekliği verir.
+    const apply = value => {
+      panel.style.setProperty('--fs-fit-w', `${Math.floor(value)}px`);
+      window.dispatchEvent(new CustomEvent('game:fullscreenfit', { detail: { width: Math.floor(value) } }));
+    };
+    const measure = () => ({ height: element.getBoundingClientRect().height, excess: contentHeight() - availableHeight });
+    let last = null;
+    const slopeAt = (w, h) => (last && Math.abs(last.width - w) > 0.5 && Math.abs(last.height - h) >= 0.5 ? (h - last.height) / (w - last.width) : 0);
+
+    let width = clampWidth(fitWidth || maxWidth);
+    apply(width);
+    let { height, excess } = measure();
+    let bestFit = excess <= 1 ? { width, excess } : null;
+    let probe = null;
+    for (let i = 0; i < 14; i += 1) {
+      if (Math.abs(excess) <= 1 || height <= 0) break;
+      if (excess < 0 && width >= maxWidth) break;
+      const slope = slopeAt(width, height);
+      let next;
+      if (probe) next = width * 0.75;
+      else if (slope > 0) next = width - excess / slope;
+      else next = width * Math.max(0.3, (height - excess) / height);
+      next = clampWidth(next);
+      if (excess > 0 && next > width - 1) next = Math.max(FULLSCREEN_MIN_WIDTH, width - 1);
+      if (Math.abs(next - width) < 0.5) break;
+      const before = { width, height, excess };
+      last = { width, height };
+      width = next;
+      apply(width);
+      ({ height, excess } = measure());
+      if (Math.abs(height - before.height) >= 0.5) {
+        if (excess <= 1 && (!bestFit || width > bestFit.width)) bestFit = { width, excess };
+        probe = null;
+        continue;
+      }
+      // Tepki yok: tahta bir sınıra takıldı. Boşluk varsa daha genişte kalmanın anlamı yok, geri dön.
+      if (before.excess < 0) {
+        width = before.width;
+        apply(width);
+        ({ height, excess } = measure());
+        break;
+      }
+      // Taşma varsa sınırın altına inmek için birkaç adım daha daralt; hiç tepki yoksa son tepki veren genişliğe dön.
+      probe ||= { width: before.width, steps: 0 };
+      probe.steps += 1;
+      if (probe.steps > 5 || width <= FULLSCREEN_MIN_WIDTH) {
+        width = probe.width;
+        apply(width);
+        ({ height, excess } = measure());
+        break;
+      }
+    }
+    // Döngü taşarak bittiyse doğrulanmış (taze) ve sığan en geniş değere dön.
+    if (excess > 1 && bestFit) { width = bestFit.width; excess = bestFit.excess; apply(width); }
+    fitWidth = width;
+    // Son çare: hiçbir genişlik sığdıramıyorsa içerik kesilmesin, panel kaydırılabilir olsun.
+    panel.classList.toggle('fs-overflow', excess > 1);
+    stableKey = `${availableWidth}x${availableHeight}:${Math.round(element.getBoundingClientRect().height)}`;
+  }
+
+  function scheduleFit() {
+    if (!fitFrame) fitFrame = requestAnimationFrame(fit);
+  }
+
+  // Kendi genişlik değişikliğimizin tetiklediği gözlemleri yok say; yalnızca ekran ya da içerik değişince yeniden sığdır.
+  const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(() => {
+    const element = target();
+    if (!active || !element) return;
+    // Oyun tam ekrandayken paneli gizlerse (örneğin ana menüye dönüş) tam ekrandan çık.
+    if (!panel.getClientRects().length) { exit(); return; }
+    const { width, height } = innerSize();
+    if (`${width}x${height}:${Math.round(element.getBoundingClientRect().height)}` !== stableKey) scheduleFit();
+  }) : null;
+
+  function updateHint() {
+    const wrong = active && settings.orientation && coarse.matches && (settings.orientation === 'landscape') === portrait.matches;
+    if (!wrong || hintDismissed) {
+      if (hint) { hint.remove(); hint = null; }
+      return;
+    }
+    if (hint) return;
+    hint = document.createElement('div');
+    hint.className = 'fs-rotate-hint';
+    hint.setAttribute('role', 'status');
+    const text = document.createElement('span');
+    text.textContent = settings.orientation === 'landscape' ? '↻ Daha rahat oynamak için telefonu yan çevir' : '↻ Daha rahat oynamak için telefonu dik tut';
+    const close = document.createElement('button');
+    close.type = 'button';
+    close.setAttribute('aria-label', 'İpucunu kapat');
+    close.textContent = '✕';
+    close.addEventListener('click', () => { hintDismissed = true; updateHint(); });
+    hint.append(text, close);
+    panel.append(hint);
+    // İçeriği itmeyen, kendiliğinden kaybolan bir bildirim: 6 saniye sonra ya da ✕ ile kapanır.
+    setTimeout(() => { if (hint) { hintDismissed = true; updateHint(); } }, 6000);
+  }
+
+  async function lockOrientation() {
+    if (settings.orientation && native && coarse.matches) {
+      try { await screen.orientation?.lock?.(settings.orientation); } catch { /* Kilit desteklenmiyorsa ipucu gösterilir. */ }
+    }
+    updateHint();
+  }
+
+  async function requestWakeLock() {
+    if (!active || !navigator.wakeLock || (wakeLock && !wakeLock.released)) return;
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch { wakeLock = null; }
+  }
+
+  async function enter() {
+    if (active) return;
+    active = true;
+    savedScroll = window.scrollY;
+    // Tarayıcı tam ekranı kullanıcı tıklamasının içinde, ilk await'ten önce istenmeli.
+    const request = root.requestFullscreen || root.webkitRequestFullscreen;
+    let pending = null;
+    if (request && !nativeElement()) {
+      try { pending = request.call(root, { navigationUI: 'hide' }); } catch { pending = null; }
+    }
+    root.classList.add('game-fs-open');
+    panel.classList.add('is-fullscreen');
+    panel.setAttribute('tabindex', '-1');
+    target()?.setAttribute('data-fs-fit', '');
+    updateButton();
+    fit();
+    observer?.observe(panel);
+    if (target()) observer?.observe(target());
+    if (!panel.contains(document.activeElement) || document.activeElement === button) panel.focus({ preventScroll: true });
+    notify();
+    try { await pending; } catch { /* Yedek mod kullanılır. */ }
+    if (!active) return;
+    native = Boolean(nativeElement());
+    if (!native) {
+      // Geri tuşu tam ekrandan çıksın; tarayıcı çıkışta eski kaydırma konumunu kendi başına geri yüklemesin.
+      if ('scrollRestoration' in history) { previousRestoration = history.scrollRestoration; history.scrollRestoration = 'manual'; }
+      history.pushState({ ...(history.state || {}), gameFullscreen: true }, '');
+      historyEntry = true;
+    }
+    lockOrientation();
+    requestWakeLock();
+  }
+
+  function exit({ fromHistory = false } = {}) {
+    if (!active) return;
+    active = false;
+    cancelAnimationFrame(fitFrame);
+    fitFrame = 0;
+    observer?.disconnect();
+    root.classList.remove('game-fs-open');
+    panel.classList.remove('is-fullscreen', 'fs-overflow');
+    panel.removeAttribute('tabindex');
+    panel.style.removeProperty('--fs-fit-w');
+    fitWidth = 0;
+    panel.querySelector('[data-fs-fit]')?.removeAttribute('data-fs-fit');
+    hint?.remove();
+    hint = null;
+    wakeLock?.release?.().catch(() => {});
+    wakeLock = null;
+    try { screen.orientation?.unlock?.(); } catch { /* Kilit yoksa yapılacak bir şey yok. */ }
+    if (nativeElement()) {
+      const leave = document.exitFullscreen || document.webkitExitFullscreen;
+      try { leave?.call(document)?.catch?.(() => {}); } catch { /* Zaten çıkılmış olabilir. */ }
+    }
+    native = false;
+    if (historyEntry) {
+      historyEntry = false;
+      if (!fromHistory && history.state?.gameFullscreen) history.back();
+    }
+    // Tarayıcı tam ekrandan çıkış ve geçmişe dönüş kaydırmayı eşzamansız değiştirebilir; kısa süre konumu koru.
+    restoreUntil = performance.now() + 600;
+    restoreScroll();
+    updateButton();
+    button.focus({ preventScroll: true });
+    notify();
+  }
+
+  function restoreScroll() {
+    if (active || performance.now() > restoreUntil) return;
+    window.scrollTo({ top: savedScroll, behavior: 'instant' });
+    if (previousRestoration && !historyEntry) {
+      requestAnimationFrame(() => { if (previousRestoration && !active) { history.scrollRestoration = previousRestoration; previousRestoration = null; } });
+    }
+  }
+
+  button.addEventListener('click', event => {
+    event.preventDefault();
+    if (active) exit(); else enter();
+  });
+  const onNativeChange = () => {
+    if (nativeElement()) { native = true; return; }
+    if (active && native) exit();
+    else restoreScroll();
+  };
+  document.addEventListener('fullscreenchange', onNativeChange);
+  document.addEventListener('webkitfullscreenchange', onNativeChange);
+  window.addEventListener('popstate', () => {
+    if (active && historyEntry && !history.state?.gameFullscreen) { historyEntry = false; exit({ fromHistory: true }); }
+    else { restoreScroll(); requestAnimationFrame(restoreScroll); }
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && active && !native) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      exit();
+      return;
+    }
+    if (!settings.key || (event.key !== 'f' && event.key !== 'F') || event.repeat || event.ctrlKey || event.metaKey || event.altKey || typing(event.target)) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (active) exit(); else enter();
+  }, true);
+  portrait.addEventListener?.('change', () => { updateHint(); scheduleFit(); });
+  coarse.addEventListener?.('change', updateHint);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') requestWakeLock(); });
+  updateButton();
+}
+
 const panel = document.querySelector('.play-panel, .game-play');
 if (panel) {
   panel.classList.add('play-panel');
@@ -149,20 +452,6 @@ if (panel) {
   const fullscreen = document.createElement('button');
   fullscreen.type = 'button';
   fullscreen.className = 'fullscreen-button';
-  fullscreen.setAttribute('aria-label', 'Tam ekranı aç');
-  fullscreen.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5"/><path d="M8 8 3 3m13 5 5-5M8 16l-5 5m13-5 5 5"/></svg>';
-  fullscreen.addEventListener('click', async () => {
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else await panel.requestFullscreen();
-    } catch { /* Fullscreen can be unavailable in embedded or restricted browsers. */ }
-  });
-  const updateFullscreen = () => {
-    const active = document.fullscreenElement === panel;
-    fullscreen.setAttribute('aria-label', active ? 'Tam ekrandan çık' : 'Tam ekranı aç');
-    fullscreen.setAttribute('aria-pressed', String(active));
-  };
-  document.addEventListener('fullscreenchange', updateFullscreen);
   const toolbar = panel.querySelector('.play-bar');
   const actions = toolbar?.querySelector('.actions');
   const restart = actions?.querySelector('.play-new');
@@ -184,6 +473,7 @@ if (panel) {
     if (status) footer.append(status);
     panel.append(footer);
   }
+  setupFullscreen(panel, fullscreen, FULLSCREEN_OPTIONS[gameId]);
 }
 
 const goalTitle = document.querySelector('#goal-title');

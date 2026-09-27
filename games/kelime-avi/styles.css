@@ -39,3 +39,10 @@ body[data-game='kelime-avi'] .goal-equation b { min-width: 50px; height: 50px; f
   .theme-label { color: var(--ink); }
 }
 @media (prefers-reduced-motion: reduce) { .letter-cell { transition: none; } .letter-cell.hinted:not(.found) { animation: none; background: #fecf40; } }
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
+.play-panel.is-fullscreen .letter-grid, .play-panel.is-fullscreen .word-list { width: 100%; }
+@media (orientation: landscape) {
+  .play-panel.is-fullscreen .board-frame { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: center; justify-items: stretch; column-gap: clamp(14px, 2.4vw, 32px); }
+  .play-panel.is-fullscreen .word-list { align-content: center; }
+}

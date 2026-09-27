@@ -1,5 +1,5 @@
-import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=202609270203';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609270203';
+import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=202609271320';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271320';
 
 const KEY = 'oyunarasi-araba-v1';
 const canvas = document.querySelector('#board');
@@ -40,11 +40,17 @@ function formatDistance(metres) {
 
 // Canvas size: as tall as the window allows on wide screens, as wide as the panel on phones.
 function resize() {
+  const fullscreen = frameElement.closest('.play-panel')?.classList.contains('is-fullscreen');
   const mobile = window.matchMedia('(max-width: 760px)').matches;
   const available = Math.max(1, frameElement.clientWidth - (mobile ? 24 : 28));
   let h;
   let w;
-  if (mobile) {
+  if (fullscreen) {
+    // Tam ekranda yolun ekrandaki boyutunu CSS belirler; burada yalnızca çizim çözünürlüğü güncellenir.
+    const rect = canvas.getBoundingClientRect();
+    w = Math.max(1, rect.width);
+    h = Math.max(1, rect.height);
+  } else if (mobile) {
     w = Math.min(available, 440);
     h = Math.max(240, Math.min(w * 1.45, window.innerHeight - 300));
   } else {
@@ -53,8 +59,10 @@ function resize() {
   }
   const ratio = Math.min(window.devicePixelRatio || 1, 2);
   view = { w: Math.round(w), h: Math.round(h), ratio };
-  canvas.style.width = `${view.w}px`;
-  canvas.style.height = `${view.h}px`;
+  if (!fullscreen) {
+    canvas.style.width = `${view.w}px`;
+    canvas.style.height = `${view.h}px`;
+  }
   canvas.width = Math.round(view.w * ratio);
   canvas.height = Math.round(view.h * ratio);
   draw(performance.now());
@@ -62,7 +70,9 @@ function resize() {
 
 function roundRect(x, y, w, h, r) {
   context.beginPath();
-  context.roundRect(x, y, w, h, r);
+  // Tuval çok küçükken (ör. tam ekran sığdırma denemesi) boyutlar negatife düşebilir; çizimi atla.
+  if (w <= 0 || h <= 0) return;
+  context.roundRect(x, y, w, h, Math.max(0, Math.min(r, w / 2, h / 2)));
 }
 
 function drawCar(cx, cy, w, h, [body, edge], player = false) {
@@ -283,6 +293,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) pause
 window.addEventListener('blur', pause);
 new ResizeObserver(() => resize()).observe(frameElement);
 window.addEventListener('resize', resize);
+window.addEventListener('game:fullscreenfit', resize);
 
 const cloudSync = syncGameOnAccountChange('araba', {
   read: () => ({ records }),

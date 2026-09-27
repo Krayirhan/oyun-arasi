@@ -25,3 +25,6 @@ body[data-game='mayin-tarlasi'] { --frame: #1768a0; --title: #1768a0; --title-sh
 @media (max-width: 760px) {
   .board { --gap: 3px; --cell: clamp(22px, calc((100cqw - (var(--columns) - 1) * var(--gap)) / var(--columns)), 56px); }
 }
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
+.play-panel.is-fullscreen .board { --cell: clamp(22px, calc((100cqw - (var(--columns) - 1) * var(--gap)) / var(--columns)), 84px); }

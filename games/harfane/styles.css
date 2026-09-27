@@ -232,3 +232,27 @@ h1 em { color: var(--green); font-style: normal; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Tam ekran: kutu boyutu tahta kutusunun genişliğinden türetilir; game-shell.js bu kutuyu ekrana sığdırır. */
+body[data-game='harfane'] .play-panel.is-fullscreen .board-wrap { width: fit-content; }
+body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(34px, calc((var(--fs-fit-w, 400px) - 72px) / 5), 120px); grid-template-columns: repeat(5, var(--fs-tile)); }
+body[data-game='harfane'] .play-panel.is-fullscreen .tile { width: var(--fs-tile); height: var(--fs-tile); font-size: calc(var(--fs-tile) * .48); }
+body[data-game='harfane'] .play-panel.is-fullscreen .keyboard, body[data-game='harfane'] .play-panel.is-fullscreen .daily-footer { width: min(100%, 640px); }
+@media (max-height: 520px) {
+  body[data-game='harfane'] .play-panel.is-fullscreen .keyboard { gap: 4px; }
+  body[data-game='harfane'] .play-panel.is-fullscreen .key { height: 32px; }
+  body[data-game='harfane'] .play-panel.is-fullscreen .board-wrap { padding: 8px 10px; }
+}
+/* Kısa yatay ekranda (telefon yan) tahta solda, klavye sağda. */
+@media (orientation: landscape) and (max-height: 600px) {
+  body[data-game='harfane'] .play-panel.is-fullscreen { display: grid !important; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto auto; align-content: center; column-gap: 16px; }
+  body[data-game='harfane'] .play-panel.is-fullscreen > * { margin: 0 !important; }
+  body[data-game='harfane'] .play-panel.is-fullscreen { padding-top: calc(max(6px, env(safe-area-inset-top)) + 44px); }
+  body[data-game='harfane'] .play-panel.is-fullscreen > .play-panel-head { position: absolute; width: auto; top: max(6px, env(safe-area-inset-top)); right: max(14px, env(safe-area-inset-right)); left: max(14px, env(safe-area-inset-left)); }
+  body[data-game='harfane'] .play-panel.is-fullscreen > :is(.fs-rotate-hint, .play-panel-footer) { grid-column: 1 / -1; }
+  body[data-game='harfane'] .play-panel.is-fullscreen > .board-wrap { grid-column: 1; }
+  /* Klavye en az 300 px kalsın; kutular kalan genişliğe göre küçülür. */
+  body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(26px, min(calc((var(--fs-fit-w, 400px) - 44px) / 5), calc((100vw - 300px - 110px) / 5)), 120px); }
+  body[data-game='harfane'] .play-panel.is-fullscreen > .keyboard { grid-column: 2; align-self: center; width: 100%; }
+  body[data-game='harfane'] .play-panel.is-fullscreen > .section-label { display: none; }
+}

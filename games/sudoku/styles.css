@@ -44,3 +44,13 @@ body[data-game='sudoku'] { --frame: #b86e00; --title: #b86e00; --title-shadow: #
   .tool-button { border-color: var(--line); background: #fff; color: var(--ink); }
 }
 @media (prefers-reduced-motion: reduce) { .sudoku-cell, .numpad-key { transition: none; } }
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; yatay ekranda tuş takımı tahtanın sağına geçer. */
+.play-panel.is-fullscreen .sudoku-board { width: 100%; }
+@media (orientation: landscape) {
+  .play-panel.is-fullscreen .board-frame { grid-template-columns: minmax(0, 1fr) minmax(140px, 28%); align-items: center; column-gap: clamp(12px, 2vw, 24px); }
+  .play-panel.is-fullscreen .numpad { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(6px, 1vw, 10px); }
+  .play-panel.is-fullscreen .numpad-key { height: auto; aspect-ratio: 1; }
+  .play-panel.is-fullscreen .numpad-key b { font-size: clamp(20px, 3.2vh, 32px); }
+  .play-panel.is-fullscreen .numpad-erase { grid-column: 1 / -1; aspect-ratio: auto; height: clamp(40px, 7vh, 60px); }
+}

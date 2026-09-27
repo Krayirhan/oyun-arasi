@@ -60,3 +60,11 @@ body[data-game='tetris'] .goal-equation b.goal-light { letter-spacing: -.12em; c
   .mini-box, .stat-box { padding: 7px 4px; }
 }
 @media (prefers-reduced-motion: reduce) { .well.flash .cell.filled, .clear-pop.show { animation: none; } }
+
+/* Tam ekran: hücre boyutu çerçeve genişliğinden (yan sütunlar ve kuyu çerçevesi düşülerek) hesaplanır;
+   game-shell.js çerçeveyi ekrana sığdırır. Dokunmatik yatay ekranda tuşlar kuyunun sağına geçer. */
+.play-panel.is-fullscreen .board-frame { --cell: max(10px, calc((100cqw - 232px) / 10)); }
+@media (pointer: coarse) and (orientation: landscape) {
+  .play-panel.is-fullscreen .board-frame { --cell: max(10px, calc((100cqw - 232px - 184px) / 10)); grid-template-columns: auto 170px; align-items: center; column-gap: 14px; }
+  .play-panel.is-fullscreen .touch-pad { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: none; }
+}

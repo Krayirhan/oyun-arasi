@@ -16,3 +16,6 @@ body[data-game='xox'] { --frame: #0a2fb5; --title: #0b36c0; --title-shadow: #071
   .turn-indicator strong { color: var(--accent); }
 }
 @media (prefers-reduced-motion: reduce) { .cell { transition: none; } .cell:not(:disabled):hover { transform: none; } }
+
+/* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
+.play-panel.is-fullscreen .board { width: 100%; }

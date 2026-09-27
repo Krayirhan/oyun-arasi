@@ -136,8 +136,6 @@ body.game-page { --frame: #10264b; --title: var(--accent); --title-shadow: var(-
 .play-panel-footer .score-card > span { color: rgb(255 255 255 / .82); font-size: 14px !important; }
 .play-panel-footer .score-card > strong { color: #fecf40; font-size: 22px !important; }
 .play-panel-footer .status { flex: 1; margin: 0; text-align: right; }
-.play-panel:fullscreen { display: flex; min-height: 100dvh; flex-direction: column; justify-content: center; overflow: auto; padding: clamp(16px, 3vw, 40px); border: 0; border-radius: 0; }
-.play-panel:fullscreen .board-frame { width: min(100%, 1000px); align-self: center; }
 
 /* Bottom information tabs shown on every game page. */
 .game-details { display: grid; grid-template-columns: minmax(0, 1fr) 300px; grid-template-rows: auto 1fr; column-gap: 20px; margin: 0 0 30px; padding: 22px; border: 1px solid var(--line); border-radius: 20px; background: var(--surface); box-shadow: 0 5px 18px rgb(40 30 10 / .04); }
@@ -309,3 +307,79 @@ body.game-page { --frame: #10264b; --title: var(--accent); --title-shadow: var(-
   .play-page .scores .score-card i.pop { animation: none; }
   .play-button, .more-card-head svg, .how-chevron { transition: none; }
 }
+
+/* Tam ekran (game-shell.js): panel ekranı kaplayan sabit bir sütuna dönüşür. Başlık üstte, alt çubuk altta kalır;
+   aradaki içerik ortalanır ve [data-fs-fit] öğesinin genişliği (--fs-fit-w) her şey ekrana sığacak şekilde hesaplanır.
+   Oyunlar tam ekranda tahtalarını ekran yüksekliğinden değil bu genişlikten türetir. */
+html.game-fs-open, html.game-fs-open body { overflow: hidden; overscroll-behavior: none; }
+html.game-fs-open :is(.modal-backdrop, .toast) { z-index: 1001; }
+.play-panel.is-fullscreen {
+  position: fixed !important; inset: 0; z-index: 1000; display: flex !important; flex-direction: column; gap: 10px;
+  box-sizing: border-box; width: 100vw; max-width: none; height: 100vh; height: 100dvh; min-height: 0; margin: 0 !important;
+  padding: max(10px, env(safe-area-inset-top)) max(14px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+  overflow: hidden; overscroll-behavior: contain; border: 0; border-radius: 0; box-shadow: none; outline: none;
+}
+.play-panel.is-fullscreen.fs-overflow { overflow-y: auto; }
+.play-panel.is-fullscreen > * { flex: none; order: 0; max-width: 100%; margin: 0; }
+.play-panel.is-fullscreen > :not(.play-panel-head, .play-panel-footer) { align-self: center; }
+.play-panel.is-fullscreen > .play-panel-head + * { margin-top: auto; }
+.play-panel.is-fullscreen > :has(+ .play-panel-footer), .play-panel.is-fullscreen > :last-child:not(.play-panel-footer) { margin-bottom: auto; }
+.play-panel.is-fullscreen > :is([data-fs-fit], .progress-row) { width: var(--fs-fit-w, auto); box-sizing: border-box; }
+.play-panel.is-fullscreen > .play-options { width: 100%; justify-content: center; margin: 0; }
+.play-panel.is-fullscreen > :is(.play-extras, .goal-card, .more-card, .game-details) { display: none !important; }
+.play-panel.is-fullscreen .play-options { color: #fff; }
+.play-panel.is-fullscreen .play-record { color: rgb(255 255 255 / .85); }
+/* Tahta bir üst sınıra ulaştığında çerçeve tahtadan geniş kalabilir; çerçeve kutusu tam ekranda görünmez olur. */
+.play-panel.is-fullscreen .board-frame { border-color: transparent; background: none; box-shadow: none; }
+
+.play-panel.is-fullscreen > .play-panel-head { display: flex; width: 100%; min-height: 40px; flex-wrap: nowrap; gap: 10px; }
+.play-panel.is-fullscreen .play-panel-head .actions { order: 0; flex: 0 1 auto; width: auto; min-width: 0; margin: 0 0 0 auto; gap: 8px; }
+.play-panel.is-fullscreen .play-panel-head .play-button { flex: 0 1 auto; min-height: 40px; padding: 0 14px; font-size: 16px; white-space: nowrap; }
+.play-panel.is-fullscreen .play-panel-head .fullscreen-button { order: 0; width: 42px; height: 40px; }
+.play-panel.is-fullscreen .play-panel-identity > svg { width: 26px; height: 26px; }
+.play-panel.is-fullscreen .play-panel-labels strong { font-size: 20px; white-space: nowrap; }
+
+.play-panel.is-fullscreen > .play-panel-footer { width: 100%; min-height: 0; flex-direction: row; align-items: center; gap: 14px; padding: 0 4px; border-radius: 0; background: transparent; }
+.play-panel.is-fullscreen .play-panel-footer .scores { flex-wrap: nowrap; gap: 16px; }
+.play-panel.is-fullscreen .play-panel-footer .score-card > span { font-size: 12px !important; }
+.play-panel.is-fullscreen .play-panel-footer .score-card > strong { font-size: 19px !important; white-space: nowrap; }
+.play-panel.is-fullscreen .play-panel-footer .status { flex: 1; min-width: 0; margin: 0; overflow: hidden; font-size: 13px; text-align: right; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Oyun içi kartlar (başlat, duraklat, bitiş) küçük tahtalarda da tam görünsün. */
+.play-panel.is-fullscreen .game-overlay { container-type: size; }
+.play-panel.is-fullscreen .overlay-card { max-height: 100%; overflow: auto; }
+@container (max-height: 360px) {
+  .play-panel.is-fullscreen .overlay-card { padding: 12px 14px; }
+  .play-panel.is-fullscreen .overlay-card h2 { margin-bottom: 4px; font-size: 20px; }
+  .play-panel.is-fullscreen .overlay-card > p:not(.overlay-kicker) { margin-bottom: 8px; font-size: 13px; line-height: 1.35; }
+  .play-panel.is-fullscreen .overlay-kicker { margin-bottom: 4px; font-size: 10px; }
+  .play-panel.is-fullscreen .overlay-card .overlay-actions { flex-wrap: wrap; gap: 6px; }
+  .play-panel.is-fullscreen .overlay-card .play-button { min-height: 36px; padding: 0 12px; font-size: 15px; }
+}
+
+.fs-rotate-hint { position: absolute; top: calc(max(10px, env(safe-area-inset-top)) + 48px); left: 50%; z-index: 5; display: flex; align-items: center; gap: 10px; width: max-content; max-width: calc(100% - 28px); padding: 6px 6px 6px 14px; border-radius: 999px; background: rgb(8 14 30 / .88); color: #fff; font-size: 14px; font-weight: 700; box-shadow: 0 8px 22px rgb(0 0 0 / .3); transform: translateX(-50%); animation: fs-hint-in .25s ease-out; }
+@keyframes fs-hint-in { from { opacity: 0; transform: translate(-50%, -8px); } }
+.fs-rotate-hint button { display: grid; width: 30px; height: 30px; flex: none; place-items: center; border: 0; border-radius: 50%; background: rgb(255 255 255 / .16); color: #fff; font-size: 14px; cursor: pointer; }
+
+@media (max-width: 560px) {
+  .play-panel.is-fullscreen .play-live { display: none; }
+  .play-panel.is-fullscreen > .play-panel-head { flex-wrap: wrap; row-gap: 8px; }
+  .play-panel.is-fullscreen .play-panel-head .actions { order: 3; flex: 1 1 100%; margin: 0; }
+  .play-panel.is-fullscreen .play-panel-head .play-button { flex: 1; min-height: 38px; font-size: 15px; }
+  .play-panel.is-fullscreen .play-panel-footer .status { display: none; }
+  .play-panel.is-fullscreen .play-panel-footer .scores { flex: 1; justify-content: space-between; }
+}
+@media (max-height: 520px) {
+  .play-panel.is-fullscreen { gap: 6px; padding-block: max(6px, env(safe-area-inset-top)) max(6px, env(safe-area-inset-bottom)); }
+  .play-panel.is-fullscreen .play-live, .play-panel.is-fullscreen .play-panel-identity > svg { display: none; }
+  .play-panel.is-fullscreen > .play-panel-head { min-height: 34px; }
+  .play-panel.is-fullscreen .play-panel-head .play-button { min-height: 34px; padding: 0 10px; font-size: 14px; }
+  .play-panel.is-fullscreen .play-panel-head .fullscreen-button { width: 36px; height: 34px; }
+  .play-panel.is-fullscreen .play-panel-labels strong { font-size: 16px; }
+  .play-panel.is-fullscreen .play-panel-footer .score-card > strong { font-size: 16px !important; }
+  .play-panel.is-fullscreen > .play-options { gap: 6px 10px; }
+  .play-panel.is-fullscreen .play-options :is(select, button, .play-button) { min-height: 34px; }
+}
+
+.play-panel.is-fullscreen .play-panel-footer .score-card > span { color: rgb(255 255 255 / .82) !important; }
+.play-panel.is-fullscreen .play-panel-footer .score-card > strong { color: #fecf40 !important; }
