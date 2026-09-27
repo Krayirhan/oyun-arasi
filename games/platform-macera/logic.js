@@ -1,4 +1,4 @@
-import { LEVELS } from './levels.js?v=202609270130';
+import { LEVELS } from './levels.js?v=202609270203';
 
 export const WORLD_WIDTH = 960;
 export const WORLD_HEIGHT = 540;
