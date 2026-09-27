@@ -36,12 +36,13 @@ body.game-page { --frame: #10264b; --title: var(--accent); --title-shadow: var(-
     row-gap: 18px;
     align-items: start;
   }
-  .play-intro { grid-area: intro; }
-  .how-card { grid-area: how; }
-  .shortcuts { grid-area: keys; }
-  .play-panel { grid-area: panel; }
-  .goal-card { grid-area: goal; }
-  .more-card { grid-area: more; }
+  /* Yalnızca ortak şablonun ızgarasındaki bölgeler; kendi düzenini kullanan sayfalar (Harfle) etkilenmez. */
+  .play-layout > .play-intro { grid-area: intro; }
+  .play-layout > .how-card { grid-area: how; }
+  .play-layout > .shortcuts { grid-area: keys; }
+  .play-layout > .play-panel { grid-area: panel; }
+  .play-layout > .goal-card { grid-area: goal; }
+  .play-layout > .more-card { grid-area: more; }
 }
 
 /* title */
@@ -215,11 +216,11 @@ body.game-page { --frame: #10264b; --title: var(--accent); --title-shadow: var(-
 /* tablet: board first, side cards in two columns below */
 @media (min-width: 761px) and (max-width: 1319px) {
   .play-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .play-intro, .play-panel, .how-card { grid-column: 1 / -1; }
-  .play-panel { max-width: 640px; width: 100%; justify-self: center; }
+  .play-layout > :is(.play-intro, .play-panel, .how-card) { grid-column: 1 / -1; }
+  .play-layout > .play-panel { max-width: 640px; width: 100%; justify-self: center; }
   .play-panel-head { flex-wrap: wrap; }
   .play-panel-labels strong { font-size: 21px; }
-  .how-card { order: 1; }
+  .play-layout > .how-card { order: 1; }
 }
 
 /* phones: title and scores side by side, controls, board, then the rest */

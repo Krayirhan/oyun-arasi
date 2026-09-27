@@ -1,4 +1,4 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271859';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609271922';
 
 (() => {
   'use strict';
