@@ -10,8 +10,8 @@ import {
 
 setLogLevel('silent'); // Beklenen izin reddi hatalarını günlüğe basmasın.
 
-const PLATFORM_GAMES = ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'];
-const STAT_KEYS = ['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'];
+const PLATFORM_GAMES = ['2048', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'kelime-merdiveni', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'];
+const STAT_KEYS = ['2048', 'harfane', 'xox', 'hafiza', 'mayin-tarlasi', 'sudoku', 'sekil', 'kelime-avi', 'kelime-merdiveni', 'tetris', 'soliter', 'mahjong', 'araba', 'platform-macera', 'tavla', 'okey', 'pisti', 'dort-tas'];
 
 let env;
 
