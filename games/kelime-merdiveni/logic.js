@@ -145,10 +145,17 @@ export function submitWord(game, word, dictionary) {
   return { game: next, error: null };
 }
 
-export function giveHint(game) {
+// İpucu, oyuncunun bulunduğu kelimeden hedefe giden en kısa yolun sıradaki basamağıdır. Oyuncu bulmacanın kendi
+// çözüm yolundan ayrıldıysa (başka geçerli kelimeler yazdıysa) çözüm listesi işe yaramaz; yol sözlükten yeniden bulunur.
+export function giveHint(game, dictionary = null) {
   if (!game || game.status !== 'playing') return game;
-  const nextIndex = Math.min(game.path.length, game.solution.length - 1);
-  return { ...game, hints: game.hints + 1, hint: game.solution[nextIndex] };
+  const current = game.path.at(-1);
+  let hint = game.solution[game.solution.indexOf(current) + 1];
+  if (!hint || game.path.length - 1 !== game.solution.indexOf(current)) {
+    const route = dictionary ? shortestPath(current, game.target, dictionary) : null;
+    hint = route?.[1] ?? hint ?? game.solution.at(-1);
+  }
+  return { ...game, hints: game.hints + 1, hint };
 }
 
 export function createPlayableGame(puzzle, mode = 'daily', date = '') {

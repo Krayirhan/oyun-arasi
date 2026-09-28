@@ -1,7 +1,7 @@
-import { PUZZLES } from './puzzles.js?v=sahne18';
-import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=sahne18';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne18';
-import { createFlow, createStage } from '../../game-stage.js?v=sahne18';
+import { PUZZLES } from './puzzles.js?v=mantik1';
+import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=mantik1';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik1';
+import { createFlow, createStage } from '../../game-stage.js?v=mantik1';
 
 const $ = selector => document.querySelector(selector);
 // Ortak sahne şablonu (game-stage.js): menü, merdivenin üstünde açılan katmandır; sonuç da aynı kart katmanıdır.
@@ -170,7 +170,7 @@ $('#word-form').addEventListener('submit', event => {
 
 $('#hint-button').addEventListener('click', () => {
   if (game?.status !== 'playing') return;
-  game = giveHint(game); if (mode === 'daily') saved.dailyGames[selectedDate] = game; else saved.seriesGame = game;
+  game = giveHint(game, DICTIONARY); if (mode === 'daily') saved.dailyGames[selectedDate] = game; else saved.seriesGame = game;
   save(); renderGame();
 });
 

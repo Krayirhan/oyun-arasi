@@ -1,9 +1,9 @@
-import { LEVELS, WORLDS } from './levels.js?v=sahne18';
-import { LEVEL_COUNT, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js?v=sahne18';
-import { createRenderer } from './render.js?v=sahne18';
-import { createAudio } from './audio.js?v=sahne18';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne18';
-import { createStage, createFlow } from '../../game-stage.js?v=sahne18';
+import { LEVELS, WORLDS } from './levels.js?v=mantik1';
+import { LEVEL_COUNT, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js?v=mantik1';
+import { createRenderer } from './render.js?v=mantik1';
+import { createAudio } from './audio.js?v=mantik1';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik1';
+import { createStage, createFlow } from '../../game-stage.js?v=mantik1';
 
 const SAVE_KEY = 'oyunarasi-platform-macera-v2';
 const OLD_SAVE_KEY = 'oyunarasi-platform-macera-v1';

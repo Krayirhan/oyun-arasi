@@ -77,6 +77,18 @@ test('ipucu çözümün sıradaki basamağındaki değişen harfi işaret eder',
   assert.equal(giveHint(game).hint, 'taban');
 });
 
+test('ipucu oyuncu çözüm yolundan ayrılınca da bulunduğu kelimeden tek harfle gidilen kelimeyi verir', () => {
+  for (const puzzle of PUZZLES.slice(0, 30)) {
+    let game = createGame(puzzle);
+    const alt = [...words].find(word => differsByOne(game.start, word) && word !== game.solution[1]);
+    if (!alt) continue;
+    game = submitWord(game, alt, words).game;
+    if (game.status !== 'playing') continue;
+    const hint = giveHint(game, words).hint;
+    assert.equal(differsByOne(game.path.at(-1), hint), true, `${game.path.join('>')} → ${hint}`);
+  }
+});
+
 test('kayıtlı oyun yalnız kendi bulmacasına ait geçerli bir yol tutarsa kabul edilir', () => {
   const puzzle = PUZZLES[0];
   const game = createGame(puzzle, 'daily', '2026-09-28');

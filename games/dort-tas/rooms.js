@@ -1,6 +1,6 @@
-import { db, auth } from '../../firebase-client.js?v=sahne18';
+import { db, auth } from '../../firebase-client.js?v=mantik1';
 import { collection, doc, getDoc, onSnapshot, runTransaction, serverTimestamp, setDoc } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
-import { createGame, playMove } from './logic.js?v=sahne18';
+import { createGame, playMove } from './logic.js?v=mantik1';
 
 const CODES = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ';
 const roomRef = code => doc(db, 'rooms', code);
