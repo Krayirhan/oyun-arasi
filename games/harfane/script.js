@@ -1,7 +1,7 @@
 import {
   MAX_TRIES, WORD_LENGTH, answerForDay, applyDailyResult, attemptsForMode as attemptsFor, dayKey, defaultStats, normalizePool as cleanPool,
   normalizeSeries as cleanSeries, normalizeStats, previousDayKey, puzzleNumberFor, readJson, scoreGuess as scoreWord, shuffled, streakForDisplay, writeJson
-} from './logic.js?v=mantik5';
+} from './logic.js?v=mantik6';
 
 const ANSWERS = window.HARFANE_ANSWERS;
 const VALID_WORDS = new Set(window.HARFANE_WORDS);
@@ -570,7 +570,7 @@ function openAuthModal(mode = authMode) {
 function openModal(type) {
   const content = document.querySelector('#modal-content');
   if (type === 'help') {
-    content.innerHTML = `<h2 id="modal-title">Üç farklı oyun yolu</h2><p><strong>Günlük:</strong> Her gün herkes için aynı kelimeyi altı tahminde bul.</p><p><strong>Sefer:</strong> 70 seviyeyi tamamla. İlk 20 seviyede altı, sonraki 25 seviyede beş, son 25 seviyede dört tahmin hakkın var. Yanlış sonuçta aynı seviyeyi yeniden denersin.</p><p><strong>Antrenman:</strong> Baskı olmadan sınırsız oyna. 70 kelime bitene kadar tekrar gelmez.</p><ul class="rules"><li><span class="rule-tile green">A</span> Yeşil harf doğru yerde.</li><li><span class="rule-tile yellow">R</span> Sarı harf kelimede var, yeri yanlış.</li><li><span class="rule-tile gray">T</span> Gri harf kelimede yok.</li></ul>`;
+    content.innerHTML = `<h2 id="modal-title">Üç farklı oyun yolu</h2><p><strong>Günlük:</strong> Her gün herkes için aynı kelimeyi altı tahminde bul. Günlük bulmacalar 70 günde bir tekrar eder.</p><p><strong>Sefer:</strong> 70 seviyeyi tamamla. İlk 20 seviyede altı, sonraki 25 seviyede beş, son 25 seviyede dört tahmin hakkın var. Yanlış sonuçta aynı seviyeyi yeniden denersin.</p><p><strong>Antrenman:</strong> Baskı olmadan sınırsız oyna. 70 kelime bitene kadar tekrar gelmez.</p><ul class="rules"><li><span class="rule-tile green">A</span> Yeşil harf doğru yerde.</li><li><span class="rule-tile yellow">R</span> Sarı harf kelimede var, yeri yanlış.</li><li><span class="rule-tile gray">T</span> Gri harf kelimede yok.</li></ul>`;
   } else if (type === 'auth') {
     const isSignUp = authMode === 'signup';
     content.innerHTML = `<h2 id="modal-title">${isSignUp ? 'Hesap oluştur' : 'Tekrar hoş geldin'}</h2><p>${isSignUp ? 'Serini ve oyun geçmişini cihazlar arasında sakla.' : 'Hesabına giriş yap, kaldığın yerden devam et.'}</p><form class="auth-form" id="auth-form">${isSignUp ? '<label>Kullanıcı adı<input id="auth-name" type="text" maxlength="30" autocomplete="name" required /></label>' : ''}<label>E-posta<input id="auth-email" type="email" autocomplete="email" required /></label><label>Şifre<input id="auth-password" type="password" minlength="6" autocomplete="current-password" required /></label><button class="auth-submit" type="submit">${isSignUp ? 'Kayıt ol' : 'Giriş yap'}</button></form><p class="auth-error" id="auth-error" role="status"></p>${isSignUp ? '' : '<button class="auth-switch" id="auth-forgot" type="button">Şifremi unuttum</button>'}<button class="auth-switch" id="auth-switch" type="button">${isSignUp ? 'Zaten hesabın var mı? Giriş yap' : 'Hesabın yok mu? Kayıt ol'}</button>`;
