@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createDeck } from '../cards.js';
-import { TARGET_SCORE, createGame, cardPoints, isMatch, isPisti, scoreCards, playCard, botTurn, startNextDeal, isValidGame } from './logic.js';
+import { TARGET_SCORE, createGame, cardPoints, isMatch, isPisti, scoreCards, playCard, botTurn, startNextDeal, isValidGame, chooseBotCard } from './logic.js';
 
 const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
 
@@ -136,3 +136,21 @@ test('el puanı korunumu: kart puanları 13 + en çok kart 3 + Pişti bonusları
     assert.equal(game.captured.flat().length, 52, `seed ${seed}: bütün kartlar toplandı ya da son alana verildi`);
   }
 });
+
+test('bot valeyi tek kartlık masaya harcamaz, puanlı ya da kalabalık masada kullanır, atarken valeyi ve puanlı kartı saklar', () => {
+  const base = createGame(seeded(9));
+  const game = (table, hand) => ({ ...base, turn: 1, table, hiddenCount: 0, hands: [[5, 6, 7, 8], hand], deck: [] });
+  // 10♥ (rank 10) masada tek kart; elde vale (J♠=10) ve 3♠(2), 7♠(6)... eşleşen yok → vale değil, ucuz kart atılır
+  const cheap = chooseBotCard(game([22], [10, 1, 3]), seeded(1));
+  assert.notEqual(cheap, 10, 'vale tek kartlık masaya harcanmaz');
+  // masada puan kartı (A♠ = 0) var: vale alır
+  assert.equal(chooseBotCard(game([0, 22], [10, 1, 3]), seeded(1)), 10, 'puanlı masayı vale alır');
+  // masada üç kart: vale alır
+  assert.equal(chooseBotCard(game([14, 15, 16], [10, 1, 5]), seeded(1)), 10, 'kalabalık masayı vale alır');
+  // atarken vale (10) ve 2♣ (40) saklanır: elde başka kart varsa onlar atılmaz
+  const kept = chooseBotCard(game([20], [10, 40, 3]), seeded(4));
+  assert.equal(kept, 3, 'vale ve puanlı kart saklanır');
+  // eşleşen sıradan kart varken vale kullanılmaz
+  assert.equal(chooseBotCard(game([22], [10, 9]), seeded(1)), 9, 'aynı rank varsa o alır (10♠ ile 10♥ aynı rank)');
+});
+

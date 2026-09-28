@@ -1,8 +1,8 @@
-import { PUZZLES } from './puzzles.js?v=mantik30';
-import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, prepareDictionary, revealSolution, orderForSeries, applyDailyStreak, streakForDisplay } from './logic.js?v=mantik30';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik30';
-import { createFlow, createStage } from '../../game-stage.js?v=mantik30';
-import { confirmDialog } from '../../game-dialog.js?v=mantik30';
+import { PUZZLES } from './puzzles.js?v=mantik31';
+import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, prepareDictionary, revealSolution, orderForSeries, applyDailyStreak, streakForDisplay } from './logic.js?v=mantik31';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik31';
+import { createFlow, createStage } from '../../game-stage.js?v=mantik31';
+import { confirmDialog } from '../../game-dialog.js?v=mantik31';
 
 const $ = selector => document.querySelector(selector);
 // Ortak sahne şablonu (game-stage.js): menü, merdivenin üstünde açılan katmandır; sonuç da aynı kart katmanıdır.

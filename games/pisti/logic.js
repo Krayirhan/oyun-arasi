@@ -1,5 +1,5 @@
 // Pişti rules, scoring and bot decisions. Cards use stable 0–51 ids from games/cards.js.
-import { shuffleDeck, rankOf } from '../cards.js?v=mantik30';
+import { shuffleDeck, rankOf } from '../cards.js?v=mantik31';
 
 export const TARGET_SCORE = 101;
 
@@ -99,10 +99,21 @@ export function chooseBotCard(state, random = Math.random) {
   const hand = state.hands[1];
   if (!hand.length) return null;
   const takes = hand.filter(card => state.table.length && isMatch(card, state.table.at(-1)));
+  const isJack = card => rankOf(card) === 11;
+  const tableValue = scoreCards(state.table);
   if (takes.length) {
-    return takes.find(card => isPisti(state, card)) ?? takes.sort((a, b) => cardPoints(b) - cardPoints(a))[0];
+    const pisti = takes.find(card => isPisti(state, card));
+    if (pisti !== undefined) return pisti;
+    const plain = takes.filter(card => !isJack(card));
+    if (plain.length) return plain.sort((a, b) => cardPoints(b) - cardPoints(a))[0];
+    // Vale her masayı alır ama tek başına değerli bir kartı: masada puan kartı ya da en az üç kart varsa harcanır.
+    if (state.table.length >= 3 || tableValue > 0 || hand.length === 1) return takes[0];
   }
-  return hand[Math.floor(random() * hand.length)];
+  // Atarken vale ve puanlı kartlar (A, 2♣, 10♦) saklanır; kalanlardan rastgele biri atılır.
+  const cheap = hand.filter(card => !isJack(card) && cardPoints(card) === 0);
+  const spare = cheap.length ? cheap : hand.filter(card => !isJack(card));
+  const pool = spare.length ? spare : hand;
+  return pool[Math.floor(random() * pool.length)];
 }
 
 export function botTurn(state, random = Math.random) {

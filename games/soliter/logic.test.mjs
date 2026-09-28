@@ -178,3 +178,23 @@ test('rastgele oynanan 25 elde kartlar korunur, açık diziler geçerli kalır, 
     }
   }
 });
+
+test('otomatik bitirme hamle sayısını artırmaz ama oyunu bitirir', () => {
+  // her taş açık, deste ve fire boş: yalnız bitiş hamleleri kalır
+  const random = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  let game = createGame(1, random(5), 0);
+  const suits = [0, 1, 2, 3];
+  game = { ...game, stock: [], waste: [], foundations: [[], [], [], []], down: [0, 0, 0, 0, 0, 0, 0], history: [], moves: 17,
+    tableau: [
+      suits.map(suit => suit * 13 + 12 - 0).slice(0, 0), [], [], [], [], [], []
+    ] };
+  // basit kurulum: her renkte A..K sıralı, tek sütunda üst üste (K altta, A üstte) → 4 sütun
+  game.tableau = [0, 1, 2, 3].map(suit => Array.from({ length: 13 }, (_, i) => suit * 13 + (12 - i))).concat([[], [], []]);
+  assert.equal(canAutoComplete(game), true);
+  const before = game.moves;
+  let steps = 0;
+  while (game.status === 'playing' && steps < 60) { game = autoStep(game, 1000) || game; steps += 1; }
+  assert.equal(game.status, 'won');
+  assert.equal(game.moves, before, 'otomatik hamleler sayılmaz');
+});
+
