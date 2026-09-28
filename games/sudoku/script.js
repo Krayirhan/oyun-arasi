@@ -1,6 +1,6 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne6';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne6';
-import { confirmDialog } from '../../game-dialog.js?v=sahne6';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne7';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
+import { confirmDialog } from '../../game-dialog.js?v=sahne7';
 
 const KEY = 'oyunarasi-sudoku-v1';
 const boardElement = document.querySelector('#board');

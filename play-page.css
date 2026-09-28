@@ -408,24 +408,51 @@ html.game-fs-open :is(.modal-backdrop, .toast) { z-index: 1001; }
    sayfa gibi değil, oyun panelinin içinde gösterilir. Vurgu rengi oyunun --menu-accent değişkeninden gelir. */
 .play-panel .board-frame:has(> .game-menu) { display: grid; }
 
-/* Standart oyun sahnesi (game-flow.js). Çerçevenin boyunu YALNIZCA oyun sahnesi belirler; menü ve sonuç, sahnenin
-   üstünde mutlak konumlu, perdeli katmanlar olarak açılır ve sığmazsa kendi içinde kayar. Sahnenin bir alt yüksekliği
-   vardır (menü rahat sığsın diye); böylece menü → oyun → sonuç geçişlerinde çerçeve büyüyüp küçülmez. */
-.play-panel .board-frame:has(> [data-flow]) { --stage-min: min(500px, calc(100svh - 230px)); position: relative; display: grid !important; grid-template: minmax(0, 1fr) / minmax(0, 1fr) !important; place-items: stretch !important; gap: 0 !important; min-height: max(360px, var(--stage-min)); overflow: hidden; }
-.board-frame > [data-flow='stage'] { grid-area: 1 / 1 !important; align-self: center !important; min-width: 0; min-height: 0; }
-.board-frame > [data-flow='overlay'] { position: absolute !important; inset: 0; z-index: 6; display: flex !important; flex-direction: column; justify-content: safe center; align-items: center; width: auto !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: clamp(12px, 3%, 26px); overflow: auto; overscroll-behavior: contain; border-radius: inherit; background: color-mix(in srgb, var(--frame) 80%, transparent); backdrop-filter: blur(4px); animation: flow-veil .18s ease-out; }
+/* ---- Tek oyun sahnesi (game-stage.js) ---------------------------------------------------------------
+   Kural: çerçevenin (.board-frame) boyunu YALNIZCA tahta belirler. Başlangıç, mola, sonuç ve menü katmanları
+   mutlak konumludur, perdeyle tahtanın üstünde açılır, sığmazsa kendi içinde kayar; çerçeveyi asla uzatmaz.
+   İki kip:
+     layer — createStage(): oyunun kendi çerçeve düzenine dokunulmaz, sadece üstüne tek bir kart katmanı eklenir.
+     flow  — createFlow(): menülü oyunlar; ekranlar aynı ızgara hücresinde, oyun ekranı hep sahnede.
+   --stage-min: katmanın rahat sığması için çerçevenin alt yüksekliği (menülü oyunlar kendi CSS'inde büyütür). */
+.play-panel .board-frame[data-stage-mode] { --stage-min: 280px; position: relative; min-height: var(--stage-min); }
+.play-panel .board-frame[data-stage-mode='layer'] { align-content: center; }
+.play-panel .board-frame[data-stage-mode='flow'] { --stage-min: max(360px, min(500px, calc(100svh - 230px))); display: grid !important; grid-template: minmax(0, 1fr) / minmax(0, 1fr) !important; place-items: stretch !important; gap: 0 !important; overflow: hidden; }
+.board-frame[data-stage-mode='flow'] > [data-flow='stage'] { grid-area: 1 / 1 !important; align-self: center !important; min-width: 0; min-height: 0; }
+@media (max-width: 560px) {
+  .play-panel .board-frame[data-stage-mode='flow'] { --stage-min: max(360px, min(440px, calc(100svh - 230px))); }
+}
+
+/* Katman: perde tüm çerçeveyi kaplar. */
+.board-frame > [data-flow='overlay'] { position: absolute !important; inset: 0; z-index: 6; display: flex !important; flex-direction: column; justify-content: safe center; align-items: center; width: auto !important; max-width: none !important; max-height: none !important; margin: 0 !important; padding: clamp(10px, 3%, 24px); overflow: auto; overscroll-behavior: contain; border-radius: inherit; background: color-mix(in srgb, var(--frame) 78%, transparent); backdrop-filter: blur(4px); box-shadow: none; animation: flow-veil .18s ease-out; container: flow-layer / size; }
 .board-frame > [data-flow='overlay'].is-offstage { visibility: hidden; pointer-events: none; animation: none; }
 .board-frame > [data-flow='overlay'] > * { flex: none; width: min(100%, 760px); }
-/* Sonuç katmanı: perde tüm sahneyi kaplar, beyaz kart ortada durur. */
-.board-frame > .game-result[data-flow='overlay'] { box-shadow: none; text-align: center; animation: flow-veil .18s ease-out; }
-.board-frame > .game-result[data-flow='overlay'] > .flow-card { width: min(100%, 500px); padding: 20px 22px; border-radius: 18px; background: #fffefa; color: var(--ink); box-shadow: 0 16px 36px rgb(0 0 0 / .28); animation: game-result-rise .25s ease-out; }
 @keyframes flow-veil { from { opacity: 0; } }
-/* Sahne kısaysa (telefon ya da basık tahta) katman menüsü sığacak kadar sıkılaşır: kartlar iki sütun,
-   açıklama satırları kısa. Ölçüt ekran genişliği değil sahnenin kendi yüksekliğidir. */
-@media (max-width: 560px) {
-  .play-panel .board-frame:has(> [data-flow]) { --stage-min: min(440px, calc(100svh - 230px)); }
-}
-.board-frame > [data-flow='overlay'] { container: flow-layer / size; }
+
+/* Tek tip kart: başlangıç, mola ve sonuç her oyunda aynı görünür. */
+.board-frame > .game-result[data-flow='overlay'] { text-align: center; }
+.stage-card, .board-frame > .game-result[data-flow='overlay'] > .flow-card { width: min(100%, 460px) !important; padding: 20px 22px 18px; border-radius: 20px; background: #fffefa; color: var(--ink); text-align: center; box-shadow: 0 18px 40px rgb(0 0 0 / .3); animation: game-result-rise .25s ease-out; }
+.stage-kicker { margin: 0 0 6px; color: var(--accent); font-size: 11.5px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.stage-title-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px 10px; }
+.stage-title { margin: 0; color: var(--ink); font: 700 28px / 1.1 'Fredoka', sans-serif; letter-spacing: -.01em; }
+.stage-record { padding: 4px 10px; border-radius: 999px; background: #fecf40; color: #4a3200; font: 700 13px 'Fredoka', sans-serif; letter-spacing: .02em; animation: stage-record .5s cubic-bezier(.2, 1.4, .4, 1); }
+.stage-stars { display: flex; justify-content: center; gap: 6px; margin: 8px 0 0; font-size: 30px; line-height: 1; }
+.stage-stars span { color: #d9d3c4; }
+.stage-stars span.on { color: #ffc01f; text-shadow: 0 2px 0 #c98a0c; }
+.stage-copy { margin: 8px 0 0; color: var(--muted); font-size: 15px; line-height: 1.45; }
+.stage-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 8px; margin: 14px 0 0; }
+.stage-stats > div { display: grid; gap: 2px; padding: 9px 6px; border-radius: 13px; background: color-mix(in srgb, var(--accent) 7%, #fff); }
+.stage-stats dt { color: var(--muted); font-size: 11px; font-weight: 700; letter-spacing: .03em; }
+.stage-stats dd { margin: 0; color: var(--ink); font: 700 21px / 1.1 'Fredoka', sans-serif; font-variant-numeric: tabular-nums; }
+.stage-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 16px; }
+.stage-actions .play-button, .board-frame > .game-result[data-flow='overlay'] .play-button { flex: 1 1 130px; min-height: 46px; padding: 0 14px; font-size: 17px; }
+.stage-actions .play-undo { border-color: var(--line); background: #fff; color: var(--ink); }
+.stage-card :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+.stage-reopen { position: absolute; bottom: 10px; left: 50%; z-index: 5; min-height: 38px; padding: 0 16px; border: 0; border-radius: 999px; background: color-mix(in srgb, var(--frame) 88%, #000); color: #fff; font: 700 14px 'Fredoka', sans-serif; box-shadow: 0 6px 16px rgb(0 0 0 / .3); cursor: pointer; transform: translateX(-50%); }
+.stage-reopen:hover { filter: brightness(1.15); }
+@keyframes stage-record { from { transform: scale(.4); opacity: 0; } }
+
+/* Sahne kısaysa (telefon, basık tahta) katmanlar sığacak kadar sıkılaşır. Ölçüt ekran değil sahnenin kendi boyudur. */
 @container flow-layer (max-height: 640px) {
   .flow-card :is(.game-menu-copy, .harfle-menu-copy) { display: none; }
   .flow-card .game-kicker { margin-bottom: 4px; }
@@ -441,6 +468,26 @@ html.game-fs-open :is(.modal-backdrop, .toast) { z-index: 1001; }
 @container flow-layer (max-height: 640px) and (max-width: 520px) {
   .board-frame > [data-flow='overlay'] .game-menu h2, .flow-card h2 { font-size: 24px; }
 }
+@container flow-layer (max-height: 460px) {
+  .stage-card, .board-frame > .game-result[data-flow='overlay'] > .flow-card { padding: 14px 16px 12px; border-radius: 16px; }
+  .stage-title { font-size: 22px; }
+  .stage-copy { margin-top: 5px; font-size: 13px; line-height: 1.35; }
+  .stage-stars { margin-top: 4px; font-size: 22px; }
+  .stage-stats { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 9px; }
+  .stage-stats > div { padding: 6px 4px; border-radius: 10px; }
+  .stage-stats dt { font-size: 10px; }
+  .stage-stats dd { font-size: 16px; }
+  .stage-actions { gap: 6px; margin-top: 10px; }
+  .stage-actions .play-button, .board-frame > .game-result[data-flow='overlay'] .play-button { flex-basis: 100px; min-height: 38px; font-size: 15px; }
+}
+@container flow-layer (max-height: 330px) {
+  .stage-copy { display: none; }
+  .stage-kicker { margin-bottom: 2px; font-size: 10px; }
+  .stage-title { font-size: 19px; }
+  .stage-stats { margin-top: 6px; }
+  .stage-stats dd { font-size: 14px; }
+}
+@media (prefers-reduced-motion: reduce) { .stage-card, .stage-record, .board-frame > [data-flow='overlay'] { animation: none; } }
 .game-menu { padding: clamp(10px, 2vw, 22px); color: #fff; }
 .game-kicker { margin: 0 0 8px; color: var(--menu-accent, #fecf40); font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .game-menu h2 { margin: 0; font: 700 clamp(26px, 3.2vw, 40px) / 1.05 'Fredoka', sans-serif; letter-spacing: -.02em; }

@@ -478,6 +478,7 @@ function startMode(mode) {
 // Ortak sahne standardı (play-page.css, [data-flow]): oyun tahtası hep yerinde durur, mod menüsü onun üstünde
 // perdeli bir katman olarak açılır; böylece menü ile oyun arasında geçerken çerçevenin boyu değişmez.
 function showScreen(name) {
+  homeScreen.parentElement.dataset.stageMode = 'flow';
   homeScreen.dataset.flow = 'overlay';
   gameScreen.dataset.flow = 'stage';
   homeScreen.classList.remove('hidden');

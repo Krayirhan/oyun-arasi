@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>Sahne denetimi | Oyun Arası</title>
+  <style>
+    body { margin: 0; padding: 20px; background: #f7f4ec; color: #1b2240; font: 14px/1.45 system-ui, sans-serif; }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    p { margin: 0 0 14px; color: #5b6072; }
+    .bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    button { padding: 8px 14px; border: 1px solid #c9c2b0; border-radius: 10px; background: #fff; font: inherit; cursor: pointer; }
+    table { border-collapse: collapse; background: #fff; }
+    th, td { padding: 6px 10px; border-bottom: 1px solid #ece6d8; text-align: left; white-space: nowrap; }
+    td.bad { background: #ffe6e6; color: #a1212f; font-weight: 700; }
+    td.ok { color: #1f7a4d; }
+    #stage { position: fixed; right: 0; bottom: 0; width: 1px; height: 1px; overflow: hidden; }
+  </style>
+</head>
+<body>
+  <h1>Sahne denetimi</h1>
+  <p>Her oyunu farklı ekran boylarında açar. Çerçevenin açılışta, oyun başlayınca ve en kalabalık kart açıkken aynı boyda kaldığını, kartın taşmadığını ve sayfanın yana taşmadığını ölçer. Sitede bağlantısı yoktur.</p>
+  <div class="bar"><button id="run-all" type="button">Hepsini çalıştır</button><span id="progress"></span></div>
+  <table><thead><tr><th>Oyun</th><th>Boyut</th><th>Kip</th><th>Açılış</th><th>Oyunda</th><th>Kart açık</th><th>Kart taşması</th><th>Yana taşma</th></tr></thead><tbody id="rows"></tbody></table>
+  <div id="stage"></div>
+  <script type="module">
+    export const GAMES = ['2048', 'araba', 'balon-patlat', 'dort-tas', 'hafiza', 'harfane', 'kelime-avi', 'kelime-merdiveni', 'mahjong', 'mayin-tarlasi', 'okey', 'pisti', 'platform-macera', 'sekil', 'soliter', 'sudoku', 'tavla', 'tetris', 'xox'];
+    export const SIZES = [[1366, 768], [820, 700], [390, 844], [360, 640]];
+    const START = '.stage-card .play-new, .start-game, #start-button, [data-mode="bot"], [data-mode="practice"], .game-mode:not(:disabled), #start-level';
+    const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    async function audit(id, [w, h]) {
+      const frame = document.createElement('iframe');
+      frame.style.cssText = `position:fixed;left:0;top:0;width:${w}px;height:${h}px;border:0;opacity:0;pointer-events:none;z-index:-1`;
+      document.body.append(frame);
+      await new Promise(resolve => { frame.onload = resolve; frame.src = `../games/${id}/?denetim=${Date.now()}`; });
+      await wait(700);
+      const doc = frame.contentDocument;
+      const win = frame.contentWindow;
+      Object.defineProperty(doc, 'hidden', { get: () => false, configurable: true });
+      try { win.localStorage.clear(); } catch {}
+      const board = doc.querySelector('.play-panel .board-frame');
+      const height = () => (board ? Math.round(board.getBoundingClientRect().height) : -1);
+      const mode = board?.dataset.stageMode || 'yok';
+      const layerOverflow = () => Math.max(0, ...[...(board?.querySelectorAll('[data-flow="overlay"]:not(.is-offstage)') || [])].map(layer => layer.scrollHeight - layer.clientHeight));
+      const opening = height();
+      const openingOverflow = layerOverflow();
+      doc.querySelector(START)?.click();
+      await wait(900);
+      const playing = height();
+      // En kalabalık kart: katman kipinde showDemo, akış kipinde sonuç ekranı.
+      let demo = -1;
+      let demoOverflow = 0;
+      if (win.OyunStage?.current) { win.OyunStage.current.showDemo(); }
+      else { doc.querySelector('.game-result[data-flow]')?.classList.remove('is-offstage'); }
+      await wait(250);
+      demo = height();
+      demoOverflow = Math.max(openingOverflow, layerOverflow());
+      const sideways = Math.max(0, doc.documentElement.scrollWidth - w);
+      frame.remove();
+      return { id, size: `${w}×${h}`, mode, opening, playing, demo, overflow: demoOverflow, sideways };
+    }
+
+    function row(result) {
+      const tr = document.createElement('tr');
+      const jump = Math.abs(result.opening - result.playing) > 2 || Math.abs(result.playing - result.demo) > 2;
+      const cells = [
+        [result.id], [result.size], [result.mode, result.mode === 'yok'],
+        [result.opening, jump], [result.playing, jump], [result.demo, jump],
+        [result.overflow, result.overflow > 0], [result.sideways, result.sideways > 0]
+      ];
+      for (const [value, bad] of cells) {
+        const td = document.createElement('td');
+        td.textContent = value;
+        if (bad !== undefined) td.className = bad ? 'bad' : 'ok';
+        tr.append(td);
+      }
+      result.ok = !cells.some(([, bad]) => bad);
+      return tr;
+    }
+
+    // Denetim: istenen oyun ve boyutları sırayla ölçer; sonuçlar window.stageAudit.results'ta da durur.
+    async function run(ids = GAMES, sizes = SIZES) {
+      const results = [];
+      let done = 0;
+      for (const size of sizes) {
+        for (const id of ids) {
+          document.querySelector('#progress').textContent = `${++done} / ${ids.length * sizes.length} · ${id} ${size.join('×')}`;
+          const result = await audit(id, size);
+          results.push(result);
+          document.querySelector('#rows').append(row(result));
+        }
+      }
+      document.querySelector('#progress').textContent = `Bitti: ${results.filter(result => !result.ok).length} sorunlu satır.`;
+      window.stageAudit.results.push(...results);
+      return results;
+    }
+
+    window.stageAudit = { run, audit, results: [], GAMES, SIZES };
+    document.querySelector('#run-all').addEventListener('click', () => run());
+  </script>
+</body>
+</html>
