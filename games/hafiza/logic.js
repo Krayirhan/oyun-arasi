@@ -12,6 +12,7 @@ export function flipCard(state, index, now) {
     || state.pendingMismatchAt !== null || state.matched.includes(index) || state.revealed.includes(index)) return state;
   const next = { ...state, matched: [...state.matched], revealed: [...state.revealed], elapsedMs: state.elapsedMs };
   if (next.status === 'ready') { next.status = 'playing'; next.startedAt = now; }
+  else if (next.status === 'playing' && next.startedAt === null) next.startedAt = now; // duraklatılmış oyun ilk hamlede sürer
   next.revealed.push(index);
   if (next.revealed.length === 2) {
     next.moves += 1;
@@ -21,7 +22,7 @@ export function flipCard(state, index, now) {
       next.revealed = [];
       if (next.matched.length === next.deck.length) {
         next.status = 'won';
-        next.elapsedMs = Math.max(0, now - next.startedAt);
+        next.elapsedMs = Math.max(0, next.elapsedMs + now - next.startedAt);
         next.startedAt = null;
       }
     } else next.pendingMismatchAt = now + 700;
@@ -37,7 +38,18 @@ export function settleMismatch(state, now) {
 export function elapsedMilliseconds(state, now) {
   if (state.status === 'ready') return 0;
   if (state.status === 'won' || state.startedAt === null) return Math.max(0, state.elapsedMs);
-  return Math.max(0, now - state.startedAt);
+  return Math.max(0, state.elapsedMs + now - state.startedAt);
+}
+
+// Süre parçalı birikir: startedAt çalışan parçanın başlangıcıdır, elapsedMs önceki parçaların toplamıdır.
+// Kayıt ve gizli sekme oyunu duraklatır; böylece kapalıyken geçen zaman süreye eklenmez.
+export function pauseGame(state, now) {
+  if (state.status !== 'playing' || state.startedAt === null) return state;
+  return { ...state, elapsedMs: state.elapsedMs + Math.max(0, now - state.startedAt), startedAt: null };
+}
+
+export function resumeGame(state, now) {
+  return state.status === 'playing' && state.startedAt === null ? { ...state, startedAt: now } : state;
 }
 
 export function isValidGame(value) {

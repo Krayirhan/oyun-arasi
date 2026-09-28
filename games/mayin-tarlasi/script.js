@@ -1,7 +1,7 @@
-import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=mantik23';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik23';
-import { confirmDialog } from '../../game-dialog.js?v=mantik23';
-import { createStage } from '../../game-stage.js?v=mantik23';
+import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik24';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik24';
+import { confirmDialog } from '../../game-dialog.js?v=mantik24';
+import { createStage } from '../../game-stage.js?v=mantik24';
 // Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
 const stage = createStage();
 let stageKey = '';
@@ -22,15 +22,17 @@ function loadGame() {
     if (saved?.records && typeof saved.records === 'object') {
       for (const level of Object.keys(records)) if (Number.isFinite(saved.records[level]) && saved.records[level] >= 0) records[level] = saved.records[level];
     }
-    if (isValidGame(saved?.game)) return saved.game;
+    if (isValidGame(saved?.game)) return resumeGame(saved.game);
   } catch {}
   return createGame('easy');
 }
 
 function saveGame() {
-  try { localStorage.setItem(KEY, JSON.stringify({ game, records })); saveElement.textContent = 'Oyun bu cihazda saklanıyor.'; }
+  // Kayıt duraklatılmış kopyadır: sayfa kapalıyken geçen süre eklenmez, açılışta resumeGame sürdürür.
+  const stored = { game: pauseGame(game), records };
+  try { localStorage.setItem(KEY, JSON.stringify(stored)); saveElement.textContent = 'Oyun bu cihazda saklanıyor.'; }
   catch { saveElement.textContent = 'Kayıt kullanılamıyor; bu oturumda oynamaya devam edebilirsin.'; }
-  cloudSync.save({ game, records });
+  cloudSync.save(stored);
 }
 
 function formatTime(milliseconds) { return String(Math.floor(milliseconds / 1000)).padStart(3, '0'); }
@@ -168,8 +170,8 @@ window.setInterval(() => {
 }, 1000);
 
 const cloudSync = syncGameOnAccountChange('mayin-tarlasi', {
-  read: () => ({ game, records }),
-  write: incoming => { game = incoming.game; records = mergeRecords(records, incoming.records); focusIndex = 0; flagMode = false; render(); },
+  read: () => ({ game: pauseGame(game), records }),
+  write: incoming => { game = resumeGame(incoming.game); records = mergeRecords(records, incoming.records); focusIndex = 0; flagMode = false; render(); },
   isValid: incoming => Boolean(incoming && isValidGame(incoming.game) && incoming.records && typeof incoming.records === 'object'),
   merge: (local, remote) => ({ game: remote.game, records: mergeRecords(local.records, remote.records) }),
   getStats: current => ({ easy: { bestMs: current.records.easy }, medium: { bestMs: current.records.medium }, hard: { bestMs: current.records.hard } }),
@@ -186,3 +188,10 @@ function mergeRecords(local, remote) {
 }
 
 render();
+
+// Sekme gizlenince süre durur, dönünce sürer.
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) { game = pauseGame(game); saveGame(); }
+  else game = resumeGame(game);
+});
+window.addEventListener('pagehide', saveGame);

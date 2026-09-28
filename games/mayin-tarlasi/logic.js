@@ -36,7 +36,8 @@ function placeMines(state, firstIndex, random) {
     const target = Math.floor(Math.max(0, Math.min(0.999999999, random())) * (index + 1));
     [candidates[index], candidates[target]] = [candidates[target], candidates[index]];
   }
-  const cells = state.cells.map(emptyCell);
+  // İlk açıştan önce konan bayraklar korunur (bayrak sayacı gerçek bayraklarla tutarlı kalır).
+  const cells = state.cells.map(cell => ({ ...emptyCell(), flagged: cell.flagged }));
   for (const index of candidates.slice(0, state.mineCount)) cells[index].mine = true;
   const next = { ...state, cells, firstIndex };
   cells.forEach((cell, index) => {
@@ -51,12 +52,13 @@ export function revealCell(state, index, now = Date.now(), random = Math.random)
   let next = state.status === 'ready' ? placeMines({ ...state, cells: state.cells.map(cell => ({ ...cell })) }, index, random)
     : { ...state, cells: state.cells.map(cell => ({ ...cell })) };
   if (next.status === 'ready') next = { ...next, status: 'playing', startedAt: now };
+  else if (next.startedAt === null) next.startedAt = now; // duraklatılmış oyun ilk hamlede sürer
   next.moves += 1;
   if (next.cells[index].mine) {
     next.cells = next.cells.map(cell => cell.mine ? { ...cell, revealed: true } : cell);
     next.status = 'lost';
     next.explodedIndex = index;
-    next.elapsedMs = Math.max(0, now - next.startedAt);
+    next.elapsedMs = Math.max(0, next.elapsedMs + now - next.startedAt);
     next.startedAt = null;
     return next;
   }
@@ -75,7 +77,7 @@ export function revealCell(state, index, now = Date.now(), random = Math.random)
   if (next.cells.every(cell => cell.mine || cell.revealed)) {
     next.status = 'won';
     next.cells = next.cells.map(cell => cell.mine ? { ...cell, revealed: true } : cell);
-    next.elapsedMs = Math.max(0, now - next.startedAt);
+    next.elapsedMs = Math.max(0, next.elapsedMs + now - next.startedAt);
     next.startedAt = null;
   }
   return next;
@@ -92,7 +94,17 @@ export function toggleFlag(state, index) {
 export function elapsedMilliseconds(state, now = Date.now()) {
   if (state.status === 'ready') return 0;
   if (state.startedAt === null) return Math.max(0, state.elapsedMs);
-  return Math.max(0, now - state.startedAt);
+  return Math.max(0, state.elapsedMs + now - state.startedAt);
+}
+
+// Süre parçalı birikir (startedAt çalışan parça, elapsedMs önceki parçalar). Kayıt ve gizli sekme oyunu duraklatır.
+export function pauseGame(state, now = Date.now()) {
+  if (state.status !== 'playing' || state.startedAt === null) return state;
+  return { ...state, elapsedMs: state.elapsedMs + Math.max(0, now - state.startedAt), startedAt: null };
+}
+
+export function resumeGame(state, now = Date.now()) {
+  return state.status === 'playing' && state.startedAt === null ? { ...state, startedAt: now } : state;
 }
 
 export function isValidGame(value) {

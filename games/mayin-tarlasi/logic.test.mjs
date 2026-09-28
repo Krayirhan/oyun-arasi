@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createGame, revealCell, toggleFlag, elapsedMilliseconds, DIFFICULTIES } from './logic.js';
+import { createGame, revealCell, toggleFlag, elapsedMilliseconds, DIFFICULTIES, pauseGame, resumeGame, isValidGame } from './logic.js';
 
 test('all presets have the planned dimensions and mine counts', () => {
   assert.deepEqual(Object.fromEntries(Object.entries(DIFFICULTIES).map(([key, value]) => [key, [value.width, value.height, value.mines]])), {
@@ -47,4 +47,59 @@ test('opening every safe cell wins and freezes the clock', () => {
   }
   assert.equal(game.status, 'won');
   assert.equal(elapsedMilliseconds(game, 10000), game.elapsedMs);
+});
+
+test('ilk açıştan önce konan bayraklar korunur ve oyun geçerli kalır', () => {
+  let game = createGame('easy');
+  game = toggleFlag(game, 5);
+  game = toggleFlag(game, 6);
+  const after = revealCell(game, 40, 1000, () => 0.3);
+  assert.equal(after.flags, 2);
+  assert.equal(after.cells.filter(cell => cell.flagged).length, 2);
+  assert.equal(isValidGame(after), true);
+});
+
+test('süre parçalı birikir: duraklatılan süre işlemez, devam edince sürer, kazanma/kaybetme toplamı yazar', () => {
+  let game = revealCell(createGame('easy'), 40, 1000, () => 0.3);
+  assert.equal(elapsedMilliseconds(game, 4000), 3000);
+  const paused = pauseGame(game, 4000);
+  assert.equal(paused.startedAt, null);
+  assert.equal(elapsedMilliseconds(paused, 900000), 3000, 'kapalıyken geçen süre eklenmez');
+  assert.equal(pauseGame(paused, 999999), paused);
+  const mine = paused.cells.findIndex(cell => cell.mine);
+  const lost = revealCell(resumeGame(paused, 100000), mine, 102000);
+  assert.equal(lost.status, 'lost');
+  assert.equal(lost.elapsedMs, 5000, '3 sn + 2 sn');
+  // duraklatılmış oyunda ilk hamle süreyi sürdürür
+  const safe = paused.cells.findIndex(cell => !cell.mine && !cell.revealed);
+  const moved = revealCell(paused, safe, 200000);
+  assert.equal(moved.startedAt, 200000);
+});
+
+test('rastgele oyunlarda ilk açış güvenli, komşu sayıları doğru, güvenli karelerin hepsi açılınca oyun kazanılır', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (const level of Object.keys(DIFFICULTIES)) {
+    for (let seed = 1; seed <= 15; seed += 1) {
+      const random = seeded(seed * 53 + level.length);
+      let game = createGame(level);
+      const first = Math.floor(random() * game.cells.length);
+      game = revealCell(game, first, 0, random);
+      assert.equal(game.status === 'lost', false, `${level} #${seed}: ilk açış güvenli`);
+      assert.equal(game.cells.filter(cell => cell.mine).length, DIFFICULTIES[level].mines);
+      game.cells.forEach((cell, index) => {
+        if (cell.mine) return;
+        const x = index % game.width; const y = Math.floor(index / game.width);
+        let count = 0;
+        for (let dy = -1; dy <= 1; dy += 1) for (let dx = -1; dx <= 1; dx += 1) {
+          if (!dx && !dy) continue;
+          const nx = x + dx; const ny = y + dy;
+          if (nx >= 0 && ny >= 0 && nx < game.width && ny < game.height && game.cells[ny * game.width + nx].mine) count += 1;
+        }
+        assert.equal(cell.adjacent, count, `${level} #${seed}: kare ${index} komşu sayısı`);
+      });
+      assert.equal(isValidGame(game), true);
+      game.cells.forEach((cell, index) => { if (!cell.mine) game = revealCell(game, index, 1000, random); });
+      assert.equal(game.status, 'won', `${level} #${seed}: güvenli kareler bitince kazanılır`);
+    }
+  }
 });
