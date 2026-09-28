@@ -1,5 +1,6 @@
 import { describe, test } from 'node:test';
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { LEVELS, WORLDS, TILE, T } from './levels.js';
 import { FEEL, LEVEL_COUNT, PLAYER_H, PLAYER_W, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js';
 
@@ -189,5 +190,81 @@ describe('Zıpkın sağlamlık', () => {
       }
     }
   });
+});
+
+// Kayıtlı çözümler tools/zipkin-solver.mjs ile bulunur; burada oynatılır. Her bölümün bitirilebildiğinin kanıtıdır:
+// bölüm verisi ya da fizik değişip bir bölüm bitirilemez hale gelirse ilgili test kırılır.
+const SOLUTIONS = JSON.parse(readFileSync(new URL('./solutions.json', import.meta.url), 'utf8'));
+
+function replay(number) {
+  const run = createRun(number);
+  let previousJump = false;
+  for (const step of SOLUTIONS[number].steps) {
+    const dir = step[0] === 'r' ? 1 : step[0] === 'l' ? -1 : 0;
+    const vertical = step[1] === 'd' ? 1 : step[1] === 'u' ? -1 : 0;
+    const jump = step[2] === 'J';
+    const dash = step[2] === 'D';
+    for (let t = 0; t < SOLUTIONS[number].ticks && run.status === 'playing'; t += 1) {
+      tick(run, { left: dir < 0, right: dir > 0, up: vertical < 0, down: vertical > 0, jump, jumpPressed: jump && !previousJump && t === 0, dashPressed: dash && t === 0 });
+    }
+    previousJump = jump;
+    if (run.status !== 'playing') break;
+  }
+  return run;
+}
+
+describe('Zıpkın bölümleri bitirilebilir (kayıtlı çözümler)', () => {
+  test('her bölümün kayıtlı bir çözümü var', () => {
+    assert.deepEqual(LEVELS.filter(level => !SOLUTIONS[level.number]).map(level => level.number), []);
+  });
+  for (const level of LEVELS) {
+    test(`bölüm ${level.number} (${level.title}) çözümle çıkışa ulaşılır`, () => {
+      const run = replay(level.number);
+      assert.equal(run.status, 'complete', `bölüm ${level.number}: çözüm çıkışa varmıyor (durum ${run.status}, x ${Math.round(run.x)}, y ${Math.round(run.y)})`);
+    });
+  }
+});
+
+// 3 yıldız kanıtı: bütün kristaller toplanabilir. Çoğu bölümde tek hayatta hepsi toplanıp çıkışa gidilir; tek hayatta
+// olmayan bölümlerde kristaller ölünce kaybolmadığı için (respawn onları sıfırlamaz) her biri ayrı ayrı toplanır.
+const GEM_SOLUTIONS = JSON.parse(readFileSync(new URL('./solutions-gems.json', import.meta.url), 'utf8'));
+
+function replaySteps(number, solution, stopWhen) {
+  const run = createRun(number);
+  let previousJump = false;
+  for (const step of solution.steps) {
+    const dir = step[0] === 'r' ? 1 : step[0] === 'l' ? -1 : 0;
+    const vertical = step[1] === 'd' ? 1 : step[1] === 'u' ? -1 : 0;
+    const jump = step[2] === 'J';
+    const dash = step[2] === 'D';
+    for (let t = 0; t < solution.ticks && run.status === 'playing'; t += 1) {
+      tick(run, { left: dir < 0, right: dir > 0, up: vertical < 0, down: vertical > 0, jump, jumpPressed: jump && !previousJump && t === 0, dashPressed: dash && t === 0 });
+      if (stopWhen?.(run)) return run;
+    }
+    previousJump = jump;
+    if (run.status !== 'playing') break;
+  }
+  return run;
+}
+
+describe('Zıpkın bütün kristaller toplanabilir (3 yıldız kanıtı)', () => {
+  test('her bölümün kristal çözümü kayıtlı', () => {
+    assert.deepEqual(LEVELS.filter(level => !GEM_SOLUTIONS[level.number]).map(level => level.number), []);
+  });
+  for (const level of LEVELS) {
+    test(`bölüm ${level.number} (${level.title}): ${level.gems.length} kristalin hepsi toplanır`, () => {
+      const entry = GEM_SOLUTIONS[level.number];
+      if (entry.separate) {
+        level.gems.forEach((_, index) => {
+          const run = replaySteps(level.number, entry.separate[index], state => state.gems[index]);
+          assert.equal(run.gems[index], true, `bölüm ${level.number}: ${index + 1}. kristale ulaşılmıyor`);
+        });
+        return;
+      }
+      const run = replaySteps(level.number, entry);
+      assert.equal(run.status, 'complete', `bölüm ${level.number}: çıkışa varılmıyor`);
+      assert.equal(run.gems.every(Boolean), true, `bölüm ${level.number}: bütün kristaller toplanmıyor`);
+    });
+  }
 });
 

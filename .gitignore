@@ -3,3 +3,6 @@ firebase-debug.log
 node_modules/
 firestore-debug.log
 ui-debug.log
+
+# Zıpkın çözücünün ara çıktıları
+tools/zipkin-out/
