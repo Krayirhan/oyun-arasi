@@ -3,6 +3,7 @@ import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { PUZZLES } from './puzzles.js';
 import { BLOCKED_WORDS, isBlocked } from '../harfane/engellenen.mjs';
+import { COMMON_WORDS, WELL_KNOWN_WORDS } from './yaygin.mjs';
 import { applyDailyStreak, buildPuzzleSet, createGame, dailyPuzzle, differsByOne, finalStars, giveHint, isValidGame, orderForSeries, prepareDictionary, revealSolution, scoreStars, shortestPath, streakForDisplay, submitWord, validatePuzzle } from './logic.js';
 
 const source = readFileSync(new URL('../harfane/kelimeler.js', import.meta.url), 'utf8');
@@ -170,4 +171,30 @@ test('sözlükte ve bulmacalarda engellenen (küfür, müstehcen, hakaret) kelim
   assert.deepEqual(lists.ANSWERS.filter(isBlocked), [], 'Harfle cevapları');
   assert.deepEqual(PUZZLES.flatMap(puzzle => puzzle.path).filter(isBlocked), [], 'bulmaca yolları');
   for (const word of ['yarak', 'penis', 'salak', 'zenci']) assert.equal(words.has(word), false, `${word} kabul edilmemeli`);
+});
+
+test('bulmacalar yalnızca yaygın ya da iyi bilinen kelimelerden kurulur; listeler sözlükte ve engelli değildir', () => {
+  const known = new Set([...COMMON_WORDS, ...WELL_KNOWN_WORDS, ...lists.ANSWERS]);
+  for (const word of [...COMMON_WORDS, ...WELL_KNOWN_WORDS]) {
+    assert.ok(words.has(word), `${word} sözlükte olmalı`);
+    assert.equal(isBlocked(word), false, `${word} engelli olmamalı`);
+    assert.equal([...word].length, 5, word);
+  }
+  const rare = PUZZLES.flatMap(puzzle => puzzle.path).filter(word => !known.has(word));
+  assert.deepEqual(rare, [], 'az bilinen kelime bulmaca yolunda olmamalı');
+  const common = new Set([...COMMON_WORDS, ...lists.ANSWERS]);
+  const share = PUZZLES.flatMap(puzzle => puzzle.path).filter(word => common.has(word)).length / PUZZLES.flatMap(puzzle => puzzle.path).length;
+  assert.ok(share >= 0.65, `yolların çoğu yaygın kelimedir (${share.toFixed(2)})`);
+  const starts = new Set(PUZZLES.map(puzzle => puzzle.path[0]));
+  assert.ok(starts.size >= 40, `yeterli çeşitlilik (${starts.size} farklı başlangıç)`);
+});
+
+test('bulmaca dağılımı kolaydan zora: 3 ila 7 adım, hepsinde en kısa yol tam sözlükte doğrulanır', () => {
+  const counts = {};
+  for (const puzzle of PUZZLES) {
+    const steps = puzzle.path.length - 1;
+    counts[steps] = (counts[steps] || 0) + 1;
+    assert.equal(validatePuzzle(puzzle, words).valid, true, `bulmaca ${puzzle.id}`);
+  }
+  assert.deepEqual(counts, { 3: 20, 4: 24, 5: 30, 6: 28, 7: 18 });
 });

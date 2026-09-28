@@ -1,7 +1,7 @@
-import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=mantik29';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik29';
-import { confirmDialog } from '../../game-dialog.js?v=mantik29';
-import { createStage } from '../../game-stage.js?v=mantik29';
+import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=mantik30';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik30';
+import { confirmDialog } from '../../game-dialog.js?v=mantik30';
+import { createStage } from '../../game-stage.js?v=mantik30';
 
 const KEY = 'oyunarasi-sekil-v1';
 const boardElement = document.querySelector('#board');

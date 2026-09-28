@@ -1,7 +1,7 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik29';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik29';
-import { confirmDialog } from '../../game-dialog.js?v=mantik29';
-import { createStage } from '../../game-stage.js?v=mantik29';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik30';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik30';
+import { confirmDialog } from '../../game-dialog.js?v=mantik30';
+import { createStage } from '../../game-stage.js?v=mantik30';
 
 // Sekme gizliyken süre işlemez: gizlendiği an dondurulur, dönünce kaldığı yerden sürer (telefon kilidi de dahil).
 let hiddenAt = null;

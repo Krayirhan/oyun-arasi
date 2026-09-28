@@ -1,7 +1,7 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik29';
-import { confirmDialog } from '../../game-dialog.js?v=mantik29';
-import { createStage } from '../../game-stage.js?v=mantik29';
-import { SIZE, isBoard, equalBoards, shiftBoard, canMove } from './logic.js?v=mantik29';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik30';
+import { confirmDialog } from '../../game-dialog.js?v=mantik30';
+import { createStage } from '../../game-stage.js?v=mantik30';
+import { SIZE, isBoard, equalBoards, shiftBoard, canMove } from './logic.js?v=mantik30';
 
 (() => {
   'use strict';

@@ -1,7 +1,7 @@
-import { COLS, ROWS, HIDDEN_ROWS, SHAPES, createGame, startGame, pauseGame, move, rotate, softDrop, hardDrop, holdPiece, tick, ghostPiece, pieceCells, isValidGame } from './logic.js?v=mantik29';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik29';
-import { confirmDialog } from '../../game-dialog.js?v=mantik29';
-import { createStage } from '../../game-stage.js?v=mantik29';
+import { COLS, ROWS, HIDDEN_ROWS, SHAPES, createGame, startGame, pauseGame, move, rotate, softDrop, hardDrop, holdPiece, tick, ghostPiece, pieceCells, isValidGame } from './logic.js?v=mantik30';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik30';
+import { confirmDialog } from '../../game-dialog.js?v=mantik30';
+import { createStage } from '../../game-stage.js?v=mantik30';
 
 const KEY = 'oyunarasi-tetris-v1';
 const REPEAT_DELAY_MS = 170;
