@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { PUZZLES } from './puzzles.js';
-import { buildPuzzleSet, createGame, dailyPuzzle, differsByOne, giveHint, isValidGame, prepareDictionary, scoreStars, shortestPath, submitWord, validatePuzzle } from './logic.js';
+import { applyDailyStreak, buildPuzzleSet, createGame, dailyPuzzle, differsByOne, finalStars, giveHint, isValidGame, orderForSeries, prepareDictionary, revealSolution, scoreStars, shortestPath, streakForDisplay, submitWord, validatePuzzle } from './logic.js';
 
 const source = readFileSync(new URL('../harfane/kelimeler.js', import.meta.url), 'utf8');
 const sections = [...source.matchAll(/window\.HARFANE_(ANSWERS|WORDS)\s*=\s*\[([\s\S]*?)\];/g)];
@@ -95,4 +95,70 @@ test('kayıtlı oyun yalnız kendi bulmacasına ait geçerli bir yol tutarsa kab
   assert.equal(isValidGame(game, puzzleMap, words), true);
   assert.equal(isValidGame({ ...game, path: [game.start, 'xxxxx'] }, puzzleMap, words), false);
   assert.equal(isValidGame({ ...game, target: 'başka' }, puzzleMap, words), false);
+});
+
+test('her ipucu bir yıldız düşürür, kazanan en az 1 yıldız alır', () => {
+  assert.equal(finalStars(3, 3, 0), 3);
+  assert.equal(finalStars(3, 3, 1), 2);
+  assert.equal(finalStars(3, 3, 2), 1);
+  assert.equal(finalStars(3, 3, 9), 1);
+  assert.equal(finalStars(5, 3, 1), 1);
+  assert.equal(finalStars(2, 3, 0), 0, 'en kısadan az adım olamaz');
+  const puzzle = { id: 1, path: ['tavan', 'taban', 'tabak', 'tarak'], steps: 3 };
+  let game = giveHint(giveHint(createGame(puzzle), words), words);
+  for (const word of ['taban', 'tabak', 'tarak']) game = submitWord(game, word, words).game;
+  assert.equal(game.status, 'won');
+  assert.equal(game.hints, 2);
+  assert.equal(game.stars, 1);
+});
+
+test('çözümü göster: kalan en kısa yolu yazar, oyun yıldızsız biter ve geçerli kalır', () => {
+  for (const puzzle of PUZZLES.slice(0, 40)) {
+    let game = createGame(puzzle, 'daily', '2026-09-28');
+    const alt = [...words].find(word => differsByOne(game.start, word) && word !== game.solution[1]);
+    if (alt) game = submitWord(game, alt, words).game;
+    const done = revealSolution(game, words);
+    assert.equal(done.status, 'revealed');
+    assert.equal(done.stars, 0);
+    assert.equal(done.revealed.at(-1), game.target);
+    assert.equal(isValidGame(done, puzzleMap, words), true, puzzle.path.join('>'));
+    assert.equal(submitWord(done, 'kalem', words).error, 'finished', 'bitmiş oyuna kelime girilmez');
+    assert.equal(revealSolution(done, words), done, 'ikinci kez gösterilmez');
+  }
+  const game = createGame(PUZZLES[0], 'daily', '2026-09-28');
+  const broken = { ...revealSolution(game, words), revealed: ['xxxxx'] };
+  assert.equal(isValidGame(broken, puzzleMap, words), false);
+});
+
+test('Sefer sırası kolaydan zora: adım sayısı azalmaz, tüm bulmacalar bir kez yer alır', () => {
+  const order = orderForSeries(PUZZLES);
+  assert.equal(order.length, PUZZLES.length);
+  assert.equal(new Set(order.map(puzzle => puzzle.id)).size, PUZZLES.length);
+  const steps = order.map(puzzle => puzzle.path.length - 1);
+  assert.deepEqual(steps, [...steps].sort((a, b) => a - b));
+  assert.equal(steps[0], 3);
+  assert.equal(steps.at(-1), 7);
+  assert.deepEqual(orderForSeries(PUZZLES), order, 'her seferinde aynı sıra');
+});
+
+test('günlük seri: yalnız bugünün bulmacası sayılır; ardışık artar, atlayınca 1, aynı gün ikinci kez sayılmaz', () => {
+  let record = { streak: 0, lastDate: '' };
+  record = applyDailyStreak(record, '2026-09-10', '2026-09-10');
+  assert.deepEqual(record, { streak: 1, lastDate: '2026-09-10' });
+  assert.deepEqual(applyDailyStreak(record, '2026-09-10', '2026-09-10'), record, 'aynı gün');
+  assert.deepEqual(applyDailyStreak(record, '2026-09-01', '2026-09-11'), record, 'arşiv sayılmaz');
+  record = applyDailyStreak(record, '2026-09-11', '2026-09-11');
+  assert.equal(record.streak, 2);
+  record = applyDailyStreak(record, '2026-09-14', '2026-09-14');
+  assert.deepEqual(record, { streak: 1, lastDate: '2026-09-14' });
+  assert.equal(applyDailyStreak({ streak: 4, lastDate: '2026-02-28' }, '2026-03-01', '2026-03-01').streak, 5, 'ay sınırı');
+  assert.equal(applyDailyStreak({ streak: 4, lastDate: '2025-12-31' }, '2026-01-01', '2026-01-01').streak, 5, 'yıl sınırı');
+});
+
+test('seri gösterimi: bir gün atlanınca eski değer görünmez', () => {
+  const record = { streak: 6, lastDate: '2026-09-10' };
+  assert.equal(streakForDisplay(record, '2026-09-10'), 6);
+  assert.equal(streakForDisplay(record, '2026-09-11'), 6);
+  assert.equal(streakForDisplay(record, '2026-09-12'), 0);
+  assert.equal(streakForDisplay({}, '2026-09-12'), 0);
 });

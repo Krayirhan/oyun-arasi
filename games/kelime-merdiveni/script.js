@@ -1,7 +1,8 @@
-import { PUZZLES } from './puzzles.js?v=mantik3';
-import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=mantik3';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik3';
-import { createFlow, createStage } from '../../game-stage.js?v=mantik3';
+import { PUZZLES } from './puzzles.js?v=mantik5';
+import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, prepareDictionary, revealSolution, orderForSeries, applyDailyStreak, streakForDisplay } from './logic.js?v=mantik5';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik5';
+import { createFlow, createStage } from '../../game-stage.js?v=mantik5';
+import { confirmDialog } from '../../game-dialog.js?v=mantik5';
 
 const $ = selector => document.querySelector(selector);
 // Ortak sahne şablonu (game-stage.js): menü, merdivenin üstünde açılan katmandır; sonuç da aynı kart katmanıdır.
@@ -11,14 +12,17 @@ const stage = createStage({ frame: $('#game-screen').parentElement });
 let stageKey = '';
 const DICTIONARY = new Set(prepareDictionary(window.HARFANE_WORDS || []));
 const PUZZLE_MAP = new Map(PUZZLES.map(puzzle => [puzzle.id, puzzle]));
+// Sefer kolaydan zora sıralıdır (adım sayısı 3→7); günlük bulmaca ise tarihe bağlı ham sırayı kullanır.
+const SERIES = orderForSeries(PUZZLES);
 const STORAGE_KEY = 'oyunarasi-kelime-merdiveni-v1';
 const TODAY = dateKey();
-const INITIAL = { dailyGames: {}, seriesIndex: 0, seriesStars: 0, seriesGame: null, records: { dailyPlayed: 0, dailyWins: 0, bestStars: 0, seriesCompleted: 0, totalStars: 0 } };
+const INITIAL = { dailyGames: {}, lastDailyDate: '', seriesIndex: 0, seriesStars: 0, seriesGame: null, records: { dailyPlayed: 0, dailyWins: 0, dailyStreak: 0, bestStars: 0, seriesCompleted: 0, totalStars: 0 } };
 let saved = load();
 let mode = 'daily';
 let selectedDate = TODAY;
 let game = null;
 let currentPuzzle = null;
+let lastInputKey = '';
 
 function load() {
   try {
@@ -59,7 +63,7 @@ function startSeries(index = saved.seriesIndex) {
   mode = 'series';
   const boundedIndex = Math.max(0, Math.min(PUZZLES.length - 1, index));
   saved.seriesIndex = boundedIndex;
-  currentPuzzle = PUZZLES[boundedIndex];
+  currentPuzzle = SERIES[boundedIndex];
   const candidate = saved.seriesGame;
   game = isValidGame(candidate, PUZZLE_MAP, DICTIONARY) && candidate.mode === 'series' && candidate.puzzleId === currentPuzzle.id
     ? candidate : createGame(currentPuzzle, 'series', String(boundedIndex + 1));
@@ -90,16 +94,19 @@ function showMenu() {
 }
 
 function renderResult() {
-  const finished = flow.current === 'game' && game?.status === 'won';
-  const key = finished ? `${mode}-${mode === 'daily' ? selectedDate : saved.seriesIndex}-${game.path.length}` : '';
+  const finished = flow.current === 'game' && ['won', 'revealed'].includes(game?.status);
+  const key = finished ? `${mode}-${mode === 'daily' ? selectedDate : saved.seriesIndex}-${game.path.length}-${game.status}` : '';
   if (key === stageKey) return;
   stageKey = key;
   if (!finished) { stage.hide(); return; }
-  const hasNext = mode === 'series' && saved.seriesIndex < PUZZLES.length - 1;
+  const hasNext = mode === 'series' && saved.seriesIndex < SERIES.length - 1;
   const kicker = mode === 'series' ? `SEFER · ${saved.seriesIndex + 1}. BASAMAK` : selectedDate === TODAY ? 'GÜNLÜK BULMACA · TAMAM' : 'ARŞİV BULMACASI · TAMAM';
+  const revealed = game.status === 'revealed';
   stage.show({
-    kind: 'result', kicker, title: game.stars === 3 ? 'En kısa yoldan ulaştın!' : 'Hedefe ulaştın!', stars: game.stars,
-    stats: [['Hamle', game.path.length - 1], ['En kısa', game.shortestSteps], ['Toplam', `${saved.records.totalStars} ★`]],
+    kind: 'result', kicker: revealed ? `${kicker.split(' · ')[0]} · ÇÖZÜM GÖSTERİLDİ` : kicker,
+    title: revealed ? 'Çözüm gösterildi' : game.stars === 3 ? 'En kısa yoldan ulaştın!' : 'Hedefe ulaştın!',
+    ...(revealed ? { copy: 'Bu merdivenden yıldız kazanılmadı. Diğerinde görüşürüz!' } : { stars: game.stars }),
+    stats: [['Hamle', game.path.length - 1], ['En kısa', game.shortestSteps], ['İpucu', game.hints]],
     actions: [
       ...(hasNext ? [{ label: 'Sonraki basamak', primary: true, onClick: nextLevel }] : []),
       { label: mode === 'daily' ? 'Menü ve arşiv' : 'Sefer menüsü', primary: !hasNext, onClick: showMenu }
@@ -110,6 +117,8 @@ function renderResult() {
 
 function renderChrome() {
   $('#star-total').textContent = `${saved.records.totalStars} ★`;
+  const streak = streakForDisplay({ streak: saved.records.dailyStreak, lastDate: saved.lastDailyDate }, TODAY);
+  $('#daily-note').textContent = streak > 0 ? `🔥 ${streak} günlük seri` : 'Herkes için aynı merdiven';
   $('#resume-button').hidden = !(saved.dailyGames[TODAY] || saved.seriesGame);
   $('#resume-button').textContent = mode === 'daily' ? 'Bugünkü merdivene dön' : `Sefer · ${saved.seriesIndex + 1}. basamağa dön`;
 }
@@ -118,11 +127,12 @@ function renderGame() {
   $('#step-count').textContent = `${game.path.length - 1} hamle`;
   $('#shortest-label').textContent = `En kısa: ${game.shortestSteps} hamle`;
   $('#star-display').textContent = `${'★'.repeat(game.stars)}${'☆'.repeat(3 - game.stars)}`;
-  $('#word-ladder').replaceChildren(...game.path.map((word, index) => {
-    const row = document.createElement('li'); row.className = 'ladder-step';
+  const shown = game.status === 'revealed' ? [...game.path, ...game.revealed] : game.path;
+  $('#word-ladder').replaceChildren(...shown.map((word, index) => {
+    const row = document.createElement('li'); row.className = `ladder-step${index >= game.path.length ? ' is-revealed' : ''}`;
     const count = document.createElement('span'); count.className = 'ladder-step-number'; count.textContent = String(index);
     const tiles = document.createElement('span'); tiles.className = 'ladder-word';
-    const before = [...(game.path[index - 1] || '')]; const letters = [...word];
+    const before = [...(shown[index - 1] || '')]; const letters = [...word];
     tiles.setAttribute('aria-label', word.toLocaleUpperCase('tr-TR'));
     for (let position = 0; position < letters.length; position += 1) {
       const tile = document.createElement('b'); tile.textContent = letters[position].toLocaleUpperCase('tr-TR');
@@ -133,9 +143,15 @@ function renderGame() {
     if (word === game.target) { const flag = document.createElement('span'); flag.className = 'ladder-arrived'; flag.textContent = 'HEDEF'; row.append(flag); }
     return row;
   }));
-  const finished = game.status === 'won';
-  $('#word-input').disabled = finished; $('#word-input').value = '';
+  const finished = game.status !== 'playing';
+  // Yazılan kelime yalnızca bulmaca ya da hamle değişince temizlenir; ipucu düğmesi onu silmez.
+  const inputKey = `${game.puzzleId}-${game.path.length}-${game.status}`;
+  if (inputKey !== lastInputKey) { lastInputKey = inputKey; $('#word-input').value = ''; }
+  $('#word-input').disabled = finished;
   $('#hint-button').disabled = finished;
+  $('#reveal-button').hidden = finished || game.hints < 2;
+  // Yeni kelime listenin alt ucunda kalırsa görünür olsun.
+  const ladder = $('#word-ladder'); ladder.scrollTop = ladder.scrollHeight;
   if (game.hint) {
     const previous = [...game.path.at(-1)]; const next = [...game.hint]; const position = previous.findIndex((letter, index) => letter !== next[index]);
     setMessage(`İpucu: ${position + 1}. harfi “${next[position].toLocaleUpperCase('tr-TR')}” yap.`, 'hint');
@@ -145,8 +161,12 @@ function renderGame() {
 
 function finishIfWon(previousGame, nextGame) {
   if (previousGame.status !== 'won' && nextGame.status === 'won') {
-    if (mode === 'daily') { saved.records.dailyPlayed += 1; saved.records.dailyWins += 1; }
-    else { saved.seriesStars += nextGame.stars; if (saved.seriesIndex === PUZZLES.length - 1) saved.records.seriesCompleted += 1; }
+    if (mode === 'daily') {
+      saved.records.dailyPlayed += 1; saved.records.dailyWins += 1;
+      const streak = applyDailyStreak({ streak: saved.records.dailyStreak, lastDate: saved.lastDailyDate }, selectedDate, TODAY);
+      saved.records.dailyStreak = streak.streak; saved.lastDailyDate = streak.lastDate;
+    }
+    else { saved.seriesStars += nextGame.stars; if (saved.seriesIndex === SERIES.length - 1) saved.records.seriesCompleted += 1; }
     saved.records.bestStars = Math.max(saved.records.bestStars, nextGame.stars);
     saved.records.totalStars += nextGame.stars;
   }
@@ -174,6 +194,13 @@ $('#hint-button').addEventListener('click', () => {
   save(); renderGame();
 });
 
+$('#reveal-button').addEventListener('click', async () => {
+  if (game?.status !== 'playing' || game.hints < 2) return;
+  if (!(await confirmDialog({ title: 'Çözüm gösterilsin mi?', message: 'Bu merdiveni yıldız kazanmadan bitirirsin.', confirmLabel: 'Çözümü göster' }))) return;
+  game = revealSolution(game, DICTIONARY); if (mode === 'daily') saved.dailyGames[selectedDate] = game; else saved.seriesGame = game;
+  save(); renderGame(); setMessage('Çözüm gösterildi; yıldız kazanılmadı.', '');
+});
+
 $('#open-date').addEventListener('click', () => startDaily($('#archive-date').value || TODAY));
 $('#today-button').addEventListener('click', () => startDaily(TODAY));
 $('#start-button').addEventListener('click', () => mode === 'daily' ? startDaily(TODAY) : startSeries());
@@ -189,7 +216,7 @@ $('#resume-button').addEventListener('click', () => {
 });
 $('#menu-button').addEventListener('click', showMenu);
 function nextLevel() {
-  if (!game || game.status !== 'won' || mode !== 'series' || saved.seriesIndex >= PUZZLES.length - 1) return;
+  if (!game || !['won', 'revealed'].includes(game.status) || mode !== 'series' || saved.seriesIndex >= SERIES.length - 1) return;
   saved.seriesIndex += 1; saved.seriesGame = null; save(); startSeries();
 }
 
@@ -211,7 +238,8 @@ function mergeStates(local, remote) {
   const dailyGames = { ...(remote?.dailyGames || {}), ...(local?.dailyGames || {}) };
   const records = Object.fromEntries(Object.keys(INITIAL.records).map(key => [key, Math.max(Number(local?.records?.[key]) || 0, Number(remote?.records?.[key]) || 0)]));
   const chooseSeries = (local?.seriesIndex || 0) >= (remote?.seriesIndex || 0) ? local : remote;
-  return { ...INITIAL, ...remote, ...local, dailyGames, records, seriesIndex: Math.max(local?.seriesIndex || 0, remote?.seriesIndex || 0), seriesStars: Math.max(local?.seriesStars || 0, remote?.seriesStars || 0), seriesGame: chooseSeries?.seriesGame || local?.seriesGame || remote?.seriesGame || null };
+  const lastDailyDate = [local?.lastDailyDate, remote?.lastDailyDate].filter(value => typeof value === 'string').sort().at(-1) || '';
+  return { ...INITIAL, ...remote, ...local, dailyGames, records, lastDailyDate, seriesIndex: Math.max(local?.seriesIndex || 0, remote?.seriesIndex || 0), seriesStars: Math.max(local?.seriesStars || 0, remote?.seriesStars || 0), seriesGame: chooseSeries?.seriesGame || local?.seriesGame || remote?.seriesGame || null };
 }
 
 function validState(incoming) {

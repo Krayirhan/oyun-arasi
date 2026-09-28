@@ -129,6 +129,12 @@ export function scoreStars(stepsTaken, shortestSteps) {
   return 1;
 }
 
+// Her ipucu bir yıldız düşürür; kazanan en az 1 yıldız alır.
+export function finalStars(stepsTaken, shortestSteps, hints = 0) {
+  const base = scoreStars(stepsTaken, shortestSteps);
+  return base ? Math.max(1, base - Math.max(0, hints)) : 0;
+}
+
 export function createGame(puzzle, mode = 'daily', date = '') {
   return createPlayableGame(puzzle, mode, date);
 }
@@ -141,7 +147,7 @@ export function submitWord(game, word, dictionary) {
   if (game.path.includes(candidate)) return { game, error: 'repeat' };
   if (!differsByOne(game.path.at(-1), candidate)) return { game, error: 'one-letter' };
   const path = [...game.path, candidate]; const won = candidate === game.target;
-  const next = { ...game, path, hint: null, status: won ? 'won' : 'playing', stars: won ? scoreStars(path.length - 1, game.shortestSteps) : 0 };
+  const next = { ...game, path, hint: null, status: won ? 'won' : 'playing', stars: won ? finalStars(path.length - 1, game.shortestSteps, game.hints) : 0 };
   return { game: next, error: null };
 }
 
@@ -158,6 +164,39 @@ export function giveHint(game, dictionary = null) {
   return { ...game, hints: game.hints + 1, hint };
 }
 
+// "Çözümü göster": bulunulan kelimeden hedefe kalan en kısa yol `revealed` alanına yazılır (oyuncunun yolu değişmez).
+// Oyun yıldızsız biter ve yeniden oynanamaz.
+export function revealSolution(game, dictionary = null) {
+  if (!game || game.status !== 'playing') return game;
+  const current = game.path.at(-1);
+  const onSolution = game.solution.indexOf(current);
+  const route = dictionary ? shortestPath(current, game.target, dictionary) : null;
+  const rest = route ? route.slice(1) : onSolution >= 0 ? game.solution.slice(onSolution + 1) : game.solution.slice(1);
+  return { ...game, status: 'revealed', stars: 0, hint: null, revealed: rest };
+}
+
+// Sefer sırası: kolaydan zora. Önce adım sayısı (3→7), aynı adımda tanıdık kelimesi çok olan önce.
+export function orderForSeries(puzzles) {
+  const steps = puzzle => puzzle.steps ?? puzzle.path.length - 1;
+  return [...puzzles].sort((a, b) => steps(a) - steps(b) || (b.familiar ?? 0) - (a.familiar ?? 0) || a.id - b.id);
+}
+
+const shiftDay = (key, days) => {
+  const [year, month, day] = key.split('-').map(Number);
+  return dateKey(new Date(year, month - 1, day + days));
+};
+
+// Günlük seri yalnızca BUGÜNÜN bulmacasını çözünce ilerler; arşiv bulmacaları saymaz. Aynı gün ikinci kez sayılmaz.
+export function applyDailyStreak({ streak = 0, lastDate = '' } = {}, playedDate, today) {
+  if (playedDate !== today || lastDate === today) return { streak, lastDate };
+  return { streak: lastDate === shiftDay(today, -1) ? streak + 1 : 1, lastDate: today };
+}
+
+// Bir gün atlanınca seri bozulmuştur; sonraki çözüme kadar eski değer görünmesin.
+export function streakForDisplay({ streak = 0, lastDate = '' } = {}, today) {
+  return lastDate && lastDate !== today && lastDate !== shiftDay(today, -1) ? 0 : streak;
+}
+
 export function createPlayableGame(puzzle, mode = 'daily', date = '') {
   const solution = puzzle.path.map(normalize);
   return { version: 1, puzzleId: puzzle.id, mode, date, start: solution[0], target: solution.at(-1), shortestSteps: solution.length - 1, solution, path: [solution[0]], hints: 0, status: 'playing', stars: 0 };
@@ -170,7 +209,11 @@ export function isValidGame(game, puzzleById, dictionary) {
   if (game.start !== expected[0] || game.target !== expected.at(-1) || game.shortestSteps !== expected.length - 1) return false;
   const words = dictionary instanceof Set ? dictionary : new Set(prepareDictionary(dictionary));
   if (game.path[0] !== game.start || game.path.some((word, index) => !words.has(word) || index > 0 && (!differsByOne(game.path[index - 1], word) || game.path.slice(0, index).includes(word)))) return false;
-  if (game.path.length > 200 || !['playing', 'won'].includes(game.status)) return false;
+  if (game.path.length > 200 || !['playing', 'won', 'revealed'].includes(game.status)) return false;
+  if (game.status === 'revealed') {
+    const chain = [game.path.at(-1), ...(Array.isArray(game.revealed) ? game.revealed : [])];
+    if (chain.length < 2 || chain.at(-1) !== game.target || chain.some((word, index) => !words.has(word) || index > 0 && !differsByOne(chain[index - 1], word))) return false;
+  }
   return game.status !== 'won' || game.path.at(-1) === game.target;
 }
 
