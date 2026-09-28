@@ -1,5 +1,5 @@
-import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_ESCAPES, LAUNCH_X, LAUNCH_Y, HAND_Y, createGame, startGame, pauseGame, aimAt, fireDart, advance, stageFor, isValidGame } from './logic.js?v=balon6';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon6';
+import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_ESCAPES, LAUNCH_X, LAUNCH_Y, createGame, startGame, pauseGame, aimAt, fireDart, advance, stageFor, isValidGame } from './logic.js?v=balon8';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon8';
 
 const KEY = 'oyunarasi-balon-patlat-v1';
 const $ = selector => document.querySelector(selector);
@@ -181,60 +181,85 @@ function drawBalloon(balloon, now) {
 
 // ---- Dart ve atış noktası -----------------------------------------------------------------------
 
-function dartShape(length = 1) {
-  ctx.fillStyle = '#c9d2de';
-  ctx.beginPath(); ctx.moveTo(26 * length, 0); ctx.lineTo(12, -3); ctx.lineTo(12, 3); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#2b3550';
-  ctx.fillRect(-10, -3.5, 24, 7);
-  ctx.fillStyle = '#ff4f7b';
-  ctx.beginPath(); ctx.moveTo(-8, 0); ctx.lineTo(-24, -11); ctx.lineTo(-20, 0); ctx.lineTo(-24, 11); ctx.closePath(); ctx.fill();
-  ctx.fillStyle = '#ffd23f';
-  ctx.beginPath(); ctx.moveTo(-10, 0); ctx.lineTo(-22, -6); ctx.lineTo(-19, 0); ctx.lineTo(-22, 6); ctx.closePath(); ctx.fill();
+// Birinci şahıs dart: arkadan görünür — tüyler sana dönük ve büyük, uç sahnenin derinliğine bakar.
+// (x, y) tüylerin merkezi, angle ucun baktığı yön, s ölçek (yakında büyük, uzakta küçük).
+function rearDart(x, y, angle, s) {
+  const dx = Math.cos(angle);
+  const dy = Math.sin(angle);
+  const tipX = x + dx * 46 * s;
+  const tipY = y + dy * 46 * s;
+  ctx.save();
+  ctx.lineCap = 'round';
+  // Gövde: arkada kalın, uca doğru incelir
+  ctx.strokeStyle = '#1f2740';
+  ctx.lineWidth = 7 * s;
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + dx * 30 * s, y + dy * 30 * s); ctx.stroke();
+  ctx.strokeStyle = '#9aa6b8';
+  ctx.lineWidth = 5 * s;
+  ctx.beginPath(); ctx.moveTo(x + dx * 14 * s, y + dy * 14 * s); ctx.lineTo(x + dx * 30 * s, y + dy * 30 * s); ctx.stroke();
+  ctx.strokeStyle = '#d9dee6';
+  ctx.lineWidth = 1.8 * s;
+  ctx.beginPath(); ctx.moveTo(x + dx * 30 * s, y + dy * 30 * s); ctx.lineTo(tipX, tipY); ctx.stroke();
+  // Tüyler: arkadan bakınca X biçiminde dört kanat
+  for (let i = 0; i < 4; i += 1) {
+    const a = angle + Math.PI / 4 + i * Math.PI / 2;
+    const ox = Math.cos(a);
+    const oy = Math.sin(a);
+    const back = -8 * s;
+    ctx.fillStyle = i % 2 ? '#ffd23f' : '#ff4f7b';
+    ctx.strokeStyle = 'rgb(20 25 45 / .55)';
+    ctx.lineWidth = 1.2 * s;
+    ctx.beginPath();
+    ctx.moveTo(x + dx * 6 * s, y + dy * 6 * s);
+    ctx.lineTo(x + ox * 20 * s + dx * back, y + oy * 20 * s + dy * back);
+    ctx.lineTo(x + ox * 17 * s + dx * (back - 10 * s), y + oy * 17 * s + dy * (back - 10 * s));
+    ctx.lineTo(x - dx * 4 * s, y - dy * 4 * s);
+    ctx.closePath();
+    ctx.fill();
+    ctx.stroke();
+  }
+  ctx.fillStyle = '#1f2740';
+  ctx.beginPath(); ctx.arc(x, y, 3.2 * s, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
 }
 
-// Uçan dart: elden (ekranın altı) hedef noktaya yay çizerek gider, uzaklaştıkça küçülür.
+// Elin konumu: ekranın sağ altı (dart elden, ekranın içinden sahneye fırlar).
+const HAND = { x: WIDTH * .7, y: HEIGHT - 58 };
+const HAND_SCALE = 2.4;
+const FAR_SCALE = .55;
+
 function dartPosition(dart, t) {
-  const p = 1 - (1 - t) * (1 - t);
+  const p = 1 - (1 - t) ** 3;
   return {
-    x: dart.sx + (dart.tx - dart.sx) * p,
-    y: dart.sy + (dart.ty - dart.sy) * p - Math.sin(Math.PI * t) * 70,
-    scale: 1.9 - 1.15 * p
+    x: HAND.x + (dart.tx - HAND.x) * p,
+    y: HAND.y + (dart.ty - HAND.y) * p - Math.sin(Math.PI * p) * 40,
+    scale: HAND_SCALE + (FAR_SCALE - HAND_SCALE) * p
   };
 }
 
 function drawDart(dart) {
   const now = dartPosition(dart, dart.t);
-  const before = dartPosition(dart, Math.max(0, dart.t - .06));
-  const angle = Math.atan2(now.y - before.y, now.x - before.x) || -Math.PI / 2;
+  const angle = Math.atan2(dart.ty - HAND.y, dart.tx - HAND.x);
+  // Hız izi
+  const before = dartPosition(dart, Math.max(0, dart.t - .08));
   ctx.save();
-  ctx.strokeStyle = 'rgb(255 255 255 / .5)';
-  ctx.lineWidth = 4 * now.scale;
+  ctx.strokeStyle = 'rgb(255 255 255 / .35)';
+  ctx.lineWidth = 10 * now.scale;
   ctx.lineCap = 'round';
   ctx.beginPath(); ctx.moveTo(before.x, before.y); ctx.lineTo(now.x, now.y); ctx.stroke();
-  ctx.translate(now.x, now.y);
-  ctx.rotate(angle);
-  ctx.scale(now.scale, now.scale);
-  dartShape();
   ctx.restore();
+  rearDart(now.x, now.y, angle, now.scale);
 }
 
 let readyAt = 0;
 
-// Elde tutulan dart ve nişangâh. Dart havadayken el boştur; dart varınca yenisi aşağıdan kayarak gelir.
+// Nişangâh ve elde bekleyen dart. Dart havadayken el boştur; varınca yenisi aşağıdan gelir.
 function drawLauncher(now) {
   const { x, y } = game.aim;
-  const playing = game.status === 'playing';
   const flying = game.darts.length > 0;
   if (flying) readyAt = now;
-  ctx.save();
-  if (playing) {
-    // Atışın izleyeceği yay (silik)
-    const guide = { sx: LAUNCH_X, sy: HAND_Y, tx: x, ty: y };
-    for (let t = .12; t < .96; t += .08) {
-      const point = dartPosition(guide, t);
-      ctx.fillStyle = `rgb(255 255 255 / ${.5 - t * .35})`;
-      ctx.beginPath(); ctx.arc(point.x, point.y, 3, 0, Math.PI * 2); ctx.fill();
-    }
+  if (game.status === 'playing') {
+    ctx.save();
     ctx.strokeStyle = '#fff';
     ctx.lineWidth = 3;
     ctx.shadowColor = 'rgb(20 40 80 / .55)';
@@ -243,24 +268,17 @@ function drawLauncher(now) {
     ctx.beginPath();
     for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { ctx.moveTo(x + dx * 8, y + dy * 8); ctx.lineTo(x + dx * 22, y + dy * 22); }
     ctx.stroke();
+    ctx.shadowColor = 'transparent';
     ctx.fillStyle = '#ff4f7b';
     ctx.beginPath(); ctx.arc(x, y, 3, 0, Math.PI * 2); ctx.fill();
-    ctx.shadowColor = 'transparent';
+    ctx.restore();
   }
   if (!flying) {
-    // Elde bekleyen dart: nişana doğru bakar, hafifçe sallanır
-    const slide = Math.min(1, (now - readyAt) / 180);
-    const handX = LAUNCH_X;
-    const handY = HEIGHT - 70 + (1 - slide) * 90 + Math.sin(now / 320) * 3;
-    const angle = Math.atan2(y - handY, x - handX);
-    ctx.fillStyle = 'rgb(30 70 40 / .22)';
-    ctx.beginPath(); ctx.ellipse(handX, HEIGHT - 22, 46, 9, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.translate(handX, handY);
-    ctx.rotate(angle);
-    ctx.scale(2.1, 2.1);
-    dartShape();
+    const slide = Math.min(1, (now - readyAt) / 220);
+    const hx = HAND.x + (1 - slide) * 60;
+    const hy = HAND.y + (1 - slide) * 140 + Math.sin(now / 340) * 3;
+    rearDart(hx, hy, Math.atan2(y - hy, x - hx), HAND_SCALE);
   }
-  ctx.restore();
 }
 
 // ---- Tahta içi gösterge: hedef tabelası, süre halkası, canlar ---------------------------------
@@ -391,7 +409,7 @@ function updateEffects(dt) {
     effect.age += dt;
     if (effect.type === 'shard') { effect.x += effect.vx * dt; effect.y += effect.vy * dt; effect.vy += 620 * dt; effect.rot += effect.spin * dt; }
     if (effect.type === 'text') effect.y -= 46 * dt;
-    if (effect.type === 'fall') { effect.x += effect.vx * dt; effect.y += effect.vy * dt; effect.vy += 900 * dt; effect.rot += effect.spin * dt; }
+    if (effect.type === 'away') effect.y -= 60 * dt;
     return effect.age < effect.life;
   });
 }
@@ -405,12 +423,9 @@ function drawEffects() {
       ctx.strokeStyle = effect.color;
       ctx.lineWidth = 6 * (1 - k) + 1;
       ctx.beginPath(); ctx.arc(effect.x, effect.y, 30 + k * 60, 0, Math.PI * 2); ctx.stroke();
-    } else if (effect.type === 'fall') {
-      ctx.globalAlpha = 1 - k * k;
-      ctx.translate(effect.x, effect.y);
-      ctx.rotate(effect.rot);
-      ctx.scale(.8, .8);
-      dartShape();
+    } else if (effect.type === 'away') {
+      // Iskalayan dart sahnenin derinliğine uçup küçülerek kaybolur
+      rearDart(effect.x, effect.y, -Math.PI / 2, FAR_SCALE * (1 - k * .8));
     } else if (effect.type === 'shard') {
       ctx.translate(effect.x, effect.y);
       ctx.rotate(effect.rot);
@@ -458,9 +473,9 @@ function drawEffects() {
 // Mantığın bu karede ürettiği olaylar: patlayan balon, ıskalanan dart, kaçan balon, seviye atlama.
 function handleEvents(previous, current) {
   for (const event of current.events || []) {
-    if (event.type === 'pop') burst(event, event.correct);
+    if (event.type === 'pop') { burst(event, event.correct); effects.push({ type: 'away', x: event.x, y: event.y, life: .35, age: 0 }); }
     else if (event.type === 'miss') {
-      effects.push({ type: 'fall', x: event.x, y: event.y, vx: (event.x - LAUNCH_X) * .4, vy: -80, rot: -Math.PI / 2, spin: 7, life: .9, age: 0 });
+      effects.push({ type: 'away', x: event.x, y: event.y, life: .45, age: 0 });
       effects.push({ type: 'text', x: event.x, y: event.y - 24, text: 'Iska!', color: '#5b6785', life: .8, age: 0 });
     }
   }

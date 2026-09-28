@@ -1,6 +1,6 @@
-import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=balon6';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon6';
-import { confirmDialog } from '../../game-dialog.js?v=balon6';
+import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=balon8';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon8';
+import { confirmDialog } from '../../game-dialog.js?v=balon8';
 
 const KEY = 'oyunarasi-xox-v1';
 const boardElement = document.querySelector('#board');
