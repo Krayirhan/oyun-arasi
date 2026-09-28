@@ -44,7 +44,7 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 .game-page a { text-decoration: none; }
 .game-page :is(a, button, select, input, [tabindex]):focus-visible { outline: 3px solid var(--orange); outline-offset: 3px; }
 .game-page :is(kbd, input, select, textarea) { font-family: inherit; }
-.game-page :is(.heading h1, .game-heading h1, .home-heading h1, .game-intro h1, .overlay-card h2, .how-to h2, .modal h2,
+.game-page :is(.heading h1, .game-heading h1, .home-heading h1, .game-intro h1, .how-to h2, .modal h2,
   .score-card > strong, .stats strong, .counters strong, .scoreboard strong, .turn-card strong, .progress-copy > strong,
   .mode-card strong, .streak-card strong, .stat strong, #countdown, .tile, .cell, .how-icon) {
   font-family: 'Fredoka', 'Roboto Condensed', sans-serif;
@@ -73,7 +73,6 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 .game-page .board-footer { font-size: 11px; }
 .game-page kbd { font-size: 12px; }
 .game-page .level-picker select { font-size: 14px; }
-.game-page .overlay-kicker { font-size: 12px; }
 
 /* buttons */
 .game-page .button { white-space: nowrap; display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 42px; padding: 0 16px; border-radius: 999px; font-size: 14px; font-weight: 700; }

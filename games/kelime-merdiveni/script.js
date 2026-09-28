@@ -1,8 +1,14 @@
-import { PUZZLES } from './puzzles.js?v=sahne14';
-import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=sahne14';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { PUZZLES } from './puzzles.js?v=sahne18';
+import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=sahne18';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne18';
+import { createFlow, createStage } from '../../game-stage.js?v=sahne18';
 
 const $ = selector => document.querySelector(selector);
+// Ortak sahne şablonu (game-stage.js): menü, merdivenin üstünde açılan katmandır; sonuç da aynı kart katmanıdır.
+// Merdiven hep sahnede durur, kelime listesi sabit yükseklikte kayar; çerçeve ekran değişince büyüyüp küçülmez.
+const flow = createFlow({ menu: $('#menu-screen'), game: $('#game-screen') });
+const stage = createStage({ frame: $('#game-screen').parentElement });
+let stageKey = '';
 const DICTIONARY = new Set(prepareDictionary(window.HARFANE_WORDS || []));
 const PUZZLE_MAP = new Map(PUZZLES.map(puzzle => [puzzle.id, puzzle]));
 const STORAGE_KEY = 'oyunarasi-kelime-merdiveni-v1';
@@ -35,12 +41,16 @@ function save() {
 
 function puzzleForDay(date) { return dailyPuzzle(PUZZLES, date); }
 
-function startDaily(date = TODAY) {
-  if (date > TODAY || date < '2026-01-01') return setMessage('Arşivde 1 Ocak 2026 ile bugün arasındaki bulmacalar var.', 'error');
+function loadDaily(date) {
   mode = 'daily'; selectedDate = date; currentPuzzle = puzzleForDay(date);
   const candidate = saved.dailyGames[date];
   game = isValidGame(candidate, PUZZLE_MAP, DICTIONARY) && candidate.date === date && candidate.mode === 'daily'
     ? candidate : createGame(currentPuzzle, 'daily', date);
+}
+
+function startDaily(date = TODAY) {
+  if (date > TODAY || date < '2026-01-01') return setMessage('Arşivde 1 Ocak 2026 ile bugün arasındaki bulmacalar var.', 'error');
+  loadDaily(date);
   $('#archive-date').value = date;
   showGame();
 }
@@ -57,15 +67,45 @@ function startSeries(index = saved.seriesIndex) {
 }
 
 function showGame() {
-  $('#menu-screen').classList.add('hidden'); $('#game-screen').classList.remove('hidden'); $('#menu-button').hidden = false;
+  $('#menu-button').hidden = false;
   $('#daily-options').classList.toggle('hidden', mode !== 'daily');
   $('#mode-caption').textContent = mode === 'daily' ? (selectedDate === TODAY ? 'GÜNLÜK BULMACA' : 'ARŞİV BULMACASI') : 'SEFER';
   $('#progress-label').textContent = mode === 'daily' ? `#${String(PUZZLES.findIndex(item => item.id === currentPuzzle.id) + 1).padStart(3, '0')}` : `${saved.seriesIndex + 1} / ${PUZZLES.length}`;
   $('#status').textContent = mode === 'daily' ? (selectedDate === TODAY ? 'Günlük merdiven başladı. Her adımda bir harfi değiştir.' : 'Arşiv merdiveni açık. Her adımda bir harfi değiştir.') : `Sefer · ${saved.seriesIndex + 1}. basamak`;
+  flow.show('game');
+  paintGame();
+}
+
+// Menü açıkken arkada bugünkü merdiven durur; sahne ilk açılışta da tam boyundadır.
+function paintGame() {
   $('#start-word').textContent = currentPuzzle.path[0].toLocaleUpperCase('tr-TR');
   $('#target-word').textContent = currentPuzzle.path.at(-1).toLocaleUpperCase('tr-TR');
   renderGame();
-  window.dispatchEvent(new Event('game:layoutchange'));
+}
+
+function showMenu() {
+  flow.show('menu');
+  $('#menu-button').hidden = true;
+  renderResult();
+}
+
+function renderResult() {
+  const finished = flow.current === 'game' && game?.status === 'won';
+  const key = finished ? `${mode}-${mode === 'daily' ? selectedDate : saved.seriesIndex}-${game.path.length}` : '';
+  if (key === stageKey) return;
+  stageKey = key;
+  if (!finished) { stage.hide(); return; }
+  const hasNext = mode === 'series' && saved.seriesIndex < PUZZLES.length - 1;
+  const kicker = mode === 'series' ? `SEFER · ${saved.seriesIndex + 1}. BASAMAK` : selectedDate === TODAY ? 'GÜNLÜK BULMACA · TAMAM' : 'ARŞİV BULMACASI · TAMAM';
+  stage.show({
+    kind: 'result', kicker, title: game.stars === 3 ? 'En kısa yoldan ulaştın!' : 'Hedefe ulaştın!', stars: game.stars,
+    stats: [['Hamle', game.path.length - 1], ['En kısa', game.shortestSteps], ['Toplam', `${saved.records.totalStars} ★`]],
+    actions: [
+      ...(hasNext ? [{ label: 'Sonraki basamak', primary: true, onClick: nextLevel }] : []),
+      { label: mode === 'daily' ? 'Menü ve arşiv' : 'Sefer menüsü', primary: !hasNext, onClick: showMenu }
+    ],
+    dismissible: true
+  });
 }
 
 function renderChrome() {
@@ -96,16 +136,11 @@ function renderGame() {
   const finished = game.status === 'won';
   $('#word-input').disabled = finished; $('#word-input').value = '';
   $('#hint-button').disabled = finished;
-  $('#result-panel').classList.toggle('hidden', !finished);
-  $('#result-title').textContent = game.stars === 3 ? 'En kısa yoldan ulaştın!' : 'Hedefe ulaştın!';
-  const used = game.path.length - 1;
-  $('#result-copy').textContent = `${used} hamlede ${game.stars} yıldız kazandın. En kısa çözüm ${game.shortestSteps} hamleydi.`;
-  $('#next-button').hidden = mode !== 'series' || saved.seriesIndex >= PUZZLES.length - 1;
-  $('#back-button').textContent = mode === 'daily' ? 'Arşive ve menüye dön' : 'Sefer menüsü';
   if (game.hint) {
     const previous = [...game.path.at(-1)]; const next = [...game.hint]; const position = previous.findIndex((letter, index) => letter !== next[index]);
     setMessage(`İpucu: ${position + 1}. harfi “${next[position].toLocaleUpperCase('tr-TR')}” yap.`, 'hint');
   } else if (!finished) setMessage('Bir harfi değiştirerek sıradaki geçerli kelimeyi yaz.', '');
+  renderResult();
 }
 
 function finishIfWon(previousGame, nextGame) {
@@ -152,18 +187,18 @@ document.querySelectorAll('.ladder-mode').forEach(button => button.addEventListe
 $('#resume-button').addEventListener('click', () => {
   if (mode === 'daily') startDaily(TODAY); else startSeries();
 });
-$('#menu-button').addEventListener('click', () => { $('#game-screen').classList.add('hidden'); $('#menu-screen').classList.remove('hidden'); $('#menu-button').hidden = true; window.dispatchEvent(new Event('game:layoutchange')); });
-$('#back-button').addEventListener('click', () => $('#menu-button').click());
-$('#next-button').addEventListener('click', () => {
+$('#menu-button').addEventListener('click', showMenu);
+function nextLevel() {
   if (!game || game.status !== 'won' || mode !== 'series' || saved.seriesIndex >= PUZZLES.length - 1) return;
   saved.seriesIndex += 1; saved.seriesGame = null; save(); startSeries();
-});
+}
 
 const cloud = syncGameOnAccountChange('kelime-merdiveni', {
   read: () => saved,
   write: incoming => {
     saved = mergeStates(saved, incoming); localStorage.setItem(STORAGE_KEY, JSON.stringify(saved)); renderChrome();
-    if (game?.mode === 'daily') startDaily(selectedDate); else if (game?.mode === 'series') startSeries(saved.seriesIndex);
+    if (flow.current !== 'game') { loadDaily(TODAY); paintGame(); }
+    else if (game?.mode === 'daily') startDaily(selectedDate); else if (game?.mode === 'series') startSeries(saved.seriesIndex);
   },
   isValid: incoming => validState(incoming),
   merge: (local, remote) => mergeStates(local, remote),
@@ -185,4 +220,7 @@ function validState(incoming) {
   return incoming.seriesGame == null || isValidGame(incoming.seriesGame, PUZZLE_MAP, DICTIONARY) && incoming.seriesGame.mode === 'series';
 }
 
+loadDaily(TODAY);
+paintGame();
+showMenu();
 renderChrome();

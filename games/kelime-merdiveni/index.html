@@ -7,17 +7,17 @@
     <meta name="description" content="Her adımda tek harfi değiştir, Türkçe kelimelerle hedefe ulaş. Günlük Kelime Merdiveni, arşiv ve sefer modu Oyun Arası'nda." />
     <title>Kelime Merdiveni | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../account.css?v=sahne14" />
-    <link rel="stylesheet" href="../../site-header.css?v=sahne14" />
-    <link rel="stylesheet" href="../../game-shell.css?v=sahne14" />
-    <link rel="stylesheet" href="../../play-page.css?v=sahne14" />
-    <link rel="stylesheet" href="styles.css?v=sahne14" />
-    <script type="module" src="../../account.js?v=sahne14"></script>
-    <script src="../harfane/kelimeler.js?v=sahne14"></script>
-    <script type="module" src="script.js?v=sahne14"></script>
-    <script defer src="../../catalog.js?v=sahne14"></script>
-    <script defer src="../../library.js?v=sahne14"></script>
-    <script defer src="../../game-shell.js?v=sahne14"></script>
+    <link rel="stylesheet" href="../../account.css?v=sahne18" />
+    <link rel="stylesheet" href="../../site-header.css?v=sahne18" />
+    <link rel="stylesheet" href="../../game-shell.css?v=sahne18" />
+    <link rel="stylesheet" href="../../play-page.css?v=sahne18" />
+    <link rel="stylesheet" href="styles.css?v=sahne18" />
+    <script type="module" src="../../account.js?v=sahne18"></script>
+    <script src="../harfane/kelimeler.js?v=sahne18"></script>
+    <script type="module" src="script.js?v=sahne18"></script>
+    <script defer src="../../catalog.js?v=sahne18"></script>
+    <script defer src="../../library.js?v=sahne18"></script>
+    <script defer src="../../game-shell.js?v=sahne18"></script>
   </head>
   <body class="game-page" data-game="kelime-merdiveni">
     <header class="site-header">
@@ -37,10 +37,10 @@
         <details class="how-card" id="how-card" open><summary><span><strong>Nasıl oynanır?</strong><small>Her adımda yalnızca bir harfi değiştir</small></span></summary><ol class="how-steps"><li>Başlangıç kelimesinden hedef kelimeye ulaş.</li><li>Her hamlede tek bir harfi değiştir; yazdığın her kelime sözlükte bulunmalı.</li><li>En kısa çözüm 3 yıldız, en fazla iki ek hamle 2 yıldız kazandırır.</li></ol></details>
         <section class="shortcuts" id="board-help" aria-label="Oyun bilgisi"><h2>Kelime ipucu</h2><p>Değişen harf sarı renkle gösterilir. Takılırsan bir sonraki basamağın ipucunu aç.</p><p class="save-state" id="save-state">Oyun bu cihazda saklanır; giriş yapınca eşitlenir.</p></section>
         <section class="play-panel" aria-label="Kelime Merdiveni oyunu">
-          <div class="play-bar"><div class="scores" aria-label="İlerleme"><div class="score-card"><span id="mode-caption">GÜNLÜK BULMACA</span><strong id="progress-label">#001</strong></div><div class="score-card"><span>TOPLAM YILDIZ</span><strong id="star-total">0 ★</strong></div></div><div class="actions"><button class="play-button play-undo" id="menu-button" type="button" hidden>Menü</button></div></div>
+          <div class="play-bar"><div class="scores" aria-label="İlerleme"><div class="score-card"><span id="mode-caption">GÜNLÜK BULMACA</span><strong id="progress-label">#001</strong></div><div class="score-card"><span>YILDIZ</span><strong id="star-total">0 ★</strong></div></div><div class="actions"><button class="play-button play-undo" id="menu-button" type="button" hidden>Menü</button></div></div>
           <div class="play-options" id="daily-options"><label class="play-select">ARŞİV TARİHİ <input type="date" id="archive-date" min="2026-01-01" /></label><button class="play-button" id="open-date" type="button">Bulmacayı aç</button><button class="play-button play-new" id="today-button" type="button">Bugün</button></div>
           <div class="board-frame"><section class="ladder-menu" id="menu-screen"><p class="ladder-kicker">KELİME MERDİVENİ · GÜNLÜK BULMACA</p><h2>Bir harfle <em>hedefe ulaş.</em></h2><p>Türkçe sözlükteki kelimelerle basamakları tırman. En kısa yolu bulup üç yıldız kazan.</p><div class="ladder-modes"><button class="ladder-mode is-selected" type="button" data-mode="daily"><span>☀️</span><strong>Günlük</strong><small>Herkes için aynı merdiven</small></button><button class="ladder-mode" type="button" data-mode="series"><span>🪜</span><strong>Sefer</strong><small>120 seviyeyi sırayla tamamla</small></button></div><button class="ladder-start" id="start-button" type="button">Günlük merdivene başla <span>↗</span></button><button class="ladder-resume" id="resume-button" type="button" hidden>Kaldığın yerden devam et</button></section>
-            <section class="ladder-game hidden" id="game-screen" aria-label="Kelime Merdiveni"><div class="ladder-route"><div class="route-word start-word"><small>BAŞLANGIÇ</small><strong id="start-word">KİTAP</strong></div><div class="route-stairs" aria-hidden="true">···</div><div class="route-word target-word"><small>HEDEF</small><strong id="target-word">KABAN</strong></div></div><div class="ladder-meta"><span id="step-count">0 hamle</span><span id="shortest-label">En kısa: 0</span><span id="star-display" aria-label="Yıldız">☆☆☆</span></div><ol class="word-ladder" id="word-ladder" aria-label="Yazılan kelimeler"></ol><form class="word-entry" id="word-form"><label class="sr-only" for="word-input">Sonraki kelime</label><input id="word-input" type="text" maxlength="5" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="5 harfli kelime yaz" required/><button class="ladder-submit" type="submit">Basamağa ekle ↗</button></form><div class="ladder-tools"><button class="play-button" id="hint-button" type="button">💡 Harf ipucu</button><span class="ladder-message" id="ladder-message" role="status" aria-live="polite">Bir harfi değiştirerek ilk hamleni yaz.</span></div><section class="ladder-result hidden" id="result-panel" aria-live="polite"><strong id="result-title">Harika!</strong><p id="result-copy"></p><button class="ladder-start" id="next-button" type="button">Sonraki basamak ↗</button><button class="play-button" id="back-button" type="button">Menü</button></section></section>
+            <section class="ladder-game" id="game-screen" aria-label="Kelime Merdiveni"><div class="ladder-route"><div class="route-word start-word"><small>BAŞLANGIÇ</small><strong id="start-word">KİTAP</strong></div><div class="route-stairs" aria-hidden="true">···</div><div class="route-word target-word"><small>HEDEF</small><strong id="target-word">KABAN</strong></div></div><div class="ladder-meta"><span id="step-count">0 hamle</span><span id="shortest-label">En kısa: 0</span><span id="star-display" aria-label="Yıldız">☆☆☆</span></div><ol class="word-ladder" id="word-ladder" aria-label="Yazılan kelimeler"></ol><form class="word-entry" id="word-form"><label class="sr-only" for="word-input">Sonraki kelime</label><input id="word-input" type="text" maxlength="5" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="5 harfli kelime yaz" required/><button class="ladder-submit" type="submit">Basamağa ekle ↗</button></form><div class="ladder-tools"><button class="play-button" id="hint-button" type="button">💡 Harf ipucu</button><span class="ladder-message" id="ladder-message" role="status" aria-live="polite">Bir harfi değiştirerek ilk hamleni yaz.</span></div></section>
           </div><p class="status" id="status" role="status" aria-live="polite">Bir oyun modu seç.</p>
         </section>
         <aside class="goal-card" aria-labelledby="goal-title"><h2 id="goal-title">Merdiven nasıl işler?</h2><p>Her basamakta yalnızca bir harfi değiştir. Başlangıç ve hedef arasında geçerli kelimelerden bir yol kur.</p><div class="goal-equation" aria-label="Tek harfi değiştirerek ilerle"><b class="ladder-tile">K</b><b class="ladder-tile">A</b><b class="ladder-tile changed">L</b><b class="ladder-tile">E</b><b class="ladder-tile">M</b></div></aside>

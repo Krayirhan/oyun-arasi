@@ -43,7 +43,6 @@ const state = {
 const board = document.querySelector('#board');
 const keyboard = document.querySelector('#keyboard');
 const message = document.querySelector('#message');
-const shareButton = document.querySelector('#share-button');
 const toast = document.querySelector('#toast');
 const authButton = document.querySelector('#auth-button');
 const homeAuthButton = document.querySelector('#home-auth-button');
@@ -51,12 +50,10 @@ const homeAccountLabel = document.querySelector('#home-account-label');
 const homeScreen = document.querySelector('#home-screen');
 const gameScreen = document.querySelector('#game-screen');
 const modeLabel = document.querySelector('#mode-label');
-const nextLevelButton = document.querySelector('#next-level-button');
 const seriesCardAction = document.querySelector('#series-card-action');
 const dailyCardAction = document.querySelector('#daily-card-action');
 const menuButton = document.querySelector('#menu-button');
 const statusElement = document.querySelector('#status');
-const resultPanel = document.querySelector('#result-panel');
 const scoreA = { label: document.querySelector('#score-a-label'), value: document.querySelector('#score-a') };
 const scoreB = { label: document.querySelector('#score-b-label'), value: document.querySelector('#score-b') };
 let firebaseBridge = null;
@@ -352,38 +349,49 @@ function refreshModeChrome() {
   updateHomeMetadata();
 }
 
-// Oyun bitince klavyenin yerinde sonuç kartı: sonuç, sıradaki adım, paylaş ve menü.
+// Oyun sonu kartı ortak sahne şablonundan gelir (game-stage.js, klasik betik için window.OyunStage). Klavye yerinde
+// kalır, kart tahtanın üstünde açılır; modül bu betikten sonra yüklendiği için kart 'oyun-stage-ready' ile kurulur.
+let resultStage = null;
+let resultKey = '';
 function renderResult() {
+  if (!resultStage && window.OyunStage) resultStage = window.OyunStage.createStage({ frame: gameScreen.parentElement });
+  if (!resultStage) return;
   const over = state.mode !== 'home' && state.gameOver;
-  resultPanel.classList.toggle('hidden', !over);
-  keyboard.classList.toggle('hidden', over);
-  if (!over) return;
+  if (!over) { resultKey = ''; resultStage.hide(); return; }
   message.textContent = '';
   const tries = state.guesses.length;
   const answer = state.answer.toLocaleUpperCase('tr-TR');
   let kicker; let title; let copy; let next = '';
   if (state.mode === 'series' && state.series.completed) {
     kicker = 'SEFER TAMAMLANDI'; title = 'Tüm seviyeler bitti!';
-    copy = `${SERIES_TOTAL} seviyenin hepsini geçtin. Yeni bir sefere başlayabilirsin.`; next = 'Yeni sefer başlat ↗';
+    copy = `${SERIES_TOTAL} seviyenin hepsini geçtin. Yeni bir sefere başlayabilirsin.`; next = 'Yeni sefer başlat';
   } else if (state.won) {
     title = tries <= 2 ? 'Muhteşem!' : tries <= 4 ? 'Harika!' : 'Buldun!';
     if (state.mode === 'daily') { kicker = `GÜNLÜK BULMACA · #${String(puzzleNumber()).padStart(3, '0')}`; copy = `${tries} denemede buldun. Yeni bulmacaya ${countdownText()} var.`; }
-    else if (state.mode === 'series') { kicker = `SEVİYE ${state.series.level} / ${SERIES_TOTAL}`; title = `Seviye ${state.series.level} tamam!`; copy = `${tries} denemede buldun.`; next = 'Sonraki seviye ↗'; }
-    else { kicker = 'ANTRENMAN'; copy = `${tries} denemede buldun.`; next = 'Yeni kelime ↗'; }
+    else if (state.mode === 'series') { kicker = `SEVİYE ${state.series.level} / ${SERIES_TOTAL}`; title = `Seviye ${state.series.level} tamam!`; copy = `${tries} denemede buldun.`; next = 'Sonraki seviye'; }
+    else { kicker = 'ANTRENMAN'; copy = `${tries} denemede buldun.`; next = 'Yeni kelime'; }
   } else {
     title = 'Bu sefer olmadı';
     if (state.mode === 'daily') { kicker = `GÜNLÜK BULMACA · #${String(puzzleNumber()).padStart(3, '0')}`; copy = `Cevap: ${answer}. Yeni bulmacaya ${countdownText()} var.`; }
-    else if (state.mode === 'series') { kicker = `SEVİYE ${state.series.level} / ${SERIES_TOTAL}`; copy = 'Tahmin hakların bitti. Aynı kelimeyi yeniden dene; seviyeyi geçince yenisi açılır.'; next = 'Tekrar dene ↗'; }
-    else { kicker = 'ANTRENMAN'; copy = `Cevap: ${answer}.`; next = 'Yeni kelime ↗'; }
+    else if (state.mode === 'series') { kicker = `SEVİYE ${state.series.level} / ${SERIES_TOTAL}`; copy = 'Tahmin hakların bitti. Aynı kelimeyi yeniden dene; seviyeyi geçince yenisi açılır.'; next = 'Tekrar dene'; }
+    else { kicker = 'ANTRENMAN'; copy = `Cevap: ${answer}.`; next = 'Yeni kelime'; }
   }
-  document.querySelector('#result-kicker').textContent = kicker;
-  document.querySelector('#result-title').textContent = title;
-  document.querySelector('#result-copy').textContent = copy;
-  nextLevelButton.hidden = !next;
-  nextLevelButton.textContent = next;
-  shareButton.hidden = state.mode !== 'daily';
-  shareButton.disabled = false;
+  const spec = {
+    kind: 'result', kicker, title, copy,
+    stats: [['Deneme', `${state.won ? tries : 'X'}/${state.tryLimit}`], ...(state.mode === 'daily' ? [['Seri', state.stats.streak], ['En iyi seri', state.stats.best]] : [])],
+    actions: [
+      ...(next ? [{ label: next, primary: true, onClick: advanceMode }] : []),
+      ...(state.mode === 'daily' ? [{ label: 'Sonucunu paylaş', primary: !next, onClick: shareResult }] : []),
+      { label: 'Menü', onClick: returnHome }
+    ],
+    dismissible: true
+  };
+  // Geri sayım her saniye metni tazeler; "Tahtaya bak" ile kapatılmış kart kendiliğinden yeniden açılmaz.
+  const key = `${state.mode}-${state.answer}-${tries}-${state.won}-${state.series.level}`;
+  if (key !== resultKey) { resultKey = key; resultStage.show(spec); }
+  else if (resultStage.visible) resultStage.show(spec);
 }
+window.addEventListener('oyun-stage-ready', renderResult);
 
 function updateHomeMetadata() {
   seriesCardAction.textContent = state.series.completed
@@ -693,9 +701,7 @@ document.querySelector('#stats-button').addEventListener('click', () => openModa
 document.querySelector('#modal-close').addEventListener('click', closeModal);
 document.querySelector('#modal-backdrop').addEventListener('click', event => { if (event.target.id === 'modal-backdrop') closeModal(); });
 document.querySelectorAll('.mode-card').forEach(card => card.addEventListener('click', () => startMode(card.dataset.mode)));
-document.querySelector('#back-home-button').addEventListener('click', returnHome);
 menuButton.addEventListener('click', returnHome);
-nextLevelButton.addEventListener('click', advanceMode);
 authButton.addEventListener('click', () => {
   if (state.user && firebaseBridge) firebaseBridge.signOut().catch(() => showToast('Çıkış yapılamadı.'));
   else openAuthModal();
@@ -704,7 +710,6 @@ homeAuthButton.addEventListener('click', () => {
   if (state.user && firebaseBridge) firebaseBridge.signOut().catch(() => showToast('Çıkış yapılamadı.'));
   else openAuthModal();
 });
-shareButton.addEventListener('click', shareResult);
 
 function connectFirebase(bridge) {
   firebaseBridge = bridge;

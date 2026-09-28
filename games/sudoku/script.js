@@ -1,7 +1,7 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne14';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
-import { confirmDialog } from '../../game-dialog.js?v=sahne14';
-import { createStage } from '../../game-stage.js?v=sahne14';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne18';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne18';
+import { confirmDialog } from '../../game-dialog.js?v=sahne18';
+import { createStage } from '../../game-stage.js?v=sahne18';
 // Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
 const stage = createStage();
 let stageKey = '';

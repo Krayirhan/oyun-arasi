@@ -71,13 +71,6 @@ body[data-game='harfane'] {
 .key.correct { background: var(--green); color: #fff; }
 .key.present { background: var(--yellow); color: #42370f; }
 .key.absent { background: #5b6662; color: #e6ebe7; }
-.harfle-result { width: min(100%, 560px); padding: 18px 20px; border-radius: 18px; background: #fffefa; color: var(--ink); text-align: center; box-shadow: 0 12px 30px rgb(0 0 0 / .18); animation: harfle-rise .25s ease-out; }
-.harfle-result .harfle-kicker { color: var(--green); }
-.harfle-result h2 { margin: 0 0 6px; font: 700 28px 'Fredoka', sans-serif; }
-.harfle-result-copy { margin: 0 0 14px; color: var(--muted); font-size: 15px; line-height: 1.45; }
-.harfle-result-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.harfle-result-actions .play-button { flex: 1 1 150px; min-height: 46px; font-size: 17px; }
-.harfle-result-actions .play-undo { border-color: var(--line); }
 @keyframes harfle-rise { from { opacity: 0; transform: translateY(8px); } }
 
 /* Başlıktaki yardım/istatistik pencereleri */
@@ -141,13 +134,13 @@ body[data-game='harfane'] {
   .key { height: 40px; font-size: 12px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .tile, .key, .mode-card, .harfle-result, .message-pulse { animation: none; transition: none; }
+  .tile, .key, .mode-card, .message-pulse { animation: none; transition: none; }
 }
 
 /* Tam ekran: kutu boyutu hesaplanan çerçeve genişliğinden türetilir; game-shell.js çerçeveyi ekrana sığdırır. */
 body[data-game='harfane'] .play-panel.is-fullscreen .board { --fs-tile: clamp(30px, calc((var(--fs-fit-w, 400px) - 72px) / 5), 104px); grid-template-columns: repeat(5, var(--fs-tile)); }
 body[data-game='harfane'] .play-panel.is-fullscreen .tile { width: var(--fs-tile); height: var(--fs-tile); font-size: calc(var(--fs-tile) * .46); }
-body[data-game='harfane'] .play-panel.is-fullscreen .keyboard, body[data-game='harfane'] .play-panel.is-fullscreen .harfle-result { width: min(100%, 640px); }
+body[data-game='harfane'] .play-panel.is-fullscreen .keyboard { width: min(100%, 640px); }
 @media (max-height: 560px) {
   body[data-game='harfane'] .play-panel.is-fullscreen .harfle-game { gap: 8px; }
   body[data-game='harfane'] .play-panel.is-fullscreen .harfle-game > .harfle-kicker { display: none; }
