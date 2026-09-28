@@ -55,7 +55,6 @@ afsun
 afşar
 afşin
 aftos
-afyon
 agami
 agora
 agraf
@@ -105,7 +104,6 @@ akort
 akpas
 akran
 akrep
-aksak
 aksam
 aksan
 akson
@@ -122,7 +120,6 @@ alaza
 albay
 albüm
 aleni
-alevi
 aleyh
 algın
 alıcı
@@ -131,8 +128,6 @@ alkan
 alkım
 alkış
 alkil
-alkol
-allah
 allak
 allem
 allık
@@ -187,7 +182,6 @@ antet
 antik
 antlı
 antre
-anüri
 anyon
 apacı
 apiko
@@ -249,7 +243,6 @@ asmak
 aspur
 astar
 astat
-astım
 astik
 asude
 asyön
@@ -292,7 +285,6 @@ aygın
 aygır
 aygıt
 ayıcı
-aylak
 aylık
 aymak
 aymaz
@@ -308,7 +300,6 @@ aysar
 aysız
 ayvan
 ayvaz
-ayyar
 ayyuk
 azade
 azami
@@ -348,7 +339,6 @@ bahai
 bahar
 bahçe
 bahir
-bahis
 bahri
 bakaç
 bakam
@@ -561,7 +551,6 @@ bitik
 bitim
 bitiş
 bitki
-bitli
 bitme
 bitüm
 biyel
@@ -572,18 +561,14 @@ bizon
 bloke
 bobin
 bocuk
-boduç
 bodur
 boğak
 boğaz
-boğma
 boğuk
 boğum
 bohça
 bohem
 bolca
-bomba
-bombe
 borak
 boran
 borat
@@ -639,7 +624,6 @@ bulgu
 bulma
 buluş
 bulut
-bunak
 bunca
 bunda
 bunlu
@@ -661,7 +645,6 @@ buzcu
 buzla
 buzlu
 buzul
-bücür
 büğet
 büğlü
 büken
@@ -684,10 +667,8 @@ büvet
 büyük
 büzgü
 büzme
-büzük
 cacık
 cadde
-cahil
 caize
 calip
 camcı
@@ -733,7 +714,6 @@ cenup
 cepçi
 cephe
 ceren
-ceset
 cesim
 cesur
 cevap
@@ -746,11 +726,9 @@ cezai
 cezbe
 cezir
 cezve
-cıbıl
 cıcık
 cıdak
 cılız
-cıvık
 cıvma
 cızık
 cibin
@@ -763,22 +741,16 @@ ciddi
 ciğer
 cihan
 cihar
-cihat
 cihaz
 cihet
 cilve
-cimri
-cinai
 cinas
-cinci
-cinli
 cirim
 cirit
 cisim
 civan
 civar
 cizre
-cizye
 conta
 corum
 coşku
@@ -787,18 +759,13 @@ cudam
 cukka
 cumba
 cunda
-cunta
 cuşiş
 cübbe
 cücük
 cülus
 cümle
-cünha
-cünun
-cünüp
 cüret
 cüruf
-cürüm
 cüsse
 çabuk
 çadır
@@ -837,7 +804,6 @@ cüsse
 çapla
 çaplı
 çapma
-çapul
 çaput
 çarık
 çarka
@@ -905,7 +871,6 @@ cüsse
 çevre
 çevri
 çeyiz
-çıban
 çıdam
 çığır
 çıkak
@@ -963,12 +928,10 @@ cüsse
 çokça
 çokçu
 çoklu
-çolak
 çolpa
 çomak
 çomar
 çopra
-çopur
 çorak
 çorap
 çorba
@@ -1007,7 +970,6 @@ cüsse
 çuşka
 çuval
 çuvaş
-çükür
 çünkü
 çürük
 dadaş
@@ -1041,7 +1003,6 @@ danca
 danış
 daraç
 daraş
-darbe
 darca
 dasit
 datça
@@ -1050,9 +1011,7 @@ davar
 davet
 davul
 davya
-dayak
 debbe
-defin
 defne
 degaj
 değer
@@ -1108,7 +1067,6 @@ deyiş
 dığan
 dılak
 dışık
-dışkı
 dibek
 dicle
 didar
@@ -1139,7 +1097,6 @@ dilsi
 dimağ
 dinar
 dince
-dinci
 dinek
 dinen
 dingi
@@ -1195,7 +1152,6 @@ dolma
 dolum
 doluş
 domur
-domuz
 donam
 donlu
 donma
@@ -1231,8 +1187,6 @@ döşem
 döşlü
 döveç
 döviz
-dövme
-dövüş
 draje
 drama
 duacı
@@ -1265,7 +1219,6 @@ dübel
 dübeş
 düçar
 düden
-düdük
 düğme
 düğüm
 düğün
@@ -1277,7 +1230,6 @@ dünya
 dürme
 dürtü
 dürüm
-dürzi
 dürzü
 düşçü
 düşes
@@ -1357,12 +1309,9 @@ elyaf
 elzem
 emare
 emaye
-emcek
 emici
 emlak
 emlik
-emmeç
-emmek
 emraz
 emsal
 emtia
@@ -1421,7 +1370,6 @@ esbak
 esbap
 eseme
 esham
-esire
 eskil
 eskiz
 eslaf
@@ -1432,7 +1380,6 @@ esnaf
 esnek
 espas
 espri
-esrik
 essah
 ester
 estet
@@ -1487,7 +1434,6 @@ eytam
 eyvah
 eyvan
 eyyam
-ezani
 ezber
 ezgiç
 ezgin
@@ -1497,7 +1443,6 @@ ezine
 ezmek
 facia
 fagot
-fahiş
 fahri
 fahte
 fahur
@@ -1519,8 +1464,6 @@ faraş
 farba
 fariğ
 faril
-faset
-fasık
 fasıl
 fasih
 fasit
@@ -1552,12 +1495,9 @@ ferih
 ferik
 ferli
 ferma
-fesat
 fesih
 fetha
 fetih
-fetüs
-fetva
 fevri
 feyiz
 fıkıh
@@ -1566,7 +1506,6 @@ fırça
 fırın
 fırka
 fışkı
-fıtık
 fıtri
 fiber
 fidan
@@ -1598,7 +1537,6 @@ fişli
 fitçi
 fitil
 fitin
-fitne
 fitre
 fiyat
 fizik
@@ -1607,7 +1545,6 @@ fleol
 flora
 flori
 flöre
-flört
 fodla
 fodra
 fodul
@@ -1662,8 +1599,6 @@ garaz
 garbi
 garip
 garoz
-gasıp
-gasil
 gaşiy
 gauss
 gavot
@@ -1674,7 +1609,6 @@ gayri
 gayur
 gayya
 gazal
-gazap
 gazel
 gazlı
 gazoz
@@ -1717,11 +1651,9 @@ geven
 geviş
 gevme
 geyik
-geyşa
 geyve
 geziş
 gezme
-gıcık
 gıcır
 gıdık
 gıdım
@@ -1769,7 +1701,6 @@ göçüş
 göden
 gödeş
 göğem
-göğüs
 gökçe
 gölek
 gölet
@@ -1815,21 +1746,18 @@ gurme
 gurup
 gurur
 gusto
-gusül
 gübre
 gübür
 gücük
 gücün
 güçlü
 güdek
-güdük
 güdül
 güdüm
 güfte
 güğüm
 gülcü
 güleç
-gülle
 güllü
 gülme
 gülük
@@ -1838,7 +1766,6 @@ gülüt
 gümeç
 gümül
 gümüş
-günah
 günce
 günde
 güneç
@@ -1867,8 +1794,6 @@ habis
 hacet
 hacim
 hacir
-haciz
-haçlı
 hadde
 hadis
 hafız
@@ -1876,7 +1801,6 @@ hafif
 hafik
 hafit
 hafta
-haham
 hahha
 haile
 hakan
@@ -1884,7 +1808,6 @@ hakas
 hakça
 hakem
 hakim
-hakir
 haklı
 halaç
 halas
@@ -1904,7 +1827,6 @@ hamal
 hamam
 hamel
 hamız
-hamil
 hamiş
 hamla
 hamle
@@ -1923,15 +1845,10 @@ hanut
 hanya
 hapaz
 hapçı
-hapis
 hapşu
 haraç
-haram
 harap
 harar
-harbe
-harbi
-harem
 harım
 harın
 hariç
@@ -1948,7 +1865,6 @@ haset
 hasıl
 hasım
 hasır
-hasis
 hassa
 hasse
 hasta
@@ -1962,7 +1878,6 @@ hatay
 hatıl
 hatır
 hatif
-hatim
 hatip
 hatmi
 hatta
@@ -1974,7 +1889,6 @@ havil
 havlı
 havlu
 havra
-havsa
 havuç
 havut
 havuz
@@ -1990,7 +1904,6 @@ hayıf
 hayır
 hayıt
 hayli
-hayta
 hazan
 hazar
 hazcı
@@ -2005,7 +1918,6 @@ hedef
 heder
 hedik
 hekim
-helak
 helal
 helen
 helik
@@ -2055,7 +1967,6 @@ hilal
 hilat
 hilye
 hindi
-hindu
 hippi
 hisar
 hisli
@@ -2097,15 +2008,12 @@ husuf
 husul
 husus
 husye
-hutbe
 hutut
 huylu
 huzur
 hücre
-hücum
 hükmi
 hüküm
-hülle
 hülya
 hüner
 hünsa
@@ -2146,7 +2054,6 @@ ibare
 ibate
 ibdai
 iblağ
-iblis
 ibraz
 ibret
 ibrik
@@ -2172,7 +2079,6 @@ iddia
 ideal
 idman
 idrak
-idrar
 ifade
 iffet
 ifham
@@ -2180,8 +2086,6 @@ iflah
 iflas
 ifrağ
 ifrat
-ifraz
-ifrit
 ifsat
 iftar
 iğdir
@@ -2217,14 +2121,12 @@ ilahe
 ilahi
 ilave
 ilbay
-ilenç
 ileri
 ileti
 ilgeç
 ilhak
 ilham
 ilhan
-ilkah
 ilkel
 ilkin
 illet
@@ -2280,7 +2182,6 @@ irşat
 isale
 isevi
 iskoç
-islam
 islav
 islim
 ismen
@@ -2297,15 +2198,12 @@ istif
 istim
 istop
 isveç
-isyan
-işgal
 işkil
 işlek
 işlem
 işlev
 işlik
 işmar
-işret
 işsiz
 iştah
 işteş
@@ -2343,7 +2241,6 @@ jarse
 jeloz
 jeton
 jikle
-jilet
 joker
 jokey
 jüpon
@@ -2351,11 +2248,9 @@ kabak
 kaban
 kabil
 kabin
-kabir
 kablo
 kabuk
 kabul
-kabza
 kaçak
 kaçar
 kaçış
@@ -2391,7 +2286,6 @@ kalan
 kalas
 kalay
 kalcı
-kalça
 kalem
 kalfa
 kalıç
@@ -2418,7 +2312,6 @@ kanış
 kanıt
 kaniş
 kanka
-kanlı
 kanma
 kanon
 kanto
@@ -2450,7 +2343,6 @@ karye
 kasap
 kasem
 kaset
-kasık
 kasım
 kasır
 kasıt
@@ -2476,7 +2368,6 @@ kavaf
 kavak
 kaval
 kavas
-kavga
 kavil
 kavim
 kavis
@@ -2503,7 +2394,6 @@ kayşa
 kazak
 kazan
 kazaz
-kazık
 kazıl
 kazım
 kazma
@@ -2514,7 +2404,6 @@ kebze
 keder
 kefal
 kefek
-kefen
 kefil
 kefir
 kefne
@@ -2530,7 +2419,6 @@ keler
 keles
 keleş
 kelik
-kelle
 kelli
 kemah
 kemal
@@ -2588,12 +2476,10 @@ keyif
 kıble
 kıdem
 kılgı
-kılıç
 kılıf
 kılık
 kılır
 kılış
-kıllı
 kılma
 kımıl
 kımız
@@ -2609,10 +2495,8 @@ kırba
 kırca
 kırcı
 kırık
-kırım
 kırkı
 kırma
-kısas
 kısık
 kısım
 kısır
@@ -2635,7 +2519,6 @@ kıyam
 kıyas
 kıygı
 kıyık
-kıyım
 kıyın
 kıyış
 kıyma
@@ -2661,11 +2544,9 @@ kilüs
 kimse
 kimüs
 kimya
-kinci
 kinik
 kinin
 kiniş
-kinli
 kiraz
 kirde
 kireç
@@ -2694,7 +2575,6 @@ kofra
 koful
 koğuş
 kokak
-koket
 kokma
 kokot
 kokoz
@@ -2703,8 +2583,6 @@ kolan
 kolay
 kolcu
 kolej
-kolik
-kolit
 kollu
 kolon
 kolpo
@@ -2730,18 +2608,15 @@ konut
 konya
 kopal
 kopça
-kopek
 kopil
 kopma
 kopoy
-kopuk
 kopuz
 kopya
 koral
 korku
 korna
 korno
-korse
 korte
 koruk
 korun
@@ -2770,7 +2645,6 @@ koyun
 koyut
 kozak
 kozan
-köçek
 köfte
 köhne
 kökçü
@@ -2791,7 +2665,6 @@ kösçü
 kösem
 kösnü
 köşek
-kötek
 köycü
 köylü
 kraça
@@ -2809,7 +2682,6 @@ kubbe
 kubur
 kucak
 kudas
-kuduz
 kudüm
 kukla
 kulaç
@@ -2818,7 +2690,6 @@ kulis
 kulun
 kulüp
 kuman
-kumar
 kumaş
 kumcu
 kumla
@@ -2830,7 +2701,6 @@ kumuk
 kumul
 kunda
 kupes
-kuple
 kupon
 kupür
 kurak
@@ -2847,7 +2717,6 @@ kuruş
 kurut
 kurya
 kurye
-kusma
 kusur
 kuşak
 kuşçu
@@ -2877,7 +2746,6 @@ külçe
 külek
 külli
 küllü
-külot
 külte
 kümes
 küncü
@@ -2915,7 +2783,6 @@ lagar
 lagün
 lağım
 lağıv
-lahit
 lahos
 lahut
 lahza
@@ -2951,7 +2818,6 @@ lehim
 lemis
 lenfa
 lento
-lepra
 lerze
 letçe
 levha
@@ -2969,7 +2835,6 @@ lider
 lifli
 liken
 likit
-likör
 liman
 limbo
 limit
@@ -2977,7 +2842,6 @@ limon
 linet
 linin
 lipit
-lipom
 liret
 lirik
 lisan
@@ -3012,8 +2876,6 @@ lütuf
 lüzum
 maada
 mabat
-mabet
-mabut
 macar
 macun
 maçka
@@ -3026,7 +2888,6 @@ mader
 madik
 madun
 mafiş
-mafya
 magma
 magri
 mahal
@@ -3076,7 +2937,6 @@ mantı
 manti
 manto
 maocu
-mapus
 maral
 maraz
 marda
@@ -3090,7 +2950,6 @@ maruf
 marul
 maruz
 marya
-masaj
 masal
 masat
 masif
@@ -3098,12 +2957,10 @@ maske
 masnu
 mason
 masör
-masöz
 mastı
 masum
 masun
 maşer
-maşuk
 matah
 matbu
 matem
@@ -3115,7 +2972,6 @@ maval
 maviş
 mavna
 mavra
-mayın
 mayıs
 mayna
 mazak
@@ -3138,7 +2994,6 @@ medya
 meful
 meğer
 mehaz
-mehdi
 mehel
 mehil
 mehle
@@ -3153,8 +3008,6 @@ melez
 melik
 melon
 melul
-melun
-memat
 memba
 memnu
 memul
@@ -3172,20 +3025,17 @@ meres
 meret
 meriç
 merih
-mermi
 mersi
 mesai
 mesaj
 mesel
 mesen
-mesih
 mesmu
 mesul
 mesut
 meşbu
 meşin
 meşru
-meşum
 metal
 metan
 metbu
@@ -3198,7 +3048,6 @@ metro
 mevdu
 mevki
 mevla
-mevta
 mevut
 mevzi
 mevzu
@@ -3206,7 +3055,6 @@ meyan
 meyil
 meyus
 meyve
-mezar
 mezat
 mezon
 mezra
@@ -3263,7 +3111,6 @@ modül
 moğol
 moher
 molas
-molla
 moloz
 monat
 monte
@@ -3299,7 +3146,6 @@ mukus
 mulaj
 mumcu
 mumlu
-mumya
 munis
 murat
 muris
@@ -3314,13 +3160,11 @@ mutat
 mutki
 mutlu
 muylu
-muzır
 muzip
 muzsu
 mübah
 müdür
 müfit
-müftü
 mühim
 mühre
 mühür
@@ -3328,7 +3172,6 @@ müjde
 mülga
 mülki
 mümas
-mümin
 münşi
 mürai
 mürit
@@ -3362,10 +3205,8 @@ nakşi
 nalan
 nalça
 nalın
-namaz
 namlı
 namlu
-namus
 nanay
 nanik
 narin
@@ -3433,7 +3274,6 @@ nikap
 nikel
 nimet
 ninni
-nipel
 nisai
 nisan
 nisap
@@ -3504,7 +3344,6 @@ onluk
 onmak
 onsuz
 ontik
-oosit
 opera
 optik
 orada
@@ -3526,7 +3365,6 @@ ortoz
 otacı
 otama
 otçul
-otist
 otizm
 otlak
 otluk
@@ -3545,7 +3383,6 @@ ozmos
 ozuga
 öbürü
 ödeme
-ödlek
 ödünç
 öğlen
 öğrek
@@ -3557,10 +3394,6 @@ ozuga
 ölçün
 ölçüş
 ölçüt
-ölgün
-ölmek
-ölmez
-ölmüş
 öncel
 öncül
 önder
@@ -3569,7 +3402,6 @@ ozuga
 önlem
 önlük
 önsel
-öpmek
 örcin
 ördek
 öreke
@@ -3625,7 +3457,6 @@ panda
 panel
 panik
 papak
-papaz
 papel
 paraf
 parça
@@ -3718,7 +3549,6 @@ plati
 plato
 plaza
 plöra
-poker
 polar
 polat
 polen
@@ -3775,8 +3605,6 @@ rafit
 rafya
 ragbi
 rahat
-rahim
-rahip
 rahle
 rahne
 rakam
@@ -3809,7 +3637,6 @@ redif
 refah
 refik
 refüj
-rehin
 rejim
 rekiz
 rekor
@@ -3859,7 +3686,6 @@ rugan
 ruhen
 ruhlu
 rujlu
-rulet
 rumba
 rumca
 rumen
@@ -3870,7 +3696,6 @@ rusya
 rutin
 rüesa
 rükün
-rüküş
 rüsum
 rüsup
 rüsva
@@ -3885,7 +3710,6 @@ sabuh
 sabun
 sabur
 saçak
-saçık
 saçış
 saçlı
 saçma
@@ -3904,7 +3728,6 @@ sagar
 sağcı
 sağım
 sağın
-sağır
 sağma
 sağrı
 sahaf
@@ -3922,7 +3745,6 @@ sakaf
 sakak
 sakal
 sakar
-sakat
 sakın
 sakıt
 sakız
@@ -3954,7 +3776,6 @@ salta
 salto
 salur
 salvo
-salya
 saman
 samba
 samsa
@@ -3965,7 +3786,6 @@ sanat
 sancı
 sanem
 sangı
-sanık
 sanki
 sanlı
 sanma
@@ -4003,7 +3823,6 @@ satma
 sauna
 savak
 savan
-savaş
 savat
 savca
 savcı
@@ -4029,7 +3848,6 @@ seben
 sebep
 sebil
 sebze
-secde
 seçal
 seçik
 seçim
@@ -4040,7 +3858,6 @@ sedef
 sedir
 sedye
 sefer
-sefih
 sefir
 seher
 sehim
@@ -4060,7 +3877,6 @@ selva
 semah
 semai
 seman
-semen
 semer
 semih
 semiz
@@ -4097,7 +3913,6 @@ sever
 sevgi
 sevim
 sevir
-seviş
 sevme
 seyek
 seyir
@@ -4135,7 +3950,6 @@ sırım
 sırlı
 sırma
 sıska
-sıtma
 sıvık
 sıyga
 sıygı
@@ -4146,18 +3960,13 @@ sicil
 sicim
 sifin
 sifon
-sigar
-siğil
-sihir
 siirt
-silah
 silaj
 silgi
 silik
 silis
 siliş
 silki
-sille
 silme
 simav
 simge
@@ -4170,7 +3979,6 @@ siniş
 sinle
 sinme
 sinop
-sinsi
 sinüs
 siper
 sipsi
@@ -4178,7 +3986,6 @@ siren
 sirer
 sirke
 sirmo
-siroz
 sirto
 sisli
 sitem
@@ -4267,7 +4074,6 @@ subra
 subye
 sucuk
 sucul
-suçlu
 sudak
 sudan
 sufle
@@ -4300,7 +4106,6 @@ sübek
 sübut
 sübye
 sücut
-süfli
 sükse
 süluk
 sülük
@@ -4309,10 +4114,7 @@ sülüs
 sümek
 sümen
 sümer
-sümük
-süngü
 sünme
-sünni
 süper
 sürat
 süreç
@@ -4361,7 +4163,6 @@ süzük
 şapçı
 şapka
 şaplı
-şarap
 şarkı
 şarki
 şarpi
@@ -4381,7 +4182,6 @@ süzük
 şedit
 şefik
 şehir
-şehit
 şehla
 şekel
 şeker
@@ -4441,7 +4241,6 @@ tabir
 tabla
 tablo
 tabur
-tabut
 tabya
 tacik
 tacil
@@ -4492,7 +4291,6 @@ tanım
 tanış
 tanıt
 tanin
-tanrı
 tapan
 tapış
 tapir
@@ -4528,7 +4326,6 @@ tatar
 tatil
 tatlı
 tatma
-tavaf
 tavan
 tavas
 tavcı
@@ -4592,7 +4389,6 @@ tenha
 tenis
 tenor
 tente
-tenya
 teori
 tepik
 tepir
@@ -4652,14 +4448,12 @@ tırık
 tırıl
 tırıs
 tibet
-tifüs
 tikel
 tilki
 timüs
 tiner
 tipik
 tiraj
-tiran
 tirat
 tirit
 tiriz
@@ -4671,7 +4465,6 @@ titiz
 tohar
 tohum
 tokaç
-tokat
 toklu
 tokuz
 tokyo
@@ -4686,7 +4479,6 @@ tonoz
 tonya
 topaç
 topak
-topal
 topaz
 topçu
 topik
@@ -4768,11 +4560,9 @@ tuzcu
 tuzla
 tuzlu
 tuzsu
-tüfek
 tümce
 tümel
 tümen
-tümör
 tümür
 tünek
 tünel
@@ -4789,14 +4579,12 @@ türlü
 türüm
 tütme
 tütsü
-tütün
 tüvit
 tüylü
 tüyme
 tüzel
 tüzük
 tvist
-ucube
 uçarı
 uçkun
 uçkur
@@ -4807,7 +4595,6 @@ uçucu
 uğrak
 uğraş
 uğrun
-ukala
 uknum
 ulama
 ulema
@@ -4834,7 +4621,6 @@ uyarı
 uygar
 uygun
 uygur
-uyluk
 uymak
 uymaz
 uyruk
@@ -4856,7 +4642,6 @@ uzman
 ülfet
 ülger
 ülker
-ülser
 ümera
 ümmet
 ümran
@@ -4897,8 +4682,6 @@ vacip
 vagon
 vahim
 vahit
-vahiy
-vahşi
 vakar
 vakfe
 vakıa
@@ -4929,21 +4712,17 @@ vatan
 vatka
 vatoz
 vazıh
-vebal
 vecih
 veciz
 veçhe
 vedia
-vefat
 vehim
 vekil
-velet
 velev
 velur
 velut
 venüs
 verdi
-verem
 verev
 vergi
 verim
@@ -4959,7 +4738,6 @@ vigla
 villa
 viraj
 viran
-virüs
 visal
 vişne
 vites
@@ -4993,7 +4771,6 @@ yağır
 yağış
 yağız
 yağlı
-yağma
 yahey
 yahni
 yahşi
@@ -5049,7 +4826,6 @@ yarka
 yarma
 yasak
 yasal
-yasin
 yaslı
 yasma
 yassı
@@ -5128,7 +4904,6 @@ yetki
 yetme
 yevmi
 yeygi
-yezit
 yığın
 yığış
 yığma
@@ -5217,13 +4992,11 @@ zağlı
 zahir
 zahit
 zaire
-zalim
 zaman
 zamir
 zamlı
 zamme
 zanka
-zanlı
 zarar
 zarcı
 zarif
@@ -5234,13 +5007,10 @@ zayıf
 zeban
 zebra
 zebun
-zebur
 zecir
 zefir
 zehap
-zehir
 zeker
-zelil
 zelve
 zemin
 zerde
@@ -5270,13 +5040,10 @@ zirai
 zirve
 ziyan
 zloti
-zorba
 zorca
 zorgu
-zorla
 zorlu
 zuhur
-zulüm
 zurna
 zübde
 zühal

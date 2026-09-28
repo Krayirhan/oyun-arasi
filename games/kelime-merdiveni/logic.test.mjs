@@ -14,7 +14,7 @@ const puzzleMap = new Map(PUZZLES.map(puzzle => [puzzle.id, puzzle]));
 
 test('sözlük Türkçe biçimde tekilleşir; yalnızca beş harfli kelimeler kalır', () => {
   assert.deepEqual(prepareDictionary([' kalem ', 'KALEM', 'çanta', 'iki', 'araba']), ['araba', 'çanta', 'kalem']);
-  assert.equal(dictionary.length, 5284, 'engellenen kelimeler çıkarıldıktan sonraki sözlük');
+  assert.equal(dictionary.length, 5051, 'engellenen kelimeler çıkarıldıktan sonraki sözlük');
 });
 
 test('tek hamle tam olarak bir harfi değiştirir ve Türkçe harfleri korur', () => {
