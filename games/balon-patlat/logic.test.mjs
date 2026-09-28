@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import {
-  CORRECT_BONUS_SECONDS, FLIGHT_TIME, MAX_LIVES, ROUND_SECONDS, WRONG_PENALTY_SECONDS,
+  CORRECT_BONUS_SECONDS, ESCAPE_GRACE, FLIGHT_TIME, MAX_LIVES, SAFE_Y, ROUND_SECONDS, WRONG_PENALTY_SECONDS,
   advance, aimAt, createGame, evaluate, fireDart, isValidGame, levelFor, levelOf, makeEquation, pauseGame, startGame
 } from './logic.js';
 
@@ -98,8 +98,10 @@ test('kombo çarpanı her üç doğruda artar ve ×5 ile sınırlanır', () => {
 
 test('hedefi veren balon kaçarsa can gider ve hedef değişir; tuzak kaçarsa bir şey olmaz', () => {
   let game = run(startGame(createGame(11)), 3);
+  game = { ...game, targetSetAt: game.elapsed - ESCAPE_GRACE - 1 };
   const target = game.target;
   const answer = answersOf(game)[0];
+  game = { ...game, balloons: game.balloons.filter(balloon => balloon.result !== target || balloon.id === answer.id) };
   const decoy = game.balloons.find(balloon => balloon.result !== target);
   game = advance({ ...game, balloons: game.balloons.map(balloon => (balloon.id === decoy.id ? { ...balloon, y: -200 } : balloon)) }, .05);
   assert.equal(game.lives, MAX_LIVES);
@@ -112,7 +114,7 @@ test('hedefi veren balon kaçarsa can gider ve hedef değişir; tuzak kaçarsa b
 test('üç can bitince ya da süre dolunca oyun biter', () => {
   let game = run(startGame(createGame(3)), 3);
   const answer = answersOf(game)[0];
-  game = advance({ ...game, lives: 1, balloons: [{ ...answer, y: -200 }] }, .05);
+  game = advance({ ...game, lives: 1, targetSetAt: -10, balloons: [{ ...answer, y: -200 }] }, .05);
   assert.equal(game.status, 'over');
   assert.equal(game.endReason, 'lives');
   const timed = advance({ ...startGame(createGame(4)), timeLeft: .03 }, .05);
@@ -168,4 +170,27 @@ test('dört işlemle üretilen her işlem doğru sonucu verir', () => {
 test('duraklatılan oyun ilerlemez', () => {
   const paused = pauseGame(startGame(createGame(2)));
   assert.equal(advance(paused, 1).timeLeft, ROUND_SECONDS);
+});
+
+test('yeni hedef, tepede kaçmak üzere olan bir balonun sonucu olamaz', () => {
+  for (let seed = 1; seed < 120; seed += 1) {
+    let game = run(startGame(createGame(seed)), 6);
+    const answer = answersOf(game)[0];
+    if (!answer) continue;
+    game = shoot(game, answer);
+    const top = game.balloons.filter(balloon => balloon.y <= SAFE_Y + 60 && balloon.x < 900);
+    assert.ok(top.every(balloon => balloon.result !== game.target), `seed ${seed}: hedef ${game.target} tepede`);
+  }
+});
+
+test('hedef yeni değiştiyse hemen kaçan cevap can götürmez; başka cevap ekrandaysa da ceza yok', () => {
+  let game = run(startGame(createGame(17)), 3);
+  const answer = answersOf(game)[0];
+  const fresh = advance({ ...game, targetSetAt: game.elapsed, balloons: [{ ...answer, y: -200 }] }, .05);
+  assert.equal(fresh.lives, MAX_LIVES);
+  assert.ok(fresh.events.some(event => event.type === 'retarget'));
+  const twin = { ...answer, id: 999, y: 500 };
+  const covered = advance({ ...game, targetSetAt: -10, balloons: [{ ...answer, y: -200 }, twin] }, .05);
+  assert.equal(covered.lives, MAX_LIVES);
+  assert.equal(covered.target, game.target);
 });

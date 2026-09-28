@@ -15,6 +15,10 @@ export const LAUNCH_Y = HEIGHT - 54;
 export const FLIGHT_TIME = 0.34;
 export const CORRECT_BONUS_SECONDS = 1;
 export const WRONG_PENALTY_SECONDS = 2;
+// Hedef yeni belirlendiyse bu süre dolmadan kaçan cevap balonu can götürmez (yetişmek imkânsız olurdu).
+export const ESCAPE_GRACE = 3.5;
+// Bu yükseklikten yukarıdaki balonlar kaçmak üzeredir: yeni hedef olarak seçilmez, "ekranda cevap var" sayılmaz.
+export const SAFE_Y = 280;
 
 const LANES = [70, 185, 300, 415, 530];
 export const OPS = ['+', '−', '×', '÷'];
@@ -89,7 +93,8 @@ function decoyResult(game, target, used) {
   return value;
 }
 
-const onScreen = (game, result) => game.balloons.some(balloon => balloon.result === result && balloon.y < HEIGHT - 40);
+// Vurulmaya zamanı olan (tepeye yaklaşmamış) cevap balonu var mı?
+const onScreen = (game, result) => game.balloons.some(balloon => balloon.result === result && balloon.y > SAFE_Y && balloon.y < HEIGHT - 40);
 
 // Sıradaki çıkışlar: hedefe yakın tuzaklar; ekranda cevap yoksa 2.–4. sıraya bir cevap yerleştirilir.
 function planQueue(game) {
@@ -106,11 +111,13 @@ function planQueue(game) {
 function chooseTarget(game) {
   const level = levelFor(levelOf(game.correctHits));
   const previous = game.target;
-  const visible = game.balloons.filter(balloon => balloon.y > 330 && balloon.y < HEIGHT - 200 && balloon.result !== previous);
+  // Tepedeki (kaçmak üzere olan) balonların sonuçları hedef yapılmaz; yoksa yeni hedefin cevabı anında kaçabilir.
+  const risky = new Set(game.balloons.filter(balloon => balloon.y <= SAFE_Y + 60).map(balloon => balloon.result));
+  const visible = game.balloons.filter(balloon => balloon.y > 360 && balloon.y < HEIGHT - 200 && balloon.result !== previous && !risky.has(balloon.result));
   if (visible.length && random(game) < .65) game.target = pick(game, visible).result;
   else {
     let value = previous;
-    for (let tries = 0; tries < 20 && value === previous; tries += 1) value = integer(game, level.minTarget, level.maxTarget);
+    for (let tries = 0; tries < 40 && (value === previous || risky.has(value)); tries += 1) value = integer(game, level.minTarget, level.maxTarget);
     game.target = value;
   }
   game.targetSetAt = game.elapsed;
@@ -253,7 +260,8 @@ function advanceSlice(game, dt) {
     next.shotCooldown = 0.08;
   }
 
-  // Kaçan balonlar: hedefi veren balon kaçarsa can gider ve hedef değişir.
+  // Kaçan balonlar: hedefi veren balon kaçarsa can gider ve hedef değişir. Adil olsun diye:
+  // ekranda hedefi veren başka balon varsa ceza yok; hedef yeni belirlendiyse (ESCAPE_GRACE) can gitmez.
   const visible = [];
   let lost = null;
   for (const balloon of next.balloons) {
@@ -261,11 +269,15 @@ function advanceSlice(game, dt) {
     else if (balloon.result === next.target && !lost) lost = balloon;
   }
   next.balloons = visible;
-  if (lost) {
-    next.lives -= 1;
-    next.escapes += 1;
-    next.combo = 0;
-    next.events.push({ type: 'escape', a: lost.a, op: lost.op, b: lost.b, result: lost.result });
+  if (lost && !visible.some(balloon => balloon.result === next.target)) {
+    if (next.elapsed - next.targetSetAt >= ESCAPE_GRACE) {
+      next.lives -= 1;
+      next.escapes += 1;
+      next.combo = 0;
+      next.events.push({ type: 'escape', a: lost.a, op: lost.op, b: lost.b, result: lost.result });
+    } else {
+      next.events.push({ type: 'retarget' });
+    }
     chooseTarget(next);
   }
 

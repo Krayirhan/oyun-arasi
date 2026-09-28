@@ -1,6 +1,6 @@
-import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=balon16';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon16';
-import { confirmDialog } from '../../game-dialog.js?v=balon16';
+import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=balon17';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon17';
+import { confirmDialog } from '../../game-dialog.js?v=balon17';
 
 const KEY = 'oyunarasi-hafiza-v1';
 const FACES = ['🍋','🍒','🍉','🍇','🍊','🍍','🥝','🍓','🥑','🥕','🍄','🌽','🥥','🍑','🫐','🥨','🍪','🍰'];

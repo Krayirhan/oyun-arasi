@@ -1,7 +1,7 @@
-import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=balon16';
-import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=balon16';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon16';
-import { createFlow, botDelay } from '../../game-flow.js?v=balon16';
+import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=balon17';
+import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=balon17';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon17';
+import { createFlow, botDelay } from '../../game-flow.js?v=balon17';
 
 const KEY = 'oyunarasi-pisti-v1';
 const $ = selector => document.querySelector(selector);

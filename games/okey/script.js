@@ -1,6 +1,6 @@
-import { createRound, nextRound, drawFromWall, drawDiscard, discardTile, botTurn, canFinish, sortHand, bestArrangement, isValidRound } from './logic.js?v=balon16';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon16';
-import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=balon16';
+import { createRound, nextRound, drawFromWall, drawDiscard, discardTile, botTurn, canFinish, sortHand, bestArrangement, isValidRound } from './logic.js?v=balon17';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon17';
+import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=balon17';
 
 const KEY = 'oyunarasi-okey-v1';
 const LEVEL_NAMES = { easy: 'Kolay', medium: 'Orta', hard: 'Zor' };

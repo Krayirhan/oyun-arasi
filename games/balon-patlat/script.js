@@ -1,5 +1,5 @@
-import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf, levelOf } from './logic.js?v=balon16';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon16';
+import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf, levelOf } from './logic.js?v=balon17';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon17';
 
 const KEY = 'oyunarasi-balon-patlat-v1';
 const SOUND_KEY = 'oyunarasi-balon-patlat-ses';
@@ -650,6 +650,9 @@ function handleEvents(current) {
       sfx('escape');
       effects.push({ type: 'text', x: WIDTH / 2, y: 190, text: `Kaçtı! ${labelOf(event)} = ${event.result}`, color: '#e0303f', life: 1.6, age: 0 });
       status.textContent = `Hedefi veren balon kaçtı (${labelOf(event)}). Bir can gitti; yeni hedef ${current.target}.`;
+    } else if (event.type === 'retarget') {
+      effects.push({ type: 'text', x: WIDTH / 2, y: 132, text: 'Yeni hedef', color: '#2f6fd6', life: .9, age: 0, small: true });
+      status.textContent = `Hedefin balonu kaçtı ama yeni geldiği için sayılmadı. Yeni hedef ${current.target}.`;
     } else if (event.type === 'level' && NEW_OPERATION[event.op]) {
       const [title, copy] = NEW_OPERATION[event.op];
       banner = { title, copy, life: 1.6, age: 0 };
