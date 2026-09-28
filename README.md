@@ -16,7 +16,7 @@ Mini oyunları tek bir yerde toplayan, statik olarak GitHub Pages'te yayımlanan
 - `games/sekil/`: Şekil Birleştir; 8×8 tahtaya üçer parça yerleştirilir, dolan satır ve sütunlar temizlenir.
 - `games/kelime-avi/`: Kelime Avı; 12 temadan kelimeler 8×8, 10×10 ya da 12×12 harf tablosuna gizlenir, oyuncu çizerek bulur.
 - `games/kelime-merdiveni/`: Kelime Merdiveni; Harfle'nin Türkçe sözlüğünden 120 BFS ile doğrulanmış günlük/sefer bulmacası, arşiv, harf ipucu ve üç yıldızlı en kısa yol puanı.
-- `games/balon-patlat/`: Balon Patlat; dalga dalga yükselen dört işlem balonları arasından hedef sayıyı veren tek balonu elden fırlatılan dartla vurma oyunu; 60 saniye (doğru +2 sn, yanlış −2 sn) ve 3 can.
+- `games/balon-patlat/`: Balon Patlat; kesintisiz yükselen dört işlem balonları arasından hedef sayıyı veren balonu elden fırlatılan dartla vurma oyunu (vurunca hedef hemen değişir); 60 saniye (doğru +1 sn, yanlış −2 sn) ve 3 can.
 - `games/tetris/`: Blok Düşür (düşen blok oyunu; klasör ve kayıt kimliği `tetris` olarak kaldı); 7'li torba, döndürme ve duvar tekmeleri, gölge parça, tutma, sıradaki 3 parça ve her 10 satırda hızlanma.
 - `games/soliter/`: Solitaire (Klondike; klasör ve kayıt kimliği `soliter`); 1 ya da 3 kart çekiş, sürükle-bırak ve dokununca otomatik taşıma, geri alma ve otomatik bitirme.
 - `games/mahjong/`: Mahjong (eşleştirmeli solitaire); 46, 102 ve 144 taşlık üç dizilim, her zaman çözülebilir dağıtım, ipucu, karıştırma ve geri alma.

@@ -1,8 +1,8 @@
 // Balon Patlat — saf oyun mantığı (DOM yok).
-// Oyun dalgalar hâlinde akar: her dalgada bir hedef sayı vardır ve yükselen balonlardan YALNIZ BİRİ o sonucu
-// verir; geri kalanlar hedefe yakın sonuçlu tuzaklardır. Cevap balonu vurulunca dalga biter, kalan balonlar
-// uçup gider ve yeni hedefle yeni dalga başlar. Cevap balonu kaçarsa bir can gider.
-// Oyun süre (60 sn; doğru +2, yanlış −2) ya da 3 can bitince sona erer.
+// Balonlar kesintisiz yükselir; üstte bir hedef sayı vardır. Hedefi veren balonu vurunca hedef hemen değişir:
+// yeni cevap çoğu zaman ekranda zaten uçan balonlardan biridir ya da birkaç balon sonra rastgele bir sırada gelir,
+// hiçbir zaman "hemen en alttan çıkan" balon değildir. Yeni çıkan balonlar hedefe yakın sonuçlu tuzaklardır.
+// Oyun süre (60 sn; doğru +1, yanlış −2) ya da 3 can bitince sona erer; hedefi veren balon kaçarsa can gider.
 // Dart elden fırlar ve nişan alınan noktaya FLIGHT_TIME sonra varır; o anda oradaki balon patlar.
 
 export const WIDTH = 600;
@@ -13,24 +13,24 @@ export const BALLOON_RADIUS = 50;
 export const LAUNCH_X = WIDTH / 2;
 export const LAUNCH_Y = HEIGHT - 54;
 export const FLIGHT_TIME = 0.34;
-export const CORRECT_BONUS_SECONDS = 2;
+export const CORRECT_BONUS_SECONDS = 1;
 export const WRONG_PENALTY_SECONDS = 2;
-export const WAVE_PAUSE = 0.7;
 
 const LANES = [70, 185, 300, 415, 530];
 export const OPS = ['+', '−', '×', '÷'];
 
-// Dalgaya göre zorluk: açılan işlemler, hedef aralığı, balon sayısı, hız ve çıkış aralığı.
-export function levelFor(wave) {
-  const ops = wave >= 10 ? ['+', '−', '×', '÷'] : wave >= 7 ? ['+', '−', '×'] : wave >= 4 ? ['+', '−'] : ['+'];
+// Seviye doğru sayısıyla artar (her 2 doğruda bir): açılan işlemler, hedef aralığı, hız ve çıkış aralığı.
+export const levelOf = correctHits => 1 + Math.floor(correctHits / 2);
+
+export function levelFor(level) {
+  const ops = level >= 10 ? ['+', '−', '×', '÷'] : level >= 7 ? ['+', '−', '×'] : level >= 4 ? ['+', '−'] : ['+'];
   return {
     ops,
-    minTarget: wave >= 7 ? 6 : 4,
-    maxTarget: Math.min(60, 10 + wave * 3),
-    maxOperand: Math.min(50, 9 + wave * 3),
-    count: Math.min(10, 5 + Math.floor(wave / 2)),
-    speed: Math.min(96, 46 + wave * 3.2),
-    spawnEvery: Math.max(0.36, 0.6 - wave * 0.02)
+    minTarget: level >= 7 ? 6 : 4,
+    maxTarget: Math.min(60, 10 + level * 3),
+    maxOperand: Math.min(50, 9 + level * 3),
+    speed: Math.min(96, 46 + level * 3.2),
+    spawnEvery: Math.max(0.42, 0.72 - level * 0.025)
   };
 }
 
@@ -89,32 +89,47 @@ function decoyResult(game, target, used) {
   return value;
 }
 
-function startWave(game, wave) {
-  const level = levelFor(wave);
-  game.wave = wave;
-  game.target = integer(game, level.minTarget, level.maxTarget);
-  const answerIndex = integer(game, 1, level.count - 2);
+const onScreen = (game, result) => game.balloons.some(balloon => balloon.result === result && balloon.y < HEIGHT - 40);
+
+// Sıradaki çıkışlar: hedefe yakın tuzaklar; ekranda cevap yoksa 2.–4. sıraya bir cevap yerleştirilir.
+function planQueue(game) {
   const used = new Set([game.target]);
-  game.plan = [];
-  for (let index = 0; index < level.count; index += 1) {
-    if (index === answerIndex) { game.plan.push({ result: game.target, answer: true }); continue; }
+  game.queue = Array.from({ length: 6 }, () => {
     const result = decoyResult(game, game.target, used);
     used.add(result);
-    game.plan.push({ result, answer: false });
+    return result;
+  });
+  if (!onScreen(game, game.target)) game.queue[integer(game, 1, 3)] = game.target;
+}
+
+// Yeni hedef: çoğu zaman ekranın ortasında uçan balonlardan birinin sonucu; değilse yeni bir sayı.
+function chooseTarget(game) {
+  const level = levelFor(levelOf(game.correctHits));
+  const previous = game.target;
+  const visible = game.balloons.filter(balloon => balloon.y > 330 && balloon.y < HEIGHT - 200 && balloon.result !== previous);
+  if (visible.length && random(game) < .65) game.target = pick(game, visible).result;
+  else {
+    let value = previous;
+    for (let tries = 0; tries < 20 && value === previous; tries += 1) value = integer(game, level.minTarget, level.maxTarget);
+    game.target = value;
   }
-  game.spawned = 0;
-  game.spawnTimer = level.spawnEvery;
-  game.answered = false;
-  game.waveStartedAt = game.elapsed;
-  game.pause = 0;
-  game.events.push({ type: 'wave', wave, target: game.target });
+  game.targetSetAt = game.elapsed;
+  planQueue(game);
 }
 
 function spawnNext(game) {
-  const level = levelFor(game.wave);
-  const item = game.plan[game.spawned];
-  game.spawned += 1;
-  const equation = makeEquation(game, item.result, level.ops, level.maxOperand);
+  const level = levelFor(levelOf(game.correctHits));
+  if (!game.queue.length) planQueue(game);
+  const result = game.queue.shift();
+  // Ekranda ve sırada cevap kalmadıysa, hemen bir sonraki değil 1–3 balon sonrasına bir cevap koy.
+  if (!game.queue.includes(game.target) && !onScreen(game, game.target) && result !== game.target) {
+    game.queue.splice(integer(game, 1, Math.min(3, game.queue.length)), 0, game.target);
+  }
+  if (game.queue.length < 3) {
+    const used = new Set([game.target, ...game.queue]);
+    while (game.queue.length < 6) { const decoy = decoyResult(game, game.target, used); used.add(decoy); game.queue.push(decoy); }
+  }
+  const equation = makeEquation(game, result, level.ops, level.maxOperand);
   // Şerit: son iki balonun şeridinden kaçın, ekranın alt kısmında en boş şeridi seç.
   const busy = LANES.map((_, lane) => game.balloons.filter(balloon => balloon.lane === lane && balloon.y > HEIGHT - 260).length);
   const options = LANES.map((_, lane) => lane).filter(lane => !game.recentLanes.includes(lane));
@@ -124,23 +139,23 @@ function spawnNext(game) {
   const depth = Math.round((0.84 + random(game) * 0.28) * 100) / 100;
   const radius = Math.round(BALLOON_RADIUS * depth);
   game.balloons.push({
-    id: game.nextBalloonId++, wave: game.wave, answer: item.answer, lane,
-    x: LANES[lane] + integer(game, -14, 14), y: HEIGHT + radius * .4,
-    ...equation, radius, depth,
-    color: Math.floor(random(game) * 6), wobble: random(game) * Math.PI * 2
+    id: game.nextBalloonId++, lane, x: LANES[lane] + integer(game, -14, 14), y: HEIGHT + radius * .4,
+    ...equation, radius, depth, color: Math.floor(random(game) * 6), wobble: random(game) * Math.PI * 2
   });
 }
 
 export function createGame(seed = Math.floor(Math.random() * 4294967296)) {
   const game = {
     status: 'ready', elapsed: 0, timeLeft: ROUND_SECONDS, score: 0, lives: MAX_LIVES,
-    wave: 0, target: 0, combo: 0, bestCombo: 0,
+    target: 0, targetSetAt: 0, combo: 0, bestCombo: 0,
     correctHits: 0, wrongHits: 0, dartsFired: 0, misses: 0, escapes: 0,
     balloons: [], darts: [], aim: { x: LAUNCH_X, y: 300 }, shotCooldown: 0,
-    plan: [], spawned: 0, spawnTimer: 0, answered: false, waveStartedAt: 0, pause: 0,
-    nextBalloonId: 1, rng: seed >>> 0, recentLanes: [], events: [], endReason: null
+    queue: [], spawnTimer: 0, nextBalloonId: 1, rng: seed >>> 0, recentLanes: [], events: [], endReason: null
   };
-  startWave(game, 1);
+  const level = levelFor(1);
+  game.target = integer(game, level.minTarget, level.maxTarget);
+  planQueue(game);
+  game.spawnTimer = level.spawnEvery;
   return game;
 }
 
@@ -176,25 +191,24 @@ function balloonAt(balloons, x, y) {
 
 export const multiplierFor = combo => Math.min(5, 1 + Math.floor(combo / 3));
 
-function finishWave(game, success) {
-  game.answered = true;
-  game.pause = WAVE_PAUSE;
-  if (!success) game.events.push({ type: 'waveFail', wave: game.wave });
-}
-
 function resolveHit(game, balloon) {
   const event = { type: 'pop', x: balloon.x, y: balloon.y, radius: balloon.radius, color: balloon.color, a: balloon.a, op: balloon.op, b: balloon.b, result: balloon.result };
-  if (balloon.wave !== game.wave || game.answered) { game.events.push({ ...event, outcome: 'stale' }); return; }
-  if (balloon.answer) {
+  if (balloon.result === game.target) {
+    const levelBefore = levelOf(game.correctHits);
     game.correctHits += 1;
     game.combo += 1;
     game.bestCombo = Math.max(game.bestCombo, game.combo);
-    const speedBonus = Math.max(0, Math.round((6 - (game.elapsed - game.waveStartedAt)) * 10));
+    const speedBonus = Math.max(0, Math.round((6 - (game.elapsed - game.targetSetAt)) * 10));
     const points = 100 * multiplierFor(game.combo) + speedBonus;
     game.score += points;
     game.timeLeft += CORRECT_BONUS_SECONDS;
     game.events.push({ ...event, outcome: 'correct', points });
-    finishWave(game, true);
+    chooseTarget(game);
+    const level = levelOf(game.correctHits);
+    if (level > levelBefore) {
+      const opened = levelFor(level).ops.find(op => !levelFor(levelBefore).ops.includes(op));
+      game.events.push({ type: 'level', level, op: opened || null });
+    }
   } else {
     game.wrongHits += 1;
     game.combo = 0;
@@ -204,30 +218,25 @@ function resolveHit(game, balloon) {
 }
 
 function advanceSlice(game, dt) {
-  const next = { ...game, balloons: [...game.balloons], darts: [], recentLanes: [...game.recentLanes] };
+  const next = { ...game, balloons: [...game.balloons], darts: [], queue: [...game.queue], recentLanes: [...game.recentLanes] };
   next.elapsed += dt;
   next.timeLeft = Math.max(0, next.timeLeft - dt);
   next.shotCooldown = Math.max(0, next.shotCooldown - dt);
+  const level = levelFor(levelOf(next.correctHits));
 
-  // Dalga akışı: dalga bitince kısa ara, sonra yeni dalga; dalga sürerken balonlar sırayla çıkar.
-  if (next.answered) {
-    next.pause -= dt;
-    if (next.pause <= 0) startWave(next, next.wave + 1);
-  } else if (next.spawned < next.plan.length) {
-    const { spawnEvery } = levelFor(next.wave);
-    next.spawnTimer += dt;
-    while (next.spawned < next.plan.length && next.spawnTimer >= spawnEvery) {
-      next.spawnTimer -= spawnEvery;
+  // Kesintisiz çıkış
+  next.spawnTimer += dt;
+  while (next.spawnTimer >= level.spawnEvery) {
+    next.spawnTimer -= level.spawnEvery;
+    if (next.balloons.length < 10) spawnNext(next);
+    else if (!onScreen(next, next.target) && next.queue.includes(next.target)) {
+      // Ekran doluyken cevap sırada beklemesin: tuzakları atlayıp cevabı çıkar.
+      next.queue = [next.target, ...next.queue.filter(result => result !== next.target)];
       spawnNext(next);
     }
   }
 
-  // Balonlar yükselir; biten dalganın balonları hızlanarak ekrandan çıkar.
-  next.balloons = next.balloons.map(balloon => {
-    const stale = balloon.wave !== next.wave || next.answered;
-    const speed = levelFor(balloon.wave).speed * (balloon.depth || 1) * (stale ? 2.4 : 1);
-    return { ...balloon, y: balloon.y - speed * dt, wobble: balloon.wobble + dt * 2 };
-  });
+  next.balloons = next.balloons.map(balloon => ({ ...balloon, y: balloon.y - level.speed * (balloon.depth || 1) * dt, wobble: balloon.wobble + dt * 2 }));
 
   // Dart varışı: vardığı noktadaki balon patlar
   for (const dart of game.darts) {
@@ -244,19 +253,21 @@ function advanceSlice(game, dt) {
     next.shotCooldown = 0.08;
   }
 
-  // Kaçan balonlar: bu dalganın cevabı kaçarsa can gider ve yeni dalgaya geçilir.
+  // Kaçan balonlar: hedefi veren balon kaçarsa can gider ve hedef değişir.
   const visible = [];
+  let lost = null;
   for (const balloon of next.balloons) {
-    if (balloon.y + balloon.radius * 1.2 >= 0) { visible.push(balloon); continue; }
-    if (balloon.answer && balloon.wave === next.wave && !next.answered) {
-      next.lives -= 1;
-      next.escapes += 1;
-      next.combo = 0;
-      next.events.push({ type: 'escape', a: balloon.a, op: balloon.op, b: balloon.b, result: balloon.result });
-      finishWave(next, false);
-    }
+    if (balloon.y + balloon.radius * 1.2 >= 0) visible.push(balloon);
+    else if (balloon.result === next.target && !lost) lost = balloon;
   }
   next.balloons = visible;
+  if (lost) {
+    next.lives -= 1;
+    next.escapes += 1;
+    next.combo = 0;
+    next.events.push({ type: 'escape', a: lost.a, op: lost.op, b: lost.b, result: lost.result });
+    chooseTarget(next);
+  }
 
   if (next.lives <= 0) { next.status = 'over'; next.endReason = 'lives'; }
   else if (next.timeLeft <= 0) { next.status = 'over'; next.endReason = 'time'; }
@@ -281,7 +292,6 @@ export function isValidGame(game) {
     && Number.isFinite(game.timeLeft) && game.timeLeft >= 0
     && Number.isInteger(game.score) && game.score >= 0
     && Number.isInteger(game.lives) && game.lives >= 0 && game.lives <= MAX_LIVES
-    && Number.isInteger(game.wave) && game.wave >= 1
     && Array.isArray(game.balloons) && game.balloons.every(balloon => Number.isFinite(balloon.x) && Number.isFinite(balloon.y)
       && OPS.includes(balloon.op) && evaluate(balloon.a, balloon.op, balloon.b) === balloon.result)
     && Array.isArray(game.darts));

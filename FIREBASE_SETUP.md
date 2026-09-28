@@ -13,7 +13,7 @@ Her hesap `users/{uid}` belgesinde açılır. Hesap oluşturulurken `gameStats` 
 - `mayin-tarlasi`: kolay/orta/zor süre rekorları.
 - `sudoku`, `kelime-avi`, `mahjong`: kolay/orta/zor süre rekorları.
 - `kelime-merdiveni`: günlük galibiyet, en iyi bulmaca yıldızı, toplam yıldız ve tamamlanan sefer.
-- `balon-patlat`: en iyi skor, en ileri dalga, doğru vuruş, en uzun kombo ve isabet oranı.
+- `balon-patlat`: en iyi skor, en yüksek seviye, doğru vuruş, en uzun kombo ve isabet oranı.
 - `tetris`: en iyi skor ve satır; `araba`: en iyi skor ve mesafe; `sekil`: en iyi skor.
 - `soliter`: toplam galibiyet ve tek/üç kart rekorları.
 - `okey`: maç galibiyeti, el galibiyeti ve zor bot galibiyeti.
