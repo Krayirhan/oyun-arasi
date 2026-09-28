@@ -1,7 +1,7 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik7';
-import { confirmDialog } from '../../game-dialog.js?v=mantik7';
-import { createStage } from '../../game-stage.js?v=mantik7';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik8';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik8';
+import { confirmDialog } from '../../game-dialog.js?v=mantik8';
+import { createStage } from '../../game-stage.js?v=mantik8';
 // Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
 const stage = createStage();
 let stageKey = '';

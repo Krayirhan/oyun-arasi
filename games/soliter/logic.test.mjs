@@ -137,3 +137,44 @@ test('pause freezes the clock and saves stay valid', () => {
   assert.ok(!isValidGame({ ...restored, draw: 2 }));
   assert.ok(!isValidGame(null));
 });
+
+test('rastgele oynanan 25 elde kartlar korunur, açık diziler geçerli kalır, geri alma birebir ve otomatik bitirme tamamlanır', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const runIsValid = (game, index) => {
+    const column = game.tableau[index];
+    for (let at = game.down[index]; at < column.length - 1; at += 1) {
+      if (isRed(column[at]) === isRed(column[at + 1]) || rankOf(column[at]) !== rankOf(column[at + 1]) + 1) return false;
+    }
+    return true;
+  };
+  for (let seed = 1; seed <= 25; seed += 1) {
+    const random = seeded(seed * 97);
+    let game = createGame(seed % 2 ? 1 : 3, random, 0);
+    for (let step = 0; step < 400 && game.status === 'playing'; step += 1) {
+      const sources = [{ type: 'waste' }, ...[0, 1, 2, 3].map(index => ({ type: 'foundation', index }))];
+      game.tableau.forEach((column, index) => { for (let card = game.down[index]; card < column.length; card += 1) sources.push({ type: 'tableau', index, card }); });
+      let next = null;
+      for (const source of sources.sort(() => random() - 0.5)) {
+        const target = bestTarget(game, source);
+        if (target) { next = moveCards(game, source, target, 0); if (next) break; }
+      }
+      if (!next || random() < 0.15) next = drawCards(game) || next;
+      if (!next) break;
+      const before = game;
+      game = next;
+      assert.equal(isValidGame(game), true, `seed ${seed} adım ${step}`);
+      for (let index = 0; index < 7; index += 1) assert.equal(runIsValid(game, index), true, `seed ${seed} sütun ${index}`);
+      if (random() < 0.05 && game.history.length) {
+        const back = undo(game);
+        const position = state => JSON.stringify([state.stock, state.waste, state.foundations, state.tableau, state.down]);
+        assert.equal(position(back), position(before), `seed ${seed} geri alma`);
+      }
+      if (canAutoComplete(game)) {
+        let auto = game;
+        for (let n = 0; n < 60 && auto.status === 'playing'; n += 1) auto = autoStep(auto, 0) || auto;
+        assert.equal(auto.status, 'won', `seed ${seed} otomatik bitirme`);
+        break;
+      }
+    }
+  }
+});

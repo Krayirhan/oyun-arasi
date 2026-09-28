@@ -173,3 +173,39 @@ test('bot her seviyede yalnız geçerli hamle yapar (rastgele oyunlar)', () => {
     }
   }
 });
+
+test('rastgele oynanan maçlarda hamleler tutarlıdır: taş korunur, bot dizileri kurallara uyar, turnMax en uzun diziye eşit, her maç biter', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const label = move => `${move.from}>${move.to}:${move.die}`;
+  for (let seed = 1; seed <= 6; seed += 1) {
+    const random = seeded(seed * 131);
+    const die = () => 1 + Math.floor(random() * 6);
+    let state = createGame(3);
+    let guard = 0;
+    while (guard++ < 30000) {
+      if (state.phase === 'opening') { state = openingRoll(state, die(), die()); continue; }
+      if (state.phase === 'roll') {
+        state = roll(state, die(), die());
+        const sequences = turnSequences(state);
+        const longest = sequences.length ? Math.max(...sequences.map(sequence => sequence.moves.length)) : 0;
+        assert.equal(state.turnMax, longest, `seed ${seed}: turnMax`);
+        const legal = new Set(legalMoves(state).map(label));
+        for (const sequence of sequences.filter(item => item.moves.length)) assert.ok(legal.has(label(sequence.moves[0])), `seed ${seed}: bot kural dışı ilk hamle`);
+        assert.equal(legal.size === 0, longest === 0, `seed ${seed}: hamle yok ise tur boş`);
+        continue;
+      }
+      if (state.phase === 'move') {
+        const legal = legalMoves(state);
+        if (!legal.length) { state = endTurn(state); continue; }
+        state = applyMove(state, legal[Math.floor(random() * legal.length)]);
+        assert.equal(isValidGame(state), true, `seed ${seed}: taş sayısı`);
+        continue;
+      }
+      if (state.match.winner !== null) break;
+      state = nextGame(state);
+    }
+    assert.ok(guard < 30000, `seed ${seed}: maç bitti`);
+    assert.equal(state.phase, 'over');
+    assert.ok(Math.max(...state.match.score) >= 3);
+  }
+});

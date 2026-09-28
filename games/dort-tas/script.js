@@ -1,7 +1,7 @@
-import { createGame, playMove, botMove, newRound, isValidGame, landingRow, winningLine, COLS, ROWS } from './logic.js?v=mantik7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik7';
-import { confirmDialog } from '../../game-dialog.js?v=mantik7';
-import { createFlow, botDelay } from '../../game-flow.js?v=mantik7';
+import { createGame, playMove, botMove, newRound, isValidGame, landingRow, winningLine, COLS, ROWS } from './logic.js?v=mantik8';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik8';
+import { confirmDialog } from '../../game-dialog.js?v=mantik8';
+import { createFlow, botDelay } from '../../game-flow.js?v=mantik8';
 
 const $ = selector => document.querySelector(selector);
 const KEY = 'oyunarasi-dort-tas-v1';
@@ -193,7 +193,7 @@ async function attachRoom(roomInfo) {
   $('#room-code').value = roomInfo.code;
   $('#room-feedback').textContent = roomInfo.seat === 0 ? `Oda ${roomInfo.code} hazır. Rakibin katılması bekleniyor.` : 'Odaya katıldın; tahta eşitleniyor.';
   flow.show('game'); render(); persist();
-  const rooms = await import('./rooms.js?v=mantik7');
+  const rooms = await import('./rooms.js?v=mantik8');
   stopWatchingRoom = rooms.watchRoom(roomInfo.code, room => {
     roomStatus = room.status; roomVersion = room.version;
     if (room.status === 'waiting') {
@@ -230,7 +230,7 @@ function playColumn(column) {
   if (game.mode === 'online') {
     const room = saved.room;
     if (!room || roomStatus !== 'playing' || game.current !== room.seat) return;
-    import('./rooms.js?v=mantik7').then(({ playRoomMove }) => playRoomMove(room.code, room.seat, column, roomVersion))
+    import('./rooms.js?v=mantik8').then(({ playRoomMove }) => playRoomMove(room.code, room.seat, column, roomVersion))
       .catch(error => { $('#status').textContent = error?.message || 'Hamle eşitlenemedi.'; });
     return;
   }
@@ -318,8 +318,8 @@ const cloudSync = syncGameOnAccountChange('dort-tas', {
   onStatus: message => { $('#save-state').textContent = message; }
 });
 
-$('#create-room').addEventListener('click', () => withRoomAction(async () => { const { createRoom } = await import('./rooms.js?v=mantik7'); await attachRoom(await createRoom()); }));
-$('#join-room').addEventListener('click', () => withRoomAction(async () => { const { joinRoom } = await import('./rooms.js?v=mantik7'); await attachRoom(await joinRoom($('#room-code').value)); }));
+$('#create-room').addEventListener('click', () => withRoomAction(async () => { const { createRoom } = await import('./rooms.js?v=mantik8'); await attachRoom(await createRoom()); }));
+$('#join-room').addEventListener('click', () => withRoomAction(async () => { const { joinRoom } = await import('./rooms.js?v=mantik8'); await attachRoom(await joinRoom($('#room-code').value)); }));
 $('#room-code').addEventListener('input', event => { event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); });
 $('#room-code').addEventListener('keydown', event => { if (event.key === 'Enter') $('#join-room').click(); });
 $('#copy-room-link').addEventListener('click', async () => {
