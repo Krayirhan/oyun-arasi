@@ -1,6 +1,10 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne13';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
-import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { confirmDialog } from '../../game-dialog.js?v=sahne14';
+import { createStage } from '../../game-stage.js?v=sahne14';
+// Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 const KEY = 'oyunarasi-sudoku-v1';
 const boardElement = document.querySelector('#board');
@@ -130,6 +134,19 @@ function render() {
   if (game.status === 'won') {
     const hintText = game.hints ? `, ${game.hints} ipucuyla` : '';
     statusElement.textContent = `Tebrikler! Bulmacayı ${formatTime(game.elapsedMs)} sürede${hintText} çözdün.`;
+  }
+  const key = game.status === 'won' ? `won-${game.elapsedMs}` : '';
+  if (key !== stageKey) {
+    stageKey = key;
+    if (game.status === 'won') {
+      stage.show({
+        kind: 'result', kicker: `${LEVELS[game.level].label.toLocaleUpperCase('tr-TR')} · ÇÖZÜLDÜ`, title: 'Bulmaca tamam!',
+        record: !game.hints && records[game.level] === game.elapsedMs,
+        copy: game.hints ? 'İpucu kullandığın için rekora sayılmadı.' : '',
+        stats: [['Süre', formatTime(game.elapsedMs)], ['Hata', game.mistakes], ['İpucu', game.hints]],
+        actions: [{ label: 'Yeni bulmaca', primary: true, onClick: () => startNew(game.level) }], dismissible: true
+      });
+    } else stage.hide();
   }
 }
 

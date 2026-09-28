@@ -1,6 +1,6 @@
-import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf, levelOf } from './logic.js?v=sahne13';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
-import { createStage } from '../../game-stage.js?v=sahne13';
+import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf, levelOf } from './logic.js?v=sahne14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { createStage } from '../../game-stage.js?v=sahne14';
 
 const KEY = 'oyunarasi-balon-patlat-v1';
 const SOUND_KEY = 'oyunarasi-balon-patlat-ses';

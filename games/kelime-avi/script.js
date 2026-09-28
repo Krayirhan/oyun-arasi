@@ -1,6 +1,10 @@
-import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne13';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
-import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { confirmDialog } from '../../game-dialog.js?v=sahne14';
+import { createStage } from '../../game-stage.js?v=sahne14';
+// Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 const KEY = 'oyunarasi-kelime-avi-v1';
 const gridElement = document.querySelector('#board');
@@ -81,6 +85,19 @@ function render() {
   timerElement.textContent = formatTime(elapsedMilliseconds(game));
   if (game.status === 'won') {
     statusElement.textContent = `Tebrikler! ${THEMES[game.theme].name} temasındaki bütün kelimeleri ${formatTime(game.elapsedMs)} sürede buldun${game.hints ? ` (${game.hints} ipucu)` : ''}.`;
+  }
+  const key = game.status === 'won' ? `won-${game.elapsedMs}` : '';
+  if (key !== stageKey) {
+    stageKey = key;
+    if (game.status === 'won') {
+      stage.show({
+        kind: 'result', kicker: `${THEMES[game.theme].name.toLocaleUpperCase('tr-TR')} · TAMAMLANDI`, title: 'Bütün kelimeler bulundu!',
+        record: !game.hints && records[game.level] === game.elapsedMs,
+        copy: game.hints ? 'İpucu kullandığın için rekora sayılmadı.' : '',
+        stats: [['Süre', formatTime(game.elapsedMs)], ['Kelime', game.words.length], ['İpucu', game.hints]],
+        actions: [{ label: 'Yeni bulmaca', primary: true, onClick: () => startNew(difficultyPicker.value) }], dismissible: true
+      });
+    } else stage.hide();
   }
 }
 

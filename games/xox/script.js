@@ -1,6 +1,10 @@
-import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=sahne13';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
-import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { createGame, playMove, newRound, resetScores, isValidGame } from './logic.js?v=sahne14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { confirmDialog } from '../../game-dialog.js?v=sahne14';
+import { createStage } from '../../game-stage.js?v=sahne14';
+// Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 const KEY = 'oyunarasi-xox-v1';
 const boardElement = document.querySelector('#board');
@@ -27,6 +31,22 @@ function announce() {
   if (game.status === 'won') messageElement.textContent = `Oyuncu ${game.winner} bu turu kazandı!`;
   else if (game.status === 'draw') messageElement.textContent = 'Berabere! Yeni turda ilk başlayan değişecek.';
   else messageElement.textContent = `Sıra Oyuncu ${game.current}’da.`;
+  const key = game.status === 'playing' ? '' : `${game.status}-${game.scores.X}-${game.scores.O}-${game.scores.draws}`;
+  if (key === stageKey) return;
+  stageKey = key;
+  if (game.status === 'playing') { stage.hide(); return; }
+  stage.show({
+    kind: 'result', kicker: 'TUR BİTTİ', title: game.status === 'won' ? `Oyuncu ${game.winner} kazandı!` : 'Berabere!',
+    copy: game.status === 'draw' ? 'Yeni turda ilk başlayan değişecek.' : '',
+    stats: [['Oyuncu X', game.scores.X], ['Berabere', game.scores.draws], ['Oyuncu O', game.scores.O]],
+    actions: [{ label: 'Yeni tur', primary: true, onClick: startRound }], dismissible: true
+  });
+}
+
+function startRound() {
+  game = newRound(game);
+  render();
+  boardElement.querySelector('.cell[tabindex="0"]')?.focus();
 }
 
 function render() {
@@ -81,9 +101,7 @@ function navigate(event, index) {
 
 document.querySelector('#round-button').addEventListener('click', async () => {
   if (game.status === 'playing' && game.board.some(Boolean) && !(await confirmDialog({ title: 'Yeni tur başlasın mı?', message: 'Bu turdaki hamleler silinecek; skorlar korunur.', confirmLabel: 'Yeni tur' }))) return;
-  game = newRound(game);
-  render();
-  boardElement.querySelector('.cell[tabindex="0"]')?.focus();
+  startRound();
 });
 
 document.querySelector('#scores-button').addEventListener('click', async () => {

@@ -1,6 +1,10 @@
-import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=sahne13';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
-import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=sahne14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { confirmDialog } from '../../game-dialog.js?v=sahne14';
+import { createStage } from '../../game-stage.js?v=sahne14';
+// Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 const KEY = 'oyunarasi-mayin-tarlasi-v1';
 const boardElement = document.querySelector('#board');
@@ -36,6 +40,25 @@ function announce() {
   else if (game.status === 'lost') statusElement.textContent = 'Mayına bastın. Yeni oyunda tekrar deneyebilirsin.';
   else if (game.status === 'ready') statusElement.textContent = 'Bir kare aç. İlk açtığın alan güvenli.';
   else statusElement.textContent = 'Güvenli kareleri açmaya devam et.';
+  const key = ['won', 'lost'].includes(game.status) ? `${game.status}-${game.elapsedMs}` : '';
+  if (key === stageKey) return;
+  stageKey = key;
+  const label = DIFFICULTIES[game.difficulty].label;
+  if (game.status === 'won') {
+    stage.show({
+      kind: 'result', kicker: `${label.toLocaleUpperCase('tr-TR')} · KAZANDIN`, title: 'Tarla temizlendi!', record: records[game.difficulty] === game.elapsedMs,
+      copy: 'Bütün güvenli kareleri açtın.',
+      stats: [['Süre', `${Math.floor(game.elapsedMs / 1000)} sn`], ['Mayın', game.mineCount], ['Zorluk', label]],
+      actions: [{ label: 'Yeni oyun', primary: true, onClick: () => startNewGame() }], dismissible: true
+    });
+  } else if (game.status === 'lost') {
+    stage.show({
+      kind: 'result', kicker: 'MAYINA BASTIN', title: 'Bum! Bu sefer olmadı',
+      copy: 'Mayınların yerini görmek için tahtaya bakabilirsin.',
+      stats: [['Süre', `${Math.floor(game.elapsedMs / 1000)} sn`], ['Mayın', game.mineCount], ['Zorluk', label]],
+      actions: [{ label: 'Tekrar dene', primary: true, onClick: () => startNewGame() }], dismissible: true
+    });
+  } else stage.hide();
 }
 
 function render() {

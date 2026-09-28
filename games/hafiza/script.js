@@ -1,6 +1,10 @@
-import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=sahne13';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
-import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=sahne14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne14';
+import { confirmDialog } from '../../game-dialog.js?v=sahne14';
+import { createStage } from '../../game-stage.js?v=sahne14';
+// Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 const KEY = 'oyunarasi-hafiza-v1';
 const FACES = ['🍋','🍒','🍉','🍇','🍊','🍍','🥝','🍓','🥑','🥕','🍄','🌽','🥥','🍑','🫐','🥨','🍪','🍰'];
@@ -65,6 +69,18 @@ function render() {
   else if (game.pendingMismatchAt !== null) statusElement.textContent = 'Eşleşmedi; kartlar kapanınca yeniden seçebilirsin.';
   else if (game.status === 'ready') statusElement.textContent = 'Bir kart açarak başla.';
   else statusElement.textContent = 'Bir kart daha seç.';
+  const key = game.status === 'won' ? `won-${game.elapsedMs}-${game.moves}` : '';
+  if (key !== stageKey) {
+    stageKey = key;
+    if (game.status === 'won') {
+      stage.show({
+        kind: 'result', kicker: 'TAMAMLANDI', title: 'Tebrikler!', record: record.bestMs === game.elapsedMs && record.bestMoves === game.moves,
+        copy: 'Bütün eşleri buldun.',
+        stats: [['Süre', formatTime(game.elapsedMs)], ['Hamle', game.moves], ['Kart', game.pairCount * 2]],
+        actions: [{ label: 'Yeni oyun', primary: true, onClick: () => startNewGame() }], dismissible: true
+      });
+    } else stage.hide();
+  }
   saveGame();
 }
 
