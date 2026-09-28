@@ -1,6 +1,6 @@
-import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=balon8';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon8';
-import { confirmDialog } from '../../game-dialog.js?v=balon8';
+import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=balon11';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon11';
+import { confirmDialog } from '../../game-dialog.js?v=balon11';
 
 const KEY = 'oyunarasi-mahjong-v1';
 const boardElement = document.querySelector('#board');

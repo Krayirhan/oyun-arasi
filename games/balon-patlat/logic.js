@@ -70,8 +70,10 @@ function addBalloon(game, { correct = false, y = correct ? HEIGHT - 120 : HEIGHT
     result = a + b;
   }
   const lane = nextColumn(game);
-  game.balloons.push({ id: game.nextBalloonId++, lane, x: COLUMNS[lane], y, a, b, result, radius: BALLOON_RADIUS,
-    color: Math.floor(random(game) * 5), wobble: random(game) * Math.PI * 2 });
+  // Derinlik: uzaktaki balon küçük ve yavaş, yakındaki büyük ve hızlı görünür.
+  const depth = Math.round((0.84 + random(game) * 0.28) * 100) / 100;
+  game.balloons.push({ id: game.nextBalloonId++, lane, x: COLUMNS[lane], y, a, b, result, radius: Math.round(BALLOON_RADIUS * depth), depth,
+    color: Math.floor(random(game) * 6), wobble: random(game) * Math.PI * 2 });
 }
 
 function equation(game) {
@@ -163,7 +165,7 @@ function advanceSlice(game, dt) {
     elapsed: Math.min(ROUND_SECONDS, game.elapsed + dt),
     shotCooldown: Math.max(0, game.shotCooldown - dt),
     spawnTimer: game.spawnTimer + dt,
-    balloons: game.balloons.map(balloon => ({ ...balloon, y: balloon.y - LEVELS[stageFor(game.correctHits) - 1].speed * dt, wobble: balloon.wobble + dt * 2 })),
+    balloons: game.balloons.map(balloon => ({ ...balloon, y: balloon.y - LEVELS[stageFor(game.correctHits) - 1].speed * (balloon.depth || 1) * dt, wobble: balloon.wobble + dt * 2 })),
     darts: [],
     events: game.events,
     lastHit: game.lastHit && game.lastHit.time > 0 ? { ...game.lastHit, time: game.lastHit.time - dt } : null
@@ -177,7 +179,7 @@ function advanceSlice(game, dt) {
     if (hit) {
       next.balloons = next.balloons.filter(balloon => balloon.id !== hit.id);
       recordHit(next, hit);
-      next.events.push({ type: 'pop', correct: hit.result === game.target, x: hit.x, y: hit.y, a: hit.a, b: hit.b, result: hit.result, color: hit.color });
+      next.events.push({ type: 'pop', correct: hit.result === game.target, x: hit.x, y: hit.y, radius: hit.radius, a: hit.a, b: hit.b, result: hit.result, color: hit.color });
     } else {
       next.misses += 1;
       next.events.push({ type: 'miss', x: dart.tx, y: dart.ty });

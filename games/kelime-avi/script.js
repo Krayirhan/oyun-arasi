@@ -1,6 +1,6 @@
-import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=balon8';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon8';
-import { confirmDialog } from '../../game-dialog.js?v=balon8';
+import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=balon11';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon11';
+import { confirmDialog } from '../../game-dialog.js?v=balon11';
 
 const KEY = 'oyunarasi-kelime-avi-v1';
 const gridElement = document.querySelector('#board');
