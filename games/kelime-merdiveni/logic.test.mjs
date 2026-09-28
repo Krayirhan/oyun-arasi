@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 import { PUZZLES } from './puzzles.js';
+import { BLOCKED_WORDS, isBlocked } from '../harfane/engellenen.mjs';
 import { applyDailyStreak, buildPuzzleSet, createGame, dailyPuzzle, differsByOne, finalStars, giveHint, isValidGame, orderForSeries, prepareDictionary, revealSolution, scoreStars, shortestPath, streakForDisplay, submitWord, validatePuzzle } from './logic.js';
 
 const source = readFileSync(new URL('../harfane/kelimeler.js', import.meta.url), 'utf8');
@@ -13,7 +14,7 @@ const puzzleMap = new Map(PUZZLES.map(puzzle => [puzzle.id, puzzle]));
 
 test('sözlük Türkçe biçimde tekilleşir; yalnızca beş harfli kelimeler kalır', () => {
   assert.deepEqual(prepareDictionary([' kalem ', 'KALEM', 'çanta', 'iki', 'araba']), ['araba', 'çanta', 'kalem']);
-  assert.equal(dictionary.length, 5381);
+  assert.equal(dictionary.length, 5284, 'engellenen kelimeler çıkarıldıktan sonraki sözlük');
 });
 
 test('tek hamle tam olarak bir harfi değiştirir ve Türkçe harfleri korur', () => {
@@ -161,4 +162,12 @@ test('seri gösterimi: bir gün atlanınca eski değer görünmez', () => {
   assert.equal(streakForDisplay(record, '2026-09-11'), 6);
   assert.equal(streakForDisplay(record, '2026-09-12'), 0);
   assert.equal(streakForDisplay({}, '2026-09-12'), 0);
+});
+
+test('sözlükte ve bulmacalarda engellenen (küfür, müstehcen, hakaret) kelime bulunmaz', () => {
+  assert.ok(BLOCKED_WORDS.length >= 90);
+  assert.deepEqual(dictionary.filter(isBlocked), [], 'sözlük');
+  assert.deepEqual(lists.ANSWERS.filter(isBlocked), [], 'Harfle cevapları');
+  assert.deepEqual(PUZZLES.flatMap(puzzle => puzzle.path).filter(isBlocked), [], 'bulmaca yolları');
+  for (const word of ['yarak', 'penis', 'salak', 'zenci']) assert.equal(words.has(word), false, `${word} kabul edilmemeli`);
 });

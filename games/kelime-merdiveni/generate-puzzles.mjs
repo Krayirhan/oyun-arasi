@@ -1,12 +1,14 @@
 // Harfle'nin kabul sözlüğü ve yaygın cevaplarından 120 çözümlü bulmaca üretir.
 import { readFile, writeFile } from 'node:fs/promises';
 import { buildPuzzleSet, prepareDictionary, validatePuzzle } from './logic.js';
+import { isBlocked } from '../harfane/engellenen.mjs';
 
 const source = await readFile(new URL('../harfane/kelimeler.js', import.meta.url), 'utf8');
 const sections = [...source.matchAll(/window\.HARFANE_(ANSWERS|WORDS)\s*=\s*\[([\s\S]*?)\];/g)];
 const lists = Object.fromEntries(sections.map(([, name, body]) => [name, [...body.matchAll(/"([^"\r\n]+)"/g)].map(([, word]) => word)]));
 if (!lists.WORDS || !lists.ANSWERS) throw new Error('Harfle kelime listeleri okunamadı.');
-const dictionary = prepareDictionary(lists.WORDS);
+// Engellenen kelimeler (küfür, müstehcen, hakaret...) sözlükten zaten çıkarıldı; burada bir kez daha süzülür.
+const dictionary = prepareDictionary(lists.WORDS.filter(word => !isBlocked(word)));
 const puzzles = buildPuzzleSet(dictionary, 120, lists.ANSWERS);
 if (puzzles.length !== 120) throw new Error(`120 yerine ${puzzles.length} bulmaca üretildi.`);
 for (const puzzle of puzzles) if (!validatePuzzle(puzzle, dictionary).valid) throw new Error(`Geçersiz bulmaca: ${puzzle.id}`);

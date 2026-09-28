@@ -3,7 +3,7 @@
 let firebaseClient;
 
 export function loadFirebaseClient() {
-  firebaseClient ||= import('./firebase-client.js?v=mantik26');
+  firebaseClient ||= import('./firebase-client.js?v=mantik27');
   return firebaseClient;
 }
 

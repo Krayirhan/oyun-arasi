@@ -146,3 +146,8 @@ test('rekor birleştirme her seviyede en kısa süreyi tutar ve boş rekoru ezme
   assert.deepEqual(mergeRecords(null, undefined), { easy: null, medium: null, hard: null });
   assert.deepEqual(mergeRecords({ easy: 'x' }, { easy: 12 }), { easy: 12, medium: null, hard: null });
 });
+
+test('temalardaki hiçbir kelime engellenen listede değildir', async () => {
+  const { isBlocked } = await import('../harfane/engellenen.mjs');
+  for (const theme of THEMES) assert.deepEqual(theme.words.filter(word => isBlocked(word.toLocaleLowerCase('tr-TR'))), [], theme.name);
+});
