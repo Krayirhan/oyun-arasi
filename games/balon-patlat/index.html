@@ -7,16 +7,16 @@
     <meta name="description" content="Toplama işlemini çöz, doğru balonu dartla patlat. Balon Patlat'ı Oyun Arası'nda oyna." />
     <title>Balon Patlat | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../account.css?v=balon11" />
-    <link rel="stylesheet" href="../../site-header.css?v=balon11" />
-    <link rel="stylesheet" href="../../game-shell.css?v=balon11" />
-    <link rel="stylesheet" href="../../play-page.css?v=balon11" />
-    <link rel="stylesheet" href="styles.css?v=balon11" />
-    <script type="module" src="../../account.js?v=balon11"></script>
-    <script type="module" src="script.js?v=balon11"></script>
-    <script defer src="../../catalog.js?v=balon11"></script>
-    <script defer src="../../library.js?v=balon11"></script>
-    <script defer src="../../game-shell.js?v=balon11"></script>
+    <link rel="stylesheet" href="../../account.css?v=balon14" />
+    <link rel="stylesheet" href="../../site-header.css?v=balon14" />
+    <link rel="stylesheet" href="../../game-shell.css?v=balon14" />
+    <link rel="stylesheet" href="../../play-page.css?v=balon14" />
+    <link rel="stylesheet" href="styles.css?v=balon14" />
+    <script type="module" src="../../account.js?v=balon14"></script>
+    <script type="module" src="script.js?v=balon14"></script>
+    <script defer src="../../catalog.js?v=balon14"></script>
+    <script defer src="../../library.js?v=balon14"></script>
+    <script defer src="../../game-shell.js?v=balon14"></script>
   </head>
   <body class="game-page" data-game="balon-patlat">
     <header class="site-header">
@@ -33,15 +33,15 @@
       <nav class="crumbs" aria-label="Sayfa konumu"><a href="../../" aria-label="Ana sayfa">Ana sayfa</a><span aria-hidden="true">›</span><a href="../../#tum-oyunlar">Oyunlar</a><span aria-hidden="true">›</span><span aria-current="page">Balon Patlat</span></nav>
       <main class="play-layout">
         <section class="play-intro" aria-labelledby="game-title"><h1 id="game-title" class="title-art">Balon Patlat<svg class="title-brush" viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M6 22C70 10 170 6 294 9c-90 4-178 10-282 19z" /></svg></h1><p class="tagline">İşlemi çöz, dartı fırlat!</p></section>
-        <details class="how-card" id="how-card" open><summary><svg class="how-book" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1v13c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z M12 6.5v13" /></svg><span><strong>Nasıl oynanır?</strong><small>Hedefe eşit işlemi vur</small></span><svg class="how-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary><ol class="how-steps"><li>Üstte hedef sayıyı gör. Örneğin hedef 13 ise 8 + 5 balonunu bul.</li><li>Dartı at: fareyle nişan alıp tıkla, telefonda balona dokun. Dart havada yol alır; yükselen balonun biraz üstüne nişan al.</li><li>Doğru vuruşlar kombo ve puan kazandırır. Üç balon kaçarsa tur biter.</li></ol></details>
+        <details class="how-card" id="how-card" open><summary><svg class="how-book" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 5.5C5.5 4.5 8.5 4.5 12 6.5c3.5-2 6.5-2 9-1v13c-2.5-1-5.5-1-9 1-3.5-2-6.5-2-9-1z M12 6.5v13" /></svg><span><strong>Nasıl oynanır?</strong><small>Dalgadaki tek doğru balonu bul</small></span><svg class="how-chevron" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg></summary><ol class="how-steps"><li>Her dalgada bir hedef sayı çıkar. Yükselen balonlardan yalnız biri o sonucu verir; diğerleri hedefe yakın tuzaklardır.</li><li>Dartını fırlat: fareyle nişan alıp tıkla, telefonda balona dokun. Dart havada yol alır; balonun biraz üstüne nişan al.</li><li>Doğru balon +2 sn ve puan, yanlış balon −2 sn. Cevabı kaçırırsan can gider. İlerleyen dalgalarda çıkarma, çarpma ve bölme gelir.</li></ol></details>
         <section class="shortcuts" id="board-help" aria-label="Kontroller"><h2>Kontroller</h2><div class="shortcut-keys"><div class="key-note"><kbd>Fare</kbd><span>Nişan al</span></div><div class="key-note"><kbd>Tıkla</kbd><span>Dart at</span></div><div class="key-note"><kbd class="k-wide">Boşluk</kbd><span>Ateş et / duraklat</span></div><div class="key-note"><kbd>← → ↑ ↓</kbd><span>Nişanı ayarla</span></div></div><p class="save-state" id="save-state">Rekorların bu cihazda saklanır.</p></section>
         <section class="play-panel" aria-label="Balon Patlat oyunu">
           <div class="play-bar"><div class="scores" aria-label="Skor ve rekor"><div class="score-card"><span>SKOR</span><strong id="score">0</strong></div><div class="score-card"><span>EN İYİ</span><strong id="best-score">0</strong></div></div><div class="actions"><button class="play-button play-new" id="new-game" type="button">Yeni tur</button><button class="icon-toggle" id="pause-button" type="button" data-state="ready" aria-label="Başla" aria-keyshortcuts="P"><svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5.5v13l10.5-6.5z" /></svg><svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7.5 5h3v14h-3zM13.5 5h3v14h-3z" /></svg></button><button class="icon-toggle" id="sound-button" type="button" aria-pressed="false" aria-label="Sesi aç"><svg class="icon-sound-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="m16 9.5 5 5m0-5-5 5" /></svg><svg class="icon-sound-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" /><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" /></svg></button></div></div>
-          <div class="round-hud sr-only" aria-label="Tur bilgileri"><div class="target-card"><span>HEDEF TOPLAM</span><strong id="target-number">13</strong></div><div class="round-stat"><span>SÜRE</span><strong id="timer">60</strong></div><div class="round-stat"><span>KAÇAK</span><strong id="misses">0 / 3</strong></div></div>
+          <div class="round-hud sr-only" aria-label="Tur bilgileri"><div class="target-card"><span>HEDEF</span><strong id="target-number">13</strong></div><div class="round-stat"><span>SÜRE</span><strong id="timer">60</strong></div><div class="round-stat"><span>CAN</span><strong id="misses">0 / 3</strong></div></div>
           <div class="board-frame"><canvas class="dart-board" id="board" width="600" height="800" role="img" aria-label="Yükselen toplama işlemi balonlarını dartla vur" aria-describedby="board-help"></canvas><div class="game-overlay" id="game-overlay" aria-live="polite"><div class="overlay-card"><p class="overlay-kicker" id="overlay-kicker">BALON PATLAT</p><h2 id="overlay-title">Hazır mısın?</h2><p id="overlay-copy">Hedef 13. 8 + 5 balonunu bulup dartla vur. 60 saniyede rekorunu kır!</p><dl class="overlay-stats" id="overlay-stats" hidden></dl><div class="overlay-actions"><button class="play-button play-new" id="overlay-button" type="button">Başla</button></div></div></div></div>
           <div class="round-footer sr-only"><span id="combo">Kombo 0 · ×1</span><span id="correct-count">Doğru 0</span></div><p class="status" id="status" role="status" aria-live="polite">Başlamak için Başla'ya bas.</p>
         </section>
-        <aside class="goal-card" aria-labelledby="goal-title"><h2 id="goal-title">Hedef ne?</h2><p>Gösterilen hedef toplamını veren işlemi taşıyan balonu bul ve dartla patlat.</p><div class="goal-equation" aria-label="Toplama örneği"><b class="goal-light">8 + 5</b><i>=</i><b class="goal-result">13</b></div></aside>
+        <aside class="goal-card" aria-labelledby="goal-title"><h2 id="goal-title">Hedef ne?</h2><p>Her dalgada hedef sayıyı veren tek balonu bul ve dartla patlat. Süre ya da canlar bitmeden olabildiğince ileri dalgaya git!</p><div class="goal-equation" aria-label="Toplama örneği"><b class="goal-light">8 + 5</b><i>=</i><b class="goal-result">13</b></div></aside>
         <aside class="more-card" aria-labelledby="more-games-title"><a class="more-card-head" href="../../#tum-oyunlar"><h2 id="more-games-title">Başka oyun dene</h2><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12h15m-6-6 6 6-6 6" /></svg></a><div class="more-card-grid" data-more-games data-limit="3"></div></aside>
       </main>
       <footer class="footer"><a href="../../" aria-label="Oyun Arası ana sayfa"><span class="logo-word">OYUN<span>ARASI</span></span></a><span>Biraz oyna, iyi hisset.</span></footer>

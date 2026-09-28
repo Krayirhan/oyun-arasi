@@ -1,4 +1,4 @@
-import { db, EMPTY_GAME_STATS, listenToAuth, sendPasswordReset, signIn, signOutUser, signUp } from '../../firebase-client.js?v=balon11';
+import { db, EMPTY_GAME_STATS, listenToAuth, sendPasswordReset, signIn, signOutUser, signUp } from '../../firebase-client.js?v=balon14';
 import { doc, getDoc, runTransaction, serverTimestamp } from 'https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js';
 
 const bridge = {

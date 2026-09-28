@@ -1,5 +1,5 @@
-import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_ESCAPES, createGame, startGame, pauseGame, aimAt, fireDart, advance, stageFor } from './logic.js?v=balon11';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon11';
+import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf } from './logic.js?v=balon14';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon14';
 
 const KEY = 'oyunarasi-balon-patlat-v1';
 const SOUND_KEY = 'oyunarasi-balon-patlat-ses';
@@ -24,7 +24,7 @@ const COLORS = [
 ];
 
 let game = createGame();
-let records = { bestScore: 0, bestCorrect: 0, bestCombo: 0, bestAccuracy: 0, runs: 0 };
+let records = { bestScore: 0, bestCorrect: 0, bestCombo: 0, bestAccuracy: 0, bestWave: 0, runs: 0 };
 let soundOn = readSoundPreference();
 let view = { width: 1, height: 1, ratio: 1 };
 let lastFrame = performance.now();
@@ -35,7 +35,7 @@ let countdown = 0;
 
 function mergeRecords(a = {}, b = {}) {
   const max = key => Math.max(Number(a[key]) || 0, Number(b[key]) || 0);
-  return { bestScore: max('bestScore'), bestCorrect: max('bestCorrect'), bestCombo: max('bestCombo'), bestAccuracy: max('bestAccuracy'), runs: max('runs') };
+  return { bestScore: max('bestScore'), bestCorrect: max('bestCorrect'), bestCombo: max('bestCombo'), bestAccuracy: max('bestAccuracy'), bestWave: max('bestWave'), runs: max('runs') };
 }
 
 function loadRecords() {
@@ -235,6 +235,8 @@ function drawBalloon(balloon, now) {
   const color = COLORS[balloon.color % COLORS.length];
   const near = (balloon.depth || 1);
   ctx.save();
+  // Biten dalganın balonları soluk; artık puan ya da ceza getirmezler.
+  if (balloon.wave !== game.wave || game.answered) ctx.globalAlpha = .42;
   ctx.strokeStyle = 'rgb(70 80 110 / .55)';
   ctx.lineWidth = 2 * near;
   ctx.beginPath();
@@ -259,7 +261,7 @@ function drawBalloon(balloon, now) {
   ctx.beginPath(); ctx.ellipse(x - r * .42, y - r * .5, r * .16, r * .3, .5, 0, Math.PI * 2); ctx.fill();
   ctx.fillStyle = 'rgb(255 255 255 / .35)';
   ctx.beginPath(); ctx.arc(x - r * .18, y - r * .78, r * .07, 0, Math.PI * 2); ctx.fill();
-  const label = `${balloon.a} + ${balloon.b}`;
+  const label = labelOf(balloon);
   const size = (label.length >= 7 ? 27 : 32) * r / 50;
   ctx.font = `700 ${size}px Fredoka, sans-serif`;
   ctx.textAlign = 'center';
@@ -393,19 +395,19 @@ function drawHud(now, dt) {
   ctx.lineWidth = 5;
   ctx.stroke();
   ctx.fillStyle = '#ff4f7b';
-  ctx.beginPath(); ctx.roundRect(-52, -60, 104, 26, 13); ctx.fill();
+  ctx.beginPath(); ctx.roundRect(-70, -60, 140, 26, 13); ctx.fill();
   ctx.fillStyle = '#fff';
-  ctx.font = '700 15px Fredoka, sans-serif';
+  ctx.font = '700 14px Fredoka, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('HEDEF', 0, -46);
+  ctx.fillText(`DALGA ${game.wave} · HEDEF`, 0, -46);
   ctx.fillStyle = '#23305a';
   ctx.font = '700 56px Fredoka, sans-serif';
   ctx.fillText(String(game.target), 0, 10);
   ctx.restore();
 
   // Süre halkası
-  const left = Math.max(0, ROUND_SECONDS - game.elapsed);
+  const left = Math.max(0, game.timeLeft);
   const urgent = left <= 10 && game.status === 'playing';
   ctx.save();
   ctx.fillStyle = 'rgb(255 255 255 / .92)';
@@ -415,7 +417,7 @@ function drawHud(now, dt) {
   ctx.beginPath(); ctx.arc(62, 64, 30, 0, Math.PI * 2); ctx.stroke();
   ctx.strokeStyle = urgent ? '#ff4f5e' : '#2f8cff';
   ctx.lineCap = 'round';
-  ctx.beginPath(); ctx.arc(62, 64, 30, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * left / ROUND_SECONDS); ctx.stroke();
+  ctx.beginPath(); ctx.arc(62, 64, 30, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * Math.min(1, left / ROUND_SECONDS)); ctx.stroke();
   const beat = urgent ? 1 + Math.max(0, Math.sin(now / 160)) * .08 : 1;
   ctx.translate(62, 64); ctx.scale(beat, beat);
   ctx.fillStyle = urgent ? '#e0303f' : '#23305a';
@@ -426,8 +428,8 @@ function drawHud(now, dt) {
   ctx.restore();
 
   // Canlar: kaçan her balon bir can götürür
-  for (let i = 0; i < MAX_ESCAPES; i += 1) {
-    const lost = i >= MAX_ESCAPES - game.escapes;
+  for (let i = 0; i < MAX_LIVES; i += 1) {
+    const lost = i >= game.lives;
     const hx = WIDTH - 112 + i * 40;
     ctx.save();
     ctx.globalAlpha = lost ? .35 : 1;
@@ -482,7 +484,8 @@ let escapeFlash = 0;
 let shake = 0;
 let banner = null;
 
-function burst(event, correct) {
+function burst(event, outcome) {
+  const correct = outcome === 'correct';
   const color = COLORS[event.color % COLORS.length];
   const { x, y } = event;
   const r = event.radius || 50;
@@ -497,11 +500,14 @@ function burst(event, correct) {
     effects.push({ type: 'rubber', x: x + (i - 1) * r * .3, y: y + r * .2, vx: (i - 1) * 90 + Math.random() * 40 - 20, vy: -60 - Math.random() * 60, rot: Math.random() * 6, spin: Math.random() * 6 - 3, size: r * (.32 + Math.random() * .12), color: color.main, edge: color.edge, life: 1.1, age: 0 });
   }
   effects.push({ type: 'string', x, y: y + r * 1.14, vy: 40, life: 1, age: 0, length: 66 * (r / 50) });
-  const multiplier = Math.min(5, 1 + Math.floor(game.combo / 3));
-  effects.push(correct
-    ? { type: 'text', x, y: y - 20, text: `+${100 * multiplier}`, color: '#1f9d55', life: 1, age: 0 }
-    : { type: 'text', x, y: y - 20, text: `✗ ${event.a}+${event.b}=${event.result}`, color: '#e0303f', life: 1.2, age: 0 });
-  shake = Math.max(shake, correct ? 7 : 4);
+  if (outcome === 'correct') {
+    effects.push({ type: 'text', x, y: y - 20, text: `+${event.points}`, color: '#1f9d55', life: 1, age: 0 });
+    effects.push({ type: 'text', x: 62, y: 118, text: `+${CORRECT_BONUS_SECONDS} sn`, color: '#1f9d55', life: .9, age: 0, small: true });
+  } else if (outcome === 'wrong') {
+    effects.push({ type: 'text', x, y: y - 20, text: `✗ ${labelOf(event)} = ${event.result}`, color: '#e0303f', life: 1.3, age: 0 });
+    effects.push({ type: 'text', x: 62, y: 118, text: `−${WRONG_PENALTY_SECONDS} sn`, color: '#e0303f', life: .9, age: 0, small: true });
+  }
+  shake = Math.max(shake, correct ? 7 : outcome === 'wrong' ? 4 : 2);
 }
 
 function updateEffects(dt) {
@@ -562,7 +568,7 @@ function drawEffects() {
     } else if (effect.type === 'away') {
       rearDart(effect.x, effect.y, -Math.PI / 2, FAR_SCALE * (1 - k * .8));
     } else {
-      ctx.font = '700 34px Fredoka, sans-serif';
+      ctx.font = `700 ${effect.small ? 22 : 34}px Fredoka, sans-serif`;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.lineJoin = 'round';
@@ -627,23 +633,28 @@ function drawCountdown() {
   ctx.restore();
 }
 
-// Mantığın bu karede ürettiği olaylar: patlayan balon, ıskalanan dart, kaçan balon, seviye atlama.
-function handleEvents(previous, current) {
+const NEW_OPERATION = { 4: 'Çıkarma geldi: −', 7: 'Çarpma geldi: ×', 10: 'Bölme geldi: ÷' };
+
+// Mantığın bu karede ürettiği olaylar: patlayan balon, ıskalanan dart, kaçan cevap, yeni dalga.
+function handleEvents(current) {
   for (const event of current.events || []) {
     if (event.type === 'pop') {
-      burst(event, event.correct);
+      burst(event, event.outcome);
       effects.push({ type: 'away', x: event.x, y: event.y, life: .35, age: 0 });
       sfx('pop');
-      sfx(event.correct ? 'correct' : 'wrong');
+      if (event.outcome === 'correct') { sfx('correct'); status.textContent = `Doğru! ${labelOf(event)} = ${event.result}. Yeni dalga geliyor.`; }
+      else if (event.outcome === 'wrong') { sfx('wrong'); status.textContent = `${labelOf(event)} = ${event.result}; hedef ${current.target}. −${WRONG_PENALTY_SECONDS} sn.`; }
     } else if (event.type === 'miss') {
       effects.push({ type: 'away', x: event.x, y: event.y, life: .45, age: 0 });
       effects.push({ type: 'text', x: event.x, y: event.y - 24, text: 'Iska!', color: '#5b6785', life: .8, age: 0 });
+    } else if (event.type === 'escape') {
+      escapeFlash = .6;
+      sfx('escape');
+      effects.push({ type: 'text', x: WIDTH / 2, y: 190, text: `Kaçtı! ${labelOf(event)} = ${event.result}`, color: '#e0303f', life: 1.6, age: 0 });
+      status.textContent = `Cevap balonu kaçtı (${labelOf(event)}). Bir can gitti.`;
+    } else if (event.type === 'wave' && event.wave > 1) {
+      banner = { title: `Dalga ${event.wave}`, copy: NEW_OPERATION[event.wave] || `Hedef ${event.target}`, life: 1.3, age: 0 };
     }
-  }
-  if (current.escapes > previous.escapes) { escapeFlash = .55; sfx('escape'); }
-  const stage = stageFor(current.correctHits);
-  if (stage > stageFor(previous.correctHits)) {
-    banner = { title: `Seviye ${stage}!`, copy: stage === 2 ? 'Sayılar 20’ye kadar büyüyor' : 'Sayılar 50’ye kadar, balonlar hızlı!', life: 1.8, age: 0 };
   }
 }
 
@@ -669,19 +680,19 @@ function updateHud() {
   $('#target-number').textContent = String(game.target);
   $('#score').textContent = game.score.toLocaleString('tr-TR');
   $('#best-score').textContent = Math.max(records.bestScore, game.score).toLocaleString('tr-TR');
-  $('#misses').textContent = `${game.escapes} / ${MAX_ESCAPES}`;
+  $('#misses').textContent = `${game.lives} / ${MAX_LIVES}`;
   $('#combo').textContent = `Kombo ${game.combo} · ×${Math.min(5, 1 + Math.floor(game.combo / 3))}`;
   $('#correct-count').textContent = `Doğru ${game.correctHits}`;
-  $('#timer').textContent = String(Math.max(0, Math.ceil(ROUND_SECONDS - game.elapsed)));
+  $('#timer').textContent = String(Math.max(0, Math.ceil(game.timeLeft)));
 }
 
 function overlayCopy() {
   if (countdown > 0) return null;
-  if (game.status === 'ready') return ['BALON PATLAT', 'Dartını hazırla!', 'Hedef sayıyı veren balonu bul ve dartını fırlat. Balonlar yükselir; biraz üstüne nişan al.', 'Başla'];
+  if (game.status === 'ready') return ['BALON PATLAT', 'Dartını hazırla!', 'Her dalgada bir hedef sayı çıkar ve balonlardan yalnız biri o sonucu verir. Onu bul, dartını fırlat! Doğru +2 sn, yanlış −2 sn; cevabı kaçırırsan can gider.', 'Başla'];
   if (game.status === 'paused') return ['MOLA', 'Oyun duraklatıldı', 'Kaldığın yerden devam edebilirsin.', 'Devam et'];
   if (game.status === 'over') {
     const record = game.score >= records.bestScore && game.score > 0;
-    return [game.endReason === 'escapes' ? 'BALONLAR KAÇTI' : 'SÜRE BİTTİ', record ? 'Yeni rekor! 🎉' : 'Güzel atıştı!', '', 'Tekrar oyna'];
+    return [game.endReason === 'lives' ? 'CANLAR BİTTİ' : 'SÜRE BİTTİ', record ? 'Yeni rekor! 🎉' : 'Güzel atıştı!', '', 'Tekrar oyna'];
   }
   return null;
 }
@@ -702,7 +713,7 @@ function renderOverlay() {
   stats.hidden = game.status !== 'over';
   if (game.status === 'over') {
     const accuracy = game.dartsFired ? Math.round(game.correctHits * 100 / game.dartsFired) : 0;
-    const items = [['Puan', game.score.toLocaleString('tr-TR')], ['Doğru', game.correctHits], ['En uzun kombo', game.bestCombo], ['İsabet', `%${accuracy}`]];
+    const items = [['Puan', game.score.toLocaleString('tr-TR')], ['Ulaştığın dalga', game.wave], ['Doğru', game.correctHits], ['En uzun kombo', game.bestCombo], ['İsabet', `%${accuracy}`], ['Yanlış', game.wrongHits]];
     stats.replaceChildren(...items.map(([label, value]) => {
       const item = document.createElement('div');
       item.append(Object.assign(document.createElement('dt'), { textContent: label }), Object.assign(document.createElement('dd'), { textContent: String(value) }));
@@ -722,11 +733,12 @@ function finishRun() {
     bestCorrect: Math.max(records.bestCorrect, game.correctHits),
     bestCombo: Math.max(records.bestCombo, game.bestCombo),
     bestAccuracy: Math.max(records.bestAccuracy, accuracy),
+    bestWave: Math.max(records.bestWave || 0, game.wave),
     runs: records.runs + 1
   };
   if (game.score > previousBest) $('#overlay-title').textContent = 'Yeni rekor! 🎉';
   saveRecords();
-  status.textContent = `${game.endReason === 'escapes' ? 'Üç balon kaçtı' : '60 saniye doldu'} · ${game.correctHits} doğru · ${game.score} puan.`;
+  status.textContent = `${game.endReason === 'lives' ? 'Canlar bitti' : 'Süre doldu'} · ${game.wave}. dalga · ${game.correctHits} doğru · ${game.score} puan.`;
   sfx('over');
   updateHud();
 }
@@ -795,15 +807,15 @@ function throwAtAim() {
 }
 
 function frameLoop(now) {
-  const dt = Math.max(0, Math.min(.05, (now - lastFrame) / 1000));
+  // Yavaş cihazda oyun ağır çekime düşmesin: kare başına en çok 0,1 sn (mantık bunu küçük dilimlerle işler);
+  // geri sayım gerçek zamanla akar.
+  const raw = Math.max(0, (now - lastFrame) / 1000);
+  const dt = Math.min(.1, raw);
   lastFrame = now;
-  tickCountdown(dt);
+  tickCountdown(Math.min(.5, raw));
   if (game.status === 'playing') {
-    const previous = game;
     game = advance(game, dt);
-    handleEvents(previous, game);
-    if (game.correctHits > previous.correctHits) status.textContent = `Doğru! Yeni hedef ${game.target}.`;
-    else if (game.wrongHits > previous.wrongHits) status.textContent = 'Bu işlem hedefe eşit değil. Hedef aynı kaldı; tekrar dene.';
+    handleEvents(game);
     updateHud();
     if (game.status === 'over') finishRun();
   }
@@ -867,7 +879,7 @@ const cloudSync = syncGameOnAccountChange('balon-patlat', {
   write: incoming => { records = mergeRecords(records, incoming.records); updateHud(); },
   isValid: incoming => Boolean(incoming?.records && typeof incoming.records === 'object'),
   merge: (local, remote) => ({ records: mergeRecords(local.records, remote.records) }),
-  getStats: current => ({ bestScore: current.records.bestScore, bestCorrect: current.records.bestCorrect, bestCombo: current.records.bestCombo, bestAccuracy: current.records.bestAccuracy }),
+  getStats: current => ({ bestScore: current.records.bestScore, bestCorrect: current.records.bestCorrect, bestCombo: current.records.bestCombo, bestAccuracy: current.records.bestAccuracy, bestWave: current.records.bestWave || 0 }),
   onStatus: message => { saveState.textContent = message; }
 });
 
