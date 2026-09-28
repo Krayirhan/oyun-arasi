@@ -1,9 +1,6 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import {
-  CORRECT_BONUS_SECONDS, ESCAPE_GRACE, FLIGHT_TIME, MAX_LIVES, SAFE_Y, ROUND_SECONDS, WRONG_PENALTY_SECONDS,
-  advance, aimAt, createGame, evaluate, fireDart, isValidGame, levelFor, levelOf, makeEquation, pauseGame, startGame
-} from './logic.js';
+import { CORRECT_BONUS_SECONDS, ESCAPE_GRACE, FLIGHT_TIME, MAX_LIVES, SAFE_Y, ROUND_SECONDS, WRONG_PENALTY_SECONDS, advance, aimAt, createGame, evaluate, fireDart, isValidGame, levelFor, levelOf, makeEquation, pauseGame, startGame, LAUNCH_Y, WIDTH, HEIGHT } from './logic.js';
 
 function run(game, seconds) {
   let current = game;
@@ -193,4 +190,36 @@ test('hedef yeni değiştiyse hemen kaçan cevap can götürmez; başka cevap ek
   const covered = advance({ ...game, targetSetAt: -10, balloons: [{ ...answer, y: -200 }, twin] }, .05);
   assert.equal(covered.lives, MAX_LIVES);
   assert.equal(covered.target, game.target);
+});
+
+test('adalet: hedefi veren balonu hep vuran oyuncu 90 saniyede hiç can kaybetmez (kaçış yok, yanlış vuruş yok denecek kadar az)', () => {
+  for (let seed = 1; seed <= 6; seed += 1) {
+    let game = startGame(createGame(seed * 1009));
+    let time = 0;
+    while (game.status === 'playing' && time < 90) {
+      const answers = game.balloons.filter(balloon => balloon.result === game.target && balloon.y > 60 && balloon.y < LAUNCH_Y - 60).sort((a, b) => a.y - b.y);
+      if (answers.length && !game.darts.length && game.shotCooldown <= 0) game = fireDart(aimAt(game, answers[0].x, answers[0].y));
+      game = advance(game, 1 / 60);
+      time += 1 / 60;
+    }
+    assert.equal(game.lives, MAX_LIVES, `seed ${seed}: can kaybı olmamalı`);
+    assert.equal(game.escapes, 0, `seed ${seed}: hedef balonu kaçmamalı`);
+    assert.ok(game.correctHits >= 40, `seed ${seed}: 90 sn'de yeterince isabet (${game.correctHits})`);
+  }
+});
+
+test('rastgele oynayan oyuncuda değerler sonlu, balon ve can sayıları sınırlı, kayıt geçerli kalır', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  for (let seed = 1; seed <= 10; seed += 1) {
+    const random = seeded(seed * 53);
+    let game = startGame(createGame(seed * 911));
+    for (let step = 0; step < 4000 && game.status === 'playing'; step += 1) {
+      if (random() < 0.1) game = aimAt(game, random() * WIDTH, random() * HEIGHT);
+      if (random() < 0.2) game = fireDart(game);
+      game = advance(game, 1 / 60);
+      assert.ok([game.timeLeft, game.score, game.elapsed].every(Number.isFinite), `seed ${seed} adım ${step}: sonlu`);
+      assert.ok(game.balloons.length <= 12 && game.lives >= 0 && game.lives <= MAX_LIVES);
+    }
+    assert.equal(isValidGame(game), true, `seed ${seed}: son durum geçerli`);
+  }
 });

@@ -1,6 +1,6 @@
 // Zıpkın: Volkana Yolculuk — tile tabanlı, sabit adımlı platform fiziği. Çizim ve ses yok; olaylar `run.events` kuyruğuna yazılır.
 // Performans için `tick` durumu yerinde değiştirir; testler bu dosyayı doğrudan Node'da çalıştırır.
-import { LEVELS, TILE, T } from './levels.js?v=mantik25';
+import { LEVELS, TILE, T } from './levels.js?v=mantik26';
 
 export const LEVEL_COUNT = LEVELS.length;
 export const PLAYER_W = 20;
@@ -284,8 +284,8 @@ export function tick(run, input, dt = STEP) {
   // Dash
   if (run.dashBuffer > 0 && run.dashes > 0 && run.dashTime <= 0) {
     let dx = dir; let dy = vertical;
-    if (!dx && !dy) dx = run.facing;
-    if (run.grounded && dy > 0) dy = 0;
+    if (run.grounded && dy > 0) dy = 0; // yerdeyken aşağı dash yok
+    if (!dx && !dy) dx = run.facing; // yön kalmadıysa baktığın yöne (yer düzeltmesinden SONRA: yoksa uzunluk 0 olup hız NaN olurdu)
     const len = Math.hypot(dx, dy);
     run.dashDx = dx / len; run.dashDy = dy / len;
     run.dashes -= 1; run.dashTime = FEEL.dashTime; run.dashBuffer = 0; run.jumpBuffer = 0; run.canCut = false; run.freeze = FEEL.dashFreeze;

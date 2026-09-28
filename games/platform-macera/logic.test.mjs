@@ -158,3 +158,36 @@ describe('Zıpkın kampanyası', () => {
     assert.equal(mergeCampaigns({ furthestLevel: 9, completed: [1], stars: {}, bestScores: {} }, null).furthestLevel, 1);
   });
 });
+
+describe('Zıpkın sağlamlık', () => {
+  test('yerdeyken aşağı + dash (yatay girdi yokken) hızı bozmaz: baktığın yöne dash atılır', () => {
+    const idle = { left: false, right: false, up: false, down: false, jump: false };
+    const run = createRun(1);
+    for (let i = 0; i < 200; i += 1) tick(run, idle);
+    assert.equal(run.grounded, true);
+    run.facing = -1;
+    tick(run, { ...idle, down: true, dashPressed: true });
+    assert.ok(Number.isFinite(run.vx) && Number.isFinite(run.vy), 'hız sonlu olmalı');
+    assert.ok(run.vx < 0 && run.vy === 0, 'yerde aşağı dash yok; baktığın yöne yatay dash');
+    for (let i = 0; i < 30; i += 1) tick(run, idle);
+    assert.ok(Number.isFinite(run.x) && Number.isFinite(run.y));
+  });
+
+  test('rastgele girdiyle her bölümde konum ve hızlar sonlu kalır, dünyadan kaçılmaz, istisna atılmaz', () => {
+    const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+    for (const level of LEVELS) {
+      for (let seed = 1; seed <= 2; seed += 1) {
+        const random = seeded(seed * 131 + level.number);
+        const run = createRun(level.number);
+        let input = {};
+        for (let step = 0; step < 3000 && run.status !== 'won'; step += 1) {
+          if (step % 20 === 0) input = { left: random() < 0.3, right: random() < 0.5, up: random() < 0.1, down: random() < 0.1, jump: random() < 0.5 };
+          tick(run, { ...input, jumpPressed: random() < 0.04, dashPressed: random() < 0.01 });
+          assert.ok([run.x, run.y, run.vx, run.vy, run.time].every(Number.isFinite), `bölüm ${level.number} seed ${seed} adım ${step}: sonlu değerler`);
+          assert.ok(run.x > -TILE * 2 && run.x < level.cols * TILE + TILE * 2, `bölüm ${level.number}: yatayda dünyadan çıkmaz`);
+        }
+      }
+    }
+  });
+});
+

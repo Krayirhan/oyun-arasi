@@ -184,3 +184,42 @@ test('pause stops time and saves stay valid', () => {
   assert.ok(!isValidGame({ ...restored, piece: { ...restored.piece, x: -5 } }));
   assert.ok(!isValidGame(null));
 });
+
+test('yerleştirme botuyla 12 oyunda: hücre sayısı 4×parça − 10×satır, seviye satırdan türer, durum geçerli kalır, satırlar silinir', () => {
+  const plan = game => {
+    let best = null;
+    for (let rot = 0; rot < 4; rot += 1) for (let x = -3; x < COLS; x += 1) {
+      const piece = { ...game.piece, rot, x };
+      if (!fits(game.board, piece)) continue;
+      const landed = { ...piece };
+      while (fits(game.board, { ...landed, y: landed.y + 1 })) landed.y += 1;
+      const board = [...game.board];
+      pieceCells(landed).forEach(({ x: cx, y: cy }) => { board[cy * COLS + cx] = 'X'; });
+      let holes = 0;
+      for (let col = 0; col < COLS; col += 1) { let seen = false; for (let row = 0; row < ROWS; row += 1) { if (board[row * COLS + col]) seen = true; else if (seen) holes += 1; } }
+      const full = [...Array(ROWS).keys()].filter(row => board.slice(row * COLS, row * COLS + COLS).every(Boolean)).length;
+      const value = full * 50 - holes * 8 + landed.y;
+      if (!best || value > best.value) best = { value, rot, x };
+    }
+    return best;
+  };
+  let lines = 0;
+  for (let seed = 1; seed <= 12; seed += 1) {
+    let game = startGame(createGame(seed * 7919));
+    for (let n = 0; n < 200 && game.status === 'playing'; n += 1) {
+      const target = plan(game);
+      if (!target) break;
+      for (let i = 0; i < target.rot; i += 1) game = rotate(game, 1);
+      for (let guard = 0; guard < 12 && game.piece.x !== target.x; guard += 1) game = move(game, target.x > game.piece.x ? 1 : -1);
+      if (n % 9 === 4) game = holdPiece(game);
+      const before = game.pieces;
+      game = hardDrop(game);
+      assert.equal(game.pieces, before + 1, `seed ${seed}: sert düşürme parçayı kilitler`);
+      assert.equal(game.board.filter(Boolean).length, 4 * game.pieces - 10 * game.lines, `seed ${seed}: hücre sayısı`);
+      assert.equal(game.level, Math.min(game.startLevel + Math.floor(game.lines / 10), 20));
+      if (game.status === 'playing') assert.equal(isValidGame(game), true, `seed ${seed}: durum geçerli`);
+    }
+    lines += game.lines;
+  }
+  assert.ok(lines >= 50, `bot satır siler (${lines})`);
+});

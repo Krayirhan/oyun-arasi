@@ -100,3 +100,35 @@ test('pause stops the world', () => {
   assert.equal(advance(paused, 1), paused);
   assert.equal(startGame(paused).status, 'playing');
 });
+
+test('adalet: ileriye 2,6 sn bakıp tam tarayan bir oyuncu, dalgalar hangi tohumla üretilirse üretilsin çarpmadan ilerleyebilir', () => {
+  const STEP = 0.1;
+  const HORIZON = 26;
+  const escape = start => {
+    const failed = new Set();
+    const search = (game, depth) => {
+      if (game.status !== 'playing') return null;
+      if (depth === HORIZON) return [];
+      const key = `${depth}:${game.lane}:${Math.round(game.x * 4)}`;
+      if (failed.has(key)) return null;
+      for (const lane of [game.lane, game.lane - 1, game.lane + 1].filter(value => value >= 0 && value < LANES)) {
+        const moved = advance(lane === game.lane ? game : steer(game, lane - game.lane), STEP);
+        if (moved.status !== 'playing') continue;
+        const rest = search(moved, depth + 1);
+        if (rest) return [lane, ...rest];
+      }
+      failed.add(key);
+      return null;
+    };
+    return search(start, 0);
+  };
+  for (let seed = 1; seed <= 4; seed += 1) {
+    let game = startGame(createGame(seed * 7919));
+    while (game.status === 'playing' && game.distance < 3500) {
+      const plan = escape(game);
+      assert.ok(plan, `seed ${seed}: ${Math.round(game.distance)} m'de kaçış yolu yok (haksız dalga)`);
+      game = advance(steer(game, plan[0] - game.lane), STEP);
+    }
+    assert.equal(game.status, 'playing');
+  }
+});
