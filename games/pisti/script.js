@@ -1,7 +1,7 @@
-import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=mantik6';
-import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=mantik6';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik6';
-import { createFlow, botDelay } from '../../game-flow.js?v=mantik6';
+import { SUITS, RANKS, suitOf, rankOf, isRed, cardName } from '../cards.js?v=mantik7';
+import { createGame, playCard, botTurn, startNextDeal, isValidGame } from './logic.js?v=mantik7';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik7';
+import { createFlow, botDelay } from '../../game-flow.js?v=mantik7';
 
 const KEY = 'oyunarasi-pisti-v1';
 const $ = selector => document.querySelector(selector);
@@ -76,7 +76,7 @@ function makeCard(card, { hidden = false, selectable = false, onClick = null } =
 function updateRecord(before, after) {
   if (after.lastAction?.type === 'play' && after.lastAction.player === 0 && after.lastAction.pisti) saved.records.pistiCount += 1;
   if (after.status === 'match-over' && before.status !== 'match-over' && after.scores[0] > after.scores[1]) saved.records.matchWins += 1;
-  saved.records.bestScore = Math.max(saved.records.bestScore, ...after.scores);
+  saved.records.bestScore = Math.max(saved.records.bestScore, after.scores[0]);
 }
 
 function updateContinueCard() {
@@ -134,7 +134,8 @@ function showResult() {
   const winner = game.scores[0] > game.scores[1] ? 0 : 1;
   $('#result-kicker').textContent = matchOver ? 'MAÇ BİTTİ' : 'EL BİTTİ';
   $('#result-title').textContent = matchOver ? (winner === 0 ? 'Maçı kazandın!' : 'Bot maçı kazandı.') : 'Yeni el hazır!';
-  $('#result-copy').textContent = `Skor ${game.scores[0]} – ${game.scores[1]}. ${matchOver ? '101 puana ulaşan maçı aldı.' : 'Sıradaki elde başlangıç oyuncusu değişecek.'}`;
+  const tied = !matchOver && game.scores[0] === game.scores[1] && game.scores[0] >= game.target;
+  $('#result-copy').textContent = `Skor ${game.scores[0]} – ${game.scores[1]}. ${matchOver ? '101 puana ulaşan maçı aldı.' : tied ? 'Skorlar eşit; kazananı belirlemek için bir el daha oynanır.' : 'Sıradaki elde başlangıç oyuncusu değişecek.'}`;
   $('#next-button').hidden = matchOver;
   flow.show('result');
 }

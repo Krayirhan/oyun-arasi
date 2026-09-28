@@ -1,7 +1,7 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik6';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik6';
-import { confirmDialog } from '../../game-dialog.js?v=mantik6';
-import { createStage } from '../../game-stage.js?v=mantik6';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik7';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik7';
+import { confirmDialog } from '../../game-dialog.js?v=mantik7';
+import { createStage } from '../../game-stage.js?v=mantik7';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');

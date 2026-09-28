@@ -1,5 +1,5 @@
 // Pişti rules, scoring and bot decisions. Cards use stable 0–51 ids from games/cards.js.
-import { shuffleDeck, rankOf } from '../cards.js?v=mantik6';
+import { shuffleDeck, rankOf } from '../cards.js?v=mantik7';
 
 export const TARGET_SCORE = 101;
 
@@ -57,8 +57,11 @@ function finishDeal(state) {
     next.scores[cardCounts[0] > cardCounts[1] ? 0 : 1] += 3;
   }
   next.rounds += 1;
-  next.status = next.scores.some(score => score >= next.target) ? 'match-over' : 'deal-over';
-  next.lastAction = { type: 'deal-over' };
+  // Hedefe ulaşan kazanır; ikisi de aşıp puanları eşitse bir el daha oynanır.
+  const reached = next.scores.some(score => score >= next.target);
+  next.status = reached && next.scores[0] !== next.scores[1] ? 'match-over' : 'deal-over';
+  // Elin son hamlesi (Pişti dahil) silinmez: sayaç ve mesaj onu okur.
+  next.lastAction = { ...(next.lastAction || { type: 'play' }), dealOver: true };
   return next;
 }
 

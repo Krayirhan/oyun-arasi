@@ -100,3 +100,39 @@ test('101 puana ulaşılması dağıtım sonunda maçı bitirir', () => {
   assert.equal(next.status, 'match-over');
   assert.ok(next.scores[0] >= 101);
 });
+
+test("iki taraf da 101'i aşıp eşitse maç bitmez, bir el daha oynanır; fark varsa yüksek olan kazanır", () => {
+  // Son kart K♠ (0 puan). Puan kartları ve 16 sıfır puanlı kart rakipte; oyuncuda 25 sıfır puanlı kart.
+  const pointCards = createDeck().filter(card => cardPoints(card) > 0);
+  const zeroCards = createDeck().filter(card => cardPoints(card) === 0 && card !== 12);
+  const setup = scores => ({ ...createGame(seeded(4)), deck: [], hands: [[12], []], table: [], hiddenCount: 0, lastCapture: 0,
+    captured: [zeroCards.slice(16), [...pointCards, ...zeroCards.slice(0, 16)]], scores });
+  const tied = playCard(setup([101, 88]), 0, 12);
+  assert.deepEqual(tied.captured.map(cards => cards.length), [26, 26], 'kart sayısı eşit: çoğunluk bonusu yok');
+  assert.deepEqual(tied.scores, [101, 101]);
+  assert.equal(tied.status, 'deal-over', 'eşit skorda maç sürer');
+  assert.equal(startNextDeal(tied, seeded(3)).status, 'playing');
+  const leading = playCard(setup([120, 88]), 0, 12);
+  assert.deepEqual(leading.scores, [120, 101]);
+  assert.equal(leading.status, 'match-over');
+});
+
+test('el puanı korunumu: kart puanları 13 + en çok kart 3 + Pişti bonusları, 300 rastgele elde', () => {
+  for (let seed = 1; seed <= 300; seed += 1) {
+    const random = seeded(seed * 31 + 7);
+    let game = createGame(random, seed % 2);
+    let bonus = 0;
+    let guard = 0;
+    while (game.status === 'playing' && guard++ < 400) {
+      const hand = game.hands[game.turn];
+      const card = game.turn === 1 ? null : hand[Math.floor(random() * hand.length)];
+      game = game.turn === 1 ? botTurn(game, random) : playCard(game, 0, card);
+      if (game.lastAction?.type === 'play') bonus += game.lastAction.points;
+    }
+    assert.equal(game.status, 'deal-over', `seed ${seed}`);
+    const counts = game.captured.map(cards => cards.length);
+    const majority = counts[0] !== counts[1] ? 3 : 0;
+    assert.equal(game.scores[0] + game.scores[1], 13 + majority + bonus, `seed ${seed}`);
+    assert.equal(game.captured.flat().length, 52, `seed ${seed}: bütün kartlar toplandı ya da son alana verildi`);
+  }
+});
