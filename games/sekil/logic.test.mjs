@@ -100,3 +100,33 @@ test('isValidGame rejects broken saves', () => {
   assert.ok(!isValidGame({ ...game, score: 10, best: 5 }));
   assert.ok(!isValidGame(null));
 });
+
+test('rastgele oynanan 40 oyunda puan yerleştirme kazancının toplamıdır, oyun yalnız hiçbir parça sığmayınca biter', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  let finished = 0;
+  for (let seed = 1; seed <= 40; seed += 1) {
+    const random = seeded(seed * 89);
+    let game = createGame(random);
+    let expected = 0;
+    for (let step = 0; step < 400 && game.status === 'playing'; step += 1) {
+      const moves = [];
+      game.tray.forEach((piece, index) => {
+        if (!piece) return;
+        for (let row = 0; row < SIZE; row += 1) for (let col = 0; col < SIZE; col += 1) if (canPlace(game.board, piece, row, col)) moves.push([index, row, col]);
+      });
+      assert.ok(moves.length > 0, `seed ${seed}: oyun sürüyorsa en az bir hamle vardır`);
+      const [index, row, col] = moves[Math.floor(random() * moves.length)];
+      const result = placePiece(game, index, row, col, random);
+      assert.ok(result, `seed ${seed}: geçerli hamle kabul edilir`);
+      expected += result.gained;
+      game = result.game;
+      assert.equal(game.score, expected, `seed ${seed}: puan = kazançların toplamı`);
+      assert.equal(isValidGame(game), true, `seed ${seed}: durum geçerli`);
+      assert.equal(game.board.filter(Boolean).length <= SIZE * SIZE, true);
+      const anyFits = game.tray.some(piece => piece && fitsAnywhere(game.board, piece));
+      assert.equal(game.status === 'over', !anyFits, `seed ${seed}: bitiş yalnız hiçbir parça sığmayınca`);
+    }
+    if (game.status === 'over') finished += 1;
+  }
+  assert.ok(finished >= 30, `rastgele oyunların çoğu biter (${finished}/40)`);
+});

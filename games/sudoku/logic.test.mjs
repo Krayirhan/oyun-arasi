@@ -109,3 +109,24 @@ test('isValidGame accepts saved games and rejects broken ones', () => {
   assert.ok(!isValidGame({ ...game, board: tampered }), 'givens cannot be overwritten');
   assert.ok(!isValidGame(null));
 });
+
+test('rastgele işlemlerde (yaz, not, sil, ipucu) geri alma tahta ve notları birebir geri getirir, oyun geçerli kalır', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  const key = state => JSON.stringify([state.board, state.notes]);
+  for (let seed = 1; seed <= 12; seed += 1) {
+    const random = seeded(seed * 71);
+    let game = createGame(['easy', 'medium', 'hard'][seed % 3], random, 0);
+    for (let step = 0; step < 120 && game.status === 'playing'; step += 1) {
+      const empty = [...Array(81).keys()].filter(index => !game.puzzle[index]);
+      const index = empty[Math.floor(random() * empty.length)];
+      const value = 1 + Math.floor(random() * 9);
+      const pick = random();
+      const next = pick < 0.45 ? placeValue(game, index, value, 0) : pick < 0.75 ? toggleNote(game, index, value)
+        : pick < 0.85 ? clearCell(game, index) : pick < 0.9 ? giveHint(game, index, 0)?.game : null;
+      if (!next) continue;
+      if (next.status === 'playing') assert.equal(key(undo(next)), key(game), `seed ${seed} adım ${step}: geri alma`);
+      assert.equal(isValidGame(next), true, `seed ${seed} adım ${step}`);
+      game = next;
+    }
+  }
+});

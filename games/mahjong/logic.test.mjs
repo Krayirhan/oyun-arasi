@@ -129,3 +129,34 @@ test('pause freezes the clock and saves stay valid', () => {
   assert.ok(!isValidGame({ ...restored, faces: restored.faces.map((face, i) => (i === 0 ? -1 : face)) }), 'a lone tile cannot be removed');
   assert.ok(!isValidGame(null));
 });
+
+test('rastgele oynanan oyunlar biter ya da dürüstçe çözülemez konuma düşer; karıştırma ve geri alma tutarlıdır', () => {
+  const seeded = seed => () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+  let won = 0;
+  let deadEnds = 0;
+  for (const [level, games] of [['easy', 20], ['medium', 12]]) {
+    for (let seed = 1; seed <= games; seed += 1) {
+      const random = seeded(seed * 37 + level.length);
+      let game = createGame(level, random, 0);
+      assert.equal(isValidGame(game), true);
+      for (let guard = 0; guard < 2000 && game.status === 'playing'; guard += 1) {
+        const pairs = availablePairs(game);
+        if (!pairs.length) {
+          const mixed = shuffleTiles(game, random);
+          if (!mixed) { deadEnds += 1; break; } // üst üste kalan taşlar: hiçbir dağılım çözemez
+          assert.equal(isValidGame(mixed), true);
+          assert.equal(remainingTiles(mixed), remainingTiles(game));
+          game = mixed;
+          continue;
+        }
+        const [a, b] = pairs[Math.floor(random() * pairs.length)];
+        game = removePair(game, a, b, 0);
+        assert.ok(game, `${level} #${seed}: eş kurala uygun`);
+        if (game.status === 'playing' && random() < 0.05) assert.equal(remainingTiles(undo(game)), remainingTiles(game) + 2);
+      }
+      if (game.status === 'won') won += 1;
+      else assert.ok(remainingTiles(game) <= 6, `${level} #${seed}: yalnız az taş kalınca çıkmaza girilir`);
+    }
+  }
+  assert.ok(won >= 28, `çoğu oyun kazanılır (${won}/32, çıkmaz ${deadEnds})`);
+});

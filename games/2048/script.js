@@ -1,12 +1,12 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik24';
-import { confirmDialog } from '../../game-dialog.js?v=mantik24';
-import { createStage } from '../../game-stage.js?v=mantik24';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik25';
+import { confirmDialog } from '../../game-dialog.js?v=mantik25';
+import { createStage } from '../../game-stage.js?v=mantik25';
+import { SIZE, isBoard, equalBoards, shiftBoard, canMove } from './logic.js?v=mantik25';
 
 (() => {
   'use strict';
 
   const STORAGE_KEY = 'oyunarasi-2048-v1';
-  const SIZE = 4;
   const TARGET = 2048;
   const boardElement = document.querySelector('#board');
   const scoreElement = document.querySelector('#score');
@@ -31,12 +31,6 @@ import { createStage } from '../../game-stage.js?v=mantik24';
 
   function emptyBoard() {
     return Array.from({ length: SIZE }, () => Array(SIZE).fill(0));
-  }
-
-  function isBoard(value) {
-    return Array.isArray(value) && value.length === SIZE
-      && value.every(row => Array.isArray(row) && row.length === SIZE
-        && row.every(cell => Number.isInteger(cell) && (cell === 0 || (cell >= 2 && (cell & (cell - 1)) === 0))));
   }
 
   function defaultState() {
@@ -64,7 +58,7 @@ import { createStage } from '../../game-stage.js?v=mantik24';
         over: Boolean(saved.over),
         undo
       };
-      next.over = !next.continued && !canMove(next.board);
+      next.over = !canMove(next.board);
       return next;
     } catch {
       return defaultState();
@@ -92,65 +86,6 @@ import { createStage } from '../../game-stage.js?v=mantik24';
     const [row, col] = empty[Math.floor(Math.random() * empty.length)];
     board[row][col] = Math.random() < 0.9 ? 2 : 4;
     return [row, col];
-  }
-
-  function equalBoards(left, right) {
-    return left.every((row, rowIndex) => row.every((cell, colIndex) => cell === right[rowIndex][colIndex]));
-  }
-
-  function slideLine(line) {
-    const values = line.filter(Boolean);
-    const result = [];
-    const mergedIndexes = [];
-    let gained = 0;
-    for (let index = 0; index < values.length; index += 1) {
-      if (values[index] === values[index + 1]) {
-        const merged = values[index] * 2;
-        mergedIndexes.push(result.length);
-        result.push(merged);
-        gained += merged;
-        index += 1;
-      } else {
-        result.push(values[index]);
-      }
-    }
-    while (result.length < SIZE) result.push(0);
-    return { line: result, gained, mergedIndexes };
-  }
-
-  function shiftedBoard(direction) {
-    const next = emptyBoard();
-    const mergedLocations = [];
-    let gained = 0;
-    for (let index = 0; index < SIZE; index += 1) {
-      const line = direction === 'left' || direction === 'right'
-        ? [...state.board[index]]
-        : state.board.map(row => row[index]);
-      if (direction === 'right' || direction === 'down') line.reverse();
-      const slid = slideLine(line);
-      if (direction === 'right' || direction === 'down') slid.line.reverse();
-      gained += slid.gained;
-      for (const mergedIndex of slid.mergedIndexes) {
-        const offset = direction === 'right' || direction === 'down' ? SIZE - 1 - mergedIndex : mergedIndex;
-        mergedLocations.push(direction === 'left' || direction === 'right' ? `${index}-${offset}` : `${offset}-${index}`);
-      }
-      for (let offset = 0; offset < SIZE; offset += 1) {
-        if (direction === 'left' || direction === 'right') next[index][offset] = slid.line[offset];
-        else next[offset][index] = slid.line[offset];
-      }
-    }
-    return { board: next, gained, mergedLocations };
-  }
-
-  function canMove(board) {
-    for (let row = 0; row < SIZE; row += 1) {
-      for (let col = 0; col < SIZE; col += 1) {
-        if (board[row][col] === 0) return true;
-        if (col + 1 < SIZE && board[row][col] === board[row][col + 1]) return true;
-        if (row + 1 < SIZE && board[row][col] === board[row + 1][col]) return true;
-      }
-    }
-    return false;
   }
 
   function render() {
@@ -229,7 +164,7 @@ import { createStage } from '../../game-stage.js?v=mantik24';
 
   function move(direction) {
     if (state.over || (state.won && !state.continued)) return;
-    const shifted = shiftedBoard(direction);
+    const shifted = shiftBoard(state.board, direction);
     if (equalBoards(shifted.board, state.board)) return;
 
     state.undo = { board: state.board.map(row => [...row]), score: state.score };
@@ -241,7 +176,8 @@ import { createStage } from '../../game-stage.js?v=mantik24';
     visualTiles = { merged: new Set(shifted.mergedLocations), added: added ? `${added[0]}-${added[1]}` : null };
     const firstWin = !state.won && state.board.some(row => row.includes(TARGET));
     if (firstWin) state.won = true;
-    state.over = !state.continued && !firstWin && !canMove(state.board);
+    // "Devam et"ten sonra da tahta tıkanınca oyun biter; yalnızca 2048'i yapan hamlede önce kazanma kartı gelir.
+    state.over = !firstWin && !canMove(state.board);
     if (firstWin) statusElement.textContent = '2048! Tebrikler. Devam etmek ister misin?';
     else if (state.over) statusElement.textContent = 'Artık hamle kalmadı. Yeni bir oyun başlatabilirsin.';
     else statusElement.textContent = shifted.gained ? `Güzel hamle! +${shifted.gained} puan.` : 'İyi gidiyorsun. Yeni bir taş belirdi.';

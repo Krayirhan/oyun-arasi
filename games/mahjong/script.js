@@ -1,7 +1,7 @@
-import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik24';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik24';
-import { createStage } from '../../game-stage.js?v=mantik24';
-import { confirmDialog } from '../../game-dialog.js?v=mantik24';
+import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik25';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik25';
+import { createStage } from '../../game-stage.js?v=mantik25';
+import { confirmDialog } from '../../game-dialog.js?v=mantik25';
 
 const KEY = 'oyunarasi-mahjong-v1';
 const boardElement = document.querySelector('#board');
@@ -164,10 +164,12 @@ function render() {
       actions: [{ label: 'Yeni oyun', primary: true, onClick: () => startNew(difficultyPicker.value) }], dismissible: true
     });
   } else if (stuck) {
+    // Kalan taşlar üst üste kalmışsa hiçbir yüz dağılımı çözülemez: karıştırma da başarısız olur, düğme yanıltmasın.
+    const canShuffle = Boolean(shuffleTiles(game));
     stage.show({
-      kind: 'result', kicker: 'HAMLE KALMADI', title: 'Eş taş kalmadı',
-      copy: 'Taşları karıştırabilir, geri alabilir ya da yeni oyuna başlayabilirsin.',
-      actions: [{ label: 'Karıştır', primary: true, onClick: shuffle }, { label: 'Geri al', onClick: () => undoButton.click() }, { label: 'Yeni oyun', onClick: () => startNew(difficultyPicker.value) }]
+      kind: 'result', kicker: 'HAMLE KALMADI', title: canShuffle ? 'Eş taş kalmadı' : 'Bu konum çözülemiyor',
+      copy: canShuffle ? 'Taşları karıştırabilir, geri alabilir ya da yeni oyuna başlayabilirsin.' : 'Kalan taşlar birbirini kapatıyor; karıştırmak da işe yaramaz. Geri alabilir ya da yeni oyuna başlayabilirsin.',
+      actions: [...(canShuffle ? [{ label: 'Karıştır', primary: true, onClick: shuffle }] : []), { label: 'Geri al', primary: !canShuffle, onClick: () => undoButton.click() }, { label: 'Yeni oyun', onClick: () => startNew(difficultyPicker.value) }]
     });
   } else stage.hide();
 }

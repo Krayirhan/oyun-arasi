@@ -145,6 +145,7 @@ export function chooseBotMove(state, random = Math.random) {
     const key = `${position.map(cell => cell ?? '-').join('')}:${player}:${depth}`;
     if (table.has(key)) return table.get(key);
     const maximize = player === 1;
+    const windowLow = alpha; const windowHigh = beta;
     let best = maximize ? -Infinity : Infinity;
     for (const column of options) {
       const row = landingRow(position, column); const next = [...position]; next[row * COLS + column] = player;
@@ -153,7 +154,8 @@ export function chooseBotMove(state, random = Math.random) {
       if (maximize) alpha = Math.max(alpha, best); else beta = Math.min(beta, best);
       if (beta <= alpha) break;
     }
-    table.set(key, best);
+    // Yalnızca kesin değerler önbelleğe yazılır: pencerenin dışına çıkan değer alfa-beta kesmesinden gelen bir sınırdır.
+    if (best > windowLow && best < windowHigh) table.set(key, best);
     return best;
   };
   let chosen = candidates[0]; let bestScore = -Infinity;
