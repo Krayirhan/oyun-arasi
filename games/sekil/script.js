@@ -1,6 +1,7 @@
-import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
-import { confirmDialog } from '../../game-dialog.js?v=sahne7';
+import { SIZE, SHAPES, shapeSize, canPlace, linesToClear, createGame, placePiece, isValidGame } from './logic.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
 
 const KEY = 'oyunarasi-sekil-v1';
 const boardElement = document.querySelector('#board');
@@ -10,7 +11,9 @@ const saveElement = document.querySelector('#save-state');
 const scoreElement = document.querySelector('#score');
 const bestElement = document.querySelector('#best-score');
 const scoreGain = document.querySelector('#score-gain');
-const overlay = document.querySelector('#game-overlay');
+// Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 let game = loadGame();
 let selected = -1;          // tray slot picked by tap or keyboard
@@ -94,10 +97,18 @@ function render() {
   scoreElement.textContent = String(game.score);
   bestElement.textContent = String(game.best);
   renderTray();
-  if (game.status === 'over') {
-    overlay.classList.remove('hidden');
-    document.querySelector('#overlay-copy').textContent = `Skorun ${game.score}${game.score >= game.best && game.score > 0 ? ' — yeni rekor!' : `. En iyi skorun ${game.best}.`}`;
-  } else overlay.classList.add('hidden');
+  const key = game.status === 'over' ? `over-${game.score}` : '';
+  if (key !== stageKey) {
+    stageKey = key;
+    if (game.status === 'over') {
+      stage.show({
+        kind: 'result', kicker: 'OYUN BİTTİ', title: 'Yer kalmadı!', record: game.score > 0 && game.score >= game.best,
+        copy: 'Hiçbir parça tahtaya sığmıyor. Yeni bir tahtada tekrar dene.',
+        stats: [['Skor', game.score], ['En iyi', game.best], ['Satır', game.lines ?? 0]],
+        actions: [{ label: 'Yeni oyun', primary: true, onClick: startFresh }], dismissible: true
+      });
+    } else stage.hide();
+  }
   showPreview();
 }
 
@@ -287,7 +298,7 @@ async function newGame() {
   render();
 }
 document.querySelector('#new-game').addEventListener('click', newGame);
-document.querySelector('#overlay-new-button').addEventListener('click', () => { game = createGame(Math.random, game.best); selected = -1; statusElement.textContent = 'Yeni oyun başladı. Parçaları tahtaya sürükle.'; saveGame(); render(); });
+function startFresh() { game = createGame(Math.random, game.best); selected = -1; statusElement.textContent = 'Yeni oyun başladı. Parçaları tahtaya sürükle.'; saveGame(); render(); }
 
 const cloudSync = syncGameOnAccountChange('sekil', {
   read: () => ({ game }),

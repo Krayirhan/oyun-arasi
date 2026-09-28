@@ -1,5 +1,6 @@
-import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf, levelOf } from './logic.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
+import { WIDTH, HEIGHT, ROUND_SECONDS, MAX_LIVES, CORRECT_BONUS_SECONDS, WRONG_PENALTY_SECONDS, createGame, startGame, pauseGame, aimAt, fireDart, advance, labelOf, levelOf } from './logic.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
 
 const KEY = 'oyunarasi-balon-patlat-v1';
 const SOUND_KEY = 'oyunarasi-balon-patlat-ses';
@@ -7,8 +8,9 @@ const $ = selector => document.querySelector(selector);
 const canvas = $('#board');
 const ctx = canvas.getContext('2d');
 const frame = $('.board-frame');
-const overlay = $('#game-overlay');
-const overlayButton = $('#overlay-button');
+// Başlangıç, mola ve tur sonu kartları ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let lastRunRecord = false;
 const status = $('#status');
 const saveState = $('#save-state');
 const soundButton = $('#sound-button');
@@ -688,48 +690,30 @@ function updateHud() {
   $('#timer').textContent = String(Math.max(0, Math.ceil(game.timeLeft)));
 }
 
-function overlayCopy() {
-  if (countdown > 0) return null;
-  if (game.status === 'ready') return ['BALON PATLAT', 'Dartını hazırla!', 'Üstteki hedef sayıyı veren balonu bul ve dartını fırlat! Vurunca hedef hemen değişir. Doğru +1 sn, yanlış −2 sn; hedefi veren balonu kaçırırsan can gider.', 'Başla'];
-  if (game.status === 'paused') return ['MOLA', 'Oyun duraklatıldı', 'Kaldığın yerden devam edebilirsin.', 'Devam et'];
-  if (game.status === 'over') {
-    const record = game.score >= records.bestScore && game.score > 0;
-    return [game.endReason === 'lives' ? 'CANLAR BİTTİ' : 'SÜRE BİTTİ', record ? 'Yeni rekor! 🎉' : 'Güzel atıştı!', '', 'Tekrar oyna'];
-  }
-  return null;
-}
-
 function renderOverlay() {
   const pauseButton = $('#pause-button');
   pauseButton.dataset.state = game.status === 'playing' || countdown > 0 ? 'playing' : 'ready';
   pauseButton.setAttribute('aria-label', game.status === 'playing' ? 'Duraklat' : game.status === 'paused' ? 'Devam et' : 'Başla');
-  const copy = overlayCopy();
-  overlay.classList.toggle('hidden', !copy || game.status === 'over' && !runRecorded);
-  if (!copy) return;
-  $('#overlay-kicker').textContent = copy[0];
-  $('#overlay-title').textContent = copy[1];
-  $('#overlay-copy').textContent = copy[2];
-  $('#overlay-copy').hidden = !copy[2];
-  overlayButton.textContent = copy[3];
-  const stats = $('#overlay-stats');
-  stats.hidden = game.status !== 'over';
-  if (game.status === 'over') {
+  if (countdown > 0) { stage.hide(); return; }
+  if (game.status === 'ready') {
+    stage.show({ kind: 'start', kicker: 'BALON PATLAT', title: 'Dartını hazırla!', copy: 'Üstteki hedef sayıyı veren balonu bul ve dartını fırlat! Vurunca hedef hemen değişir. Doğru +1 sn, yanlış −2 sn; hedefi veren balonu kaçırırsan can gider.', actions: [{ label: 'Başla', primary: true, onClick: play }] });
+  } else if (game.status === 'paused') {
+    stage.show({ kind: 'pause', kicker: 'MOLA', title: 'Oyun duraklatıldı', copy: 'Kaldığın yerden devam edebilirsin.', actions: [{ label: 'Devam et', primary: true, onClick: play }, { label: 'Yeni tur', onClick: newGame }] });
+  } else if (game.status === 'over' && runRecorded) {
     const accuracy = game.dartsFired ? Math.round(game.correctHits * 100 / game.dartsFired) : 0;
-    const items = [['Puan', game.score.toLocaleString('tr-TR')], ['Seviye', levelOf(game.correctHits)], ['Doğru', game.correctHits], ['En uzun kombo', game.bestCombo], ['İsabet', `%${accuracy}`], ['Yanlış', game.wrongHits]];
-    stats.replaceChildren(...items.map(([label, value]) => {
-      const item = document.createElement('div');
-      item.append(Object.assign(document.createElement('dt'), { textContent: label }), Object.assign(document.createElement('dd'), { textContent: String(value) }));
-      return item;
-    }));
-  }
+    stage.show({
+      kind: 'result', kicker: game.endReason === 'lives' ? 'CANLAR BİTTİ' : 'SÜRE BİTTİ', title: 'Güzel atıştı!', record: lastRunRecord,
+      stats: [['Puan', game.score.toLocaleString('tr-TR')], ['Seviye', levelOf(game.correctHits)], ['Doğru', game.correctHits], ['En uzun kombo', game.bestCombo], ['İsabet', `%${accuracy}`], ['Yanlış', game.wrongHits]],
+      actions: [{ label: 'Tekrar oyna', primary: true, onClick: play }]
+    });
+  } else stage.hide();
 }
 
 function finishRun() {
   if (runRecorded) return;
   const accuracy = game.dartsFired ? Math.round(game.correctHits * 100 / game.dartsFired) : 0;
-  const previousBest = records.bestScore;
+  lastRunRecord = game.score > 0 && game.score > records.bestScore;
   runRecorded = true;
-  renderOverlay();
   records = {
     bestScore: Math.max(records.bestScore, game.score),
     bestCorrect: Math.max(records.bestCorrect, game.correctHits),
@@ -738,7 +722,7 @@ function finishRun() {
     bestLevel: Math.max(records.bestLevel || 0, levelOf(game.correctHits)),
     runs: records.runs + 1
   };
-  if (game.score > previousBest) $('#overlay-title').textContent = 'Yeni rekor! 🎉';
+  renderOverlay();
   saveRecords();
   status.textContent = `${game.endReason === 'lives' ? 'Canlar bitti' : 'Süre doldu'} · ${game.correctHits} doğru · ${game.score} puan.`;
   sfx('over');
@@ -861,7 +845,6 @@ function syncSoundButton() {
   soundButton.setAttribute('aria-label', soundOn ? 'Sesi kapat' : 'Sesi aç');
 }
 
-overlayButton.addEventListener('click', play);
 $('#pause-button').addEventListener('click', () => (game.status === 'playing' ? pause() : countdown > 0 ? null : play()));
 $('#new-game').addEventListener('click', newGame);
 soundButton.addEventListener('click', () => {

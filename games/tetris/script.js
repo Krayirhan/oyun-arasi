@@ -1,6 +1,7 @@
-import { COLS, ROWS, HIDDEN_ROWS, SHAPES, createGame, startGame, pauseGame, move, rotate, softDrop, hardDrop, holdPiece, tick, ghostPiece, pieceCells, isValidGame } from './logic.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
-import { confirmDialog } from '../../game-dialog.js?v=sahne7';
+import { COLS, ROWS, HIDDEN_ROWS, SHAPES, createGame, startGame, pauseGame, move, rotate, softDrop, hardDrop, holdPiece, tick, ghostPiece, pieceCells, isValidGame } from './logic.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
 
 const KEY = 'oyunarasi-tetris-v1';
 const REPEAT_DELAY_MS = 170;
@@ -8,8 +9,9 @@ const REPEAT_RATE_MS = 50;
 const wellElement = document.querySelector('#board');
 const statusElement = document.querySelector('#status');
 const saveElement = document.querySelector('#save-state');
-const overlay = document.querySelector('#game-overlay');
-const overlayButton = document.querySelector('#overlay-button');
+// Başlangıç, mola ve oyun sonu kartları ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 const pauseButton = document.querySelector('#pause-button');
 const popElement = document.querySelector('#clear-pop');
 const gainElement = document.querySelector('#score-gain');
@@ -96,20 +98,19 @@ function render() {
 }
 
 function renderOverlay() {
-  const texts = {
-    ready: ['BLOK DÜŞÜR', 'Hazır mısın?', 'Başla’ya bas ya da bir ok tuşuna dokun.', 'Başla'],
-    paused: ['DURAKLATILDI', 'Mola!', `Skor ${game.score.toLocaleString('tr-TR')} · ${game.lines} satır. Kaldığın yerden devam edebilirsin.`, 'Devam et'],
-    over: ['OYUN BİTTİ', 'Bloklar tepeye ulaştı!', `Skor ${game.score.toLocaleString('tr-TR')} · ${game.lines} satır${game.score > 0 && game.score >= records.bestScore ? ' — yeni rekor!' : '.'}`, 'Yeni oyun']
-  }[game.status];
-  overlay.classList.toggle('hidden', !texts);
   pauseButton.disabled = game.status === 'over';
   pauseButton.querySelector('span').textContent = { playing: 'Duraklat', ready: 'Başla' }[game.status] || 'Devam et';
-  if (!texts) return;
-  const [kicker, title, copy, button] = texts;
-  document.querySelector('#overlay-kicker').textContent = kicker;
-  document.querySelector('#overlay-title').textContent = title;
-  document.querySelector('#overlay-copy').textContent = copy;
-  overlayButton.textContent = button;
+  const key = game.status === 'playing' ? '' : `${game.status}-${game.score}-${game.lines}`;
+  if (key === stageKey) return;
+  stageKey = key;
+  const stats = [['Skor', game.score.toLocaleString('tr-TR')], ['Satır', game.lines], ['Seviye', game.level]];
+  if (game.status === 'ready') {
+    stage.show({ kind: 'start', kicker: 'BLOK DÜŞÜR', title: 'Hazır mısın?', copy: 'Başla’ya bas ya da bir ok tuşuna dokun.', actions: [{ label: 'Başla', primary: true, onClick: play }] });
+  } else if (game.status === 'paused') {
+    stage.show({ kind: 'pause', kicker: 'DURAKLATILDI', title: 'Mola!', stats, actions: [{ label: 'Devam et', primary: true, onClick: play }, { label: 'Yeni oyun', onClick: newGame }] });
+  } else if (game.status === 'over') {
+    stage.show({ kind: 'result', kicker: 'OYUN BİTTİ', title: 'Bloklar tepeye ulaştı!', stats, record: game.score > 0 && game.score >= records.bestScore, actions: [{ label: 'Yeni oyun', primary: true, onClick: play }], dismissible: true });
+  } else stage.hide();
 }
 
 const CLEAR_NAMES = ['', 'Tek satır', 'Çift satır', 'Üç satır', 'DÖRTLÜ!'];
@@ -302,7 +303,6 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-overlayButton.addEventListener('click', play);
 pauseButton.addEventListener('click', () => (game.status === 'playing' ? pause() : play()));
 document.querySelector('#new-game').addEventListener('click', async () => { await newGame(); document.activeElement?.blur(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) { pause(); saveGame(); } });

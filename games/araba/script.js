@@ -1,5 +1,6 @@
-import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
+import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
 
 const KEY = 'oyunarasi-araba-v1';
 const canvas = document.querySelector('#board');
@@ -7,8 +8,8 @@ const context = canvas.getContext('2d');
 const frameElement = document.querySelector('.board-frame');
 const statusElement = document.querySelector('#status');
 const saveElement = document.querySelector('#save-state');
-const overlay = document.querySelector('#game-overlay');
-const overlayButton = document.querySelector('#overlay-button');
+// Başlangıç, mola ve kaza kartları ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
 const pauseButton = document.querySelector('#pause-button');
 const scoreElement = document.querySelector('#score');
 const bestElement = document.querySelector('#best-score');
@@ -181,20 +182,16 @@ function draw(now) {
 
 function renderOverlay() {
   const points = score(game);
-  const texts = {
-    ready: ['ARABA YARIŞI', 'Hazır mısın?', 'Şerit değiştirerek arabalardan kaç, jetonları topla.', 'Başla'],
-    paused: ['DURAKLATILDI', 'Mola!', `${formatDistance(game.distance)} yol, ${points.toLocaleString('tr-TR')} puan.`, 'Devam et'],
-    over: ['KAZA!', 'Çarptın!', `${formatDistance(game.distance)} yol, ${game.coins} jeton: ${points.toLocaleString('tr-TR')} puan.${points > 0 && points >= records.bestScore ? ' Yeni rekor!' : ''}`, 'Tekrar oyna']
-  }[game.status];
-  overlay.classList.toggle('hidden', !texts || (game.status === 'over' && performance.now() - crashAt < 650));
   pauseButton.disabled = game.status === 'over';
   pauseButton.querySelector('span').textContent = { ready: 'Başla', paused: 'Devam et' }[game.status] || 'Duraklat';
-  if (!texts) return;
-  const [kicker, title, copy, button] = texts;
-  document.querySelector('#overlay-kicker').textContent = kicker;
-  document.querySelector('#overlay-title').textContent = title;
-  document.querySelector('#overlay-copy').textContent = copy;
-  overlayButton.textContent = button;
+  const stats = [['Yol', formatDistance(game.distance)], ['Jeton', game.coins], ['Puan', points.toLocaleString('tr-TR')]];
+  if (game.status === 'ready') {
+    stage.show({ kind: 'start', kicker: 'ARABA YARIŞI', title: 'Hazır mısın?', copy: 'Şerit değiştirerek arabalardan kaç, jetonları topla.', actions: [{ label: 'Başla', primary: true, onClick: play }] });
+  } else if (game.status === 'paused') {
+    stage.show({ kind: 'pause', kicker: 'DURAKLATILDI', title: 'Mola!', stats, actions: [{ label: 'Devam et', primary: true, onClick: play }, { label: 'Yeni oyun', onClick: newGame }] });
+  } else if (game.status === 'over' && performance.now() - crashAt >= 650) {
+    stage.show({ kind: 'result', kicker: 'KAZA!', title: 'Çarptın!', stats, record: points > 0 && points >= records.bestScore, actions: [{ label: 'Tekrar oyna', primary: true, onClick: play }] });
+  } else stage.hide();
 }
 
 function showScore() {
@@ -286,7 +283,6 @@ document.querySelectorAll('.steer-pad button').forEach(button => {
   button.addEventListener('contextmenu', event => event.preventDefault());
 });
 
-overlayButton.addEventListener('click', play);
 pauseButton.addEventListener('click', () => (game.status === 'playing' ? pause() : play()));
 document.querySelector('#new-game').addEventListener('click', () => { newGame(); document.activeElement?.blur(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });

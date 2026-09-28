@@ -1,6 +1,7 @@
-import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
-import { confirmDialog } from '../../game-dialog.js?v=sahne7';
+import { LEVELS, positionsFor, freeTiles, facesMatch, createGame, availablePairs, removePair, undo, giveHint, shuffleTiles, remainingTiles, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
+import { confirmDialog } from '../../game-dialog.js?v=sahne13';
 
 const KEY = 'oyunarasi-mahjong-v1';
 const boardElement = document.querySelector('#board');
@@ -12,8 +13,9 @@ const timerElement = document.querySelector('#timer');
 const undoButton = document.querySelector('#undo-button');
 const hintButton = document.querySelector('#hint-button');
 const shuffleButton = document.querySelector('#shuffle-button');
-const overlay = document.querySelector('#game-overlay');
-const overlayShuffle = document.querySelector('#overlay-shuffle');
+// Kazanma ve "hamle kalmadı" kartları ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 const scrollElement = document.querySelector('#tile-scroll');
 const zoomRow = document.querySelector('#zoom-row');
 const zoomLevelElement = document.querySelector('#zoom-level');
@@ -150,18 +152,24 @@ function render() {
   document.querySelector('#best').textContent = `${LEVELS[game.level].label} rekoru: ${records[game.level] == null ? '—' : formatTime(records[game.level])}`;
 
   const stuck = playing && !availablePairs(game).length;
-  overlay.classList.toggle('hidden', !stuck && game.status !== 'won');
-  overlayShuffle.classList.toggle('hidden', !stuck);
+  const key = game.status === 'won' ? `won-${game.elapsedMs}` : stuck ? `stuck-${game.history.length}` : '';
+  if (key === stageKey) return;
+  stageKey = key;
   if (game.status === 'won') {
-    document.querySelector('#overlay-kicker').textContent = 'KAZANDIN';
-    document.querySelector('#overlay-title').textContent = 'Tebrikler!';
     const aided = game.hints || game.shuffles;
-    document.querySelector('#overlay-copy').textContent = `Bütün taşları ${formatTime(game.elapsedMs)} sürede topladın.${aided ? ' İpucu ya da karıştırma kullanıldığı için rekora sayılmadı.' : records[game.level] === game.elapsedMs ? ' Yeni rekor!' : ''}`;
+    stage.show({
+      kind: 'result', kicker: 'KAZANDIN', title: 'Tebrikler!', record: !aided && records[game.level] === game.elapsedMs,
+      copy: aided ? 'İpucu ya da karıştırma kullanıldığı için rekora sayılmadı.' : 'Bütün taşları topladın.',
+      stats: [['Süre', formatTime(game.elapsedMs)], ['Zorluk', LEVELS[game.level].label], ['İpucu', game.hints], ['Karıştırma', game.shuffles]],
+      actions: [{ label: 'Yeni oyun', primary: true, onClick: () => startNew(difficultyPicker.value) }], dismissible: true
+    });
   } else if (stuck) {
-    document.querySelector('#overlay-kicker').textContent = 'HAMLE KALMADI';
-    document.querySelector('#overlay-title').textContent = 'Eş taş kalmadı';
-    document.querySelector('#overlay-copy').textContent = 'Taşları karıştırabilir, geri alabilir ya da yeni oyuna başlayabilirsin.';
-  }
+    stage.show({
+      kind: 'result', kicker: 'HAMLE KALMADI', title: 'Eş taş kalmadı',
+      copy: 'Taşları karıştırabilir, geri alabilir ya da yeni oyuna başlayabilirsin.',
+      actions: [{ label: 'Karıştır', primary: true, onClick: shuffle }, { label: 'Geri al', onClick: () => undoButton.click() }, { label: 'Yeni oyun', onClick: () => startNew(difficultyPicker.value) }]
+    });
+  } else stage.hide();
 }
 
 function afterChange(message) {
@@ -258,12 +266,10 @@ async function startNew(level) {
 }
 
 document.querySelector('#new-game').addEventListener('click', () => startNew(difficultyPicker.value));
-document.querySelector('#overlay-new-button').addEventListener('click', () => startNew(difficultyPicker.value));
 difficultyPicker.addEventListener('change', () => startNew(difficultyPicker.value));
 undoButton.addEventListener('click', undoMove);
 hintButton.addEventListener('click', showHint);
 shuffleButton.addEventListener('click', shuffle);
-overlayShuffle.addEventListener('click', shuffle);
 
 document.addEventListener('keydown', event => {
   const target = event.target;

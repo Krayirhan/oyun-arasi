@@ -1,8 +1,9 @@
-import { LEVELS, WORLDS } from './levels.js?v=sahne7';
-import { LEVEL_COUNT, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js?v=sahne7';
-import { createRenderer } from './render.js?v=sahne7';
-import { createAudio } from './audio.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
+import { LEVELS, WORLDS } from './levels.js?v=sahne13';
+import { LEVEL_COUNT, STEP, campaignStats, createCampaign, createRun, finishCampaign, isValidCampaign, levelResult, mergeCampaigns, tick } from './logic.js?v=sahne13';
+import { createRenderer } from './render.js?v=sahne13';
+import { createAudio } from './audio.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { createStage, createFlow } from '../../game-stage.js?v=sahne13';
 
 const SAVE_KEY = 'oyunarasi-platform-macera-v2';
 const OLD_SAVE_KEY = 'oyunarasi-platform-macera-v1';
@@ -15,15 +16,13 @@ const stage = $('#game-stage');
 const mapPanel = $('#level-map');
 const mapGrid = $('#level-grid');
 const statusLine = $('#status');
-const overlay = $('#game-overlay');
-const overlayKicker = $('#overlay-kicker');
-const overlayTitle = $('#overlay-title');
-const overlayStars = $('#overlay-stars');
-const overlayCopy = $('#overlay-copy');
-const overlayButton = $('#overlay-button');
-const overlayRetry = $('#overlay-retry');
-const overlaySettings = $('#overlay-settings');
-const mapButton = $('#map-button');
+// Ortak sahne şablonu (game-stage.js): bölüm haritası oyun alanının üstünde açılan menü katmanı, mola ve bölüm
+// sonu ise aynı kart katmanıdır. Oyun alanı hep yerinde durur; çerçeve ekran değişince büyüyüp küçülmez.
+const flow = createFlow({ menu: mapPanel, game: stage });
+const cardStage = createStage({ frame: stage.parentElement });
+const settingsNode = $('#overlay-settings');
+const soundToggle = $('#sound-toggle');
+const motionToggle = $('#reduced-motion-toggle');
 const pauseButton = $('#pause-button');
 const startButton = $('#start-level');
 const saveLabel = $('#save-state');
@@ -127,7 +126,7 @@ function setWorld(world) {
 function showMap() {
   run = null;
   cancelAnimationFrame(raf);
-  stage.hidden = true; mapPanel.hidden = false;
+  flow.show('menu');
   hideOverlay();
   pauseButton.setAttribute('aria-pressed', 'false'); pauseButton.textContent = 'Duraklat';
   statusLine.textContent = 'Bölüm haritasından bir bölüm seç.';
@@ -143,7 +142,7 @@ function startLevel(number) {
   selectedWorld = Math.floor((number - 1) / PER_WORLD);
   run = createRun(number);
   lastResult = null; completeTimer = 0; accumulator = 0;
-  stage.hidden = false; mapPanel.hidden = true;
+  flow.show('game');
   hideOverlay();
   pauseButton.setAttribute('aria-pressed', 'false'); pauseButton.textContent = 'Duraklat';
   $('#level-number').textContent = levelCode(number);
@@ -201,33 +200,35 @@ function completeLevel() {
   audio.play('checkpoint');
   const last = run.level === LEVEL_COUNT;
   const newRecord = !previousBest || lastResult.time < previousBest;
-  overlayKicker.textContent = last ? 'VOLKANA ULAŞTIN' : `${levelCode(run.level)} TAMAMLANDI`;
-  overlayTitle.textContent = last ? 'Zirvedesin, Zıpkın!' : lastResult.stars === 3 ? 'Kusursuz!' : lastResult.stars === 2 ? 'Harika!' : 'Başardın!';
-  overlayStars.hidden = false;
-  overlayStars.replaceChildren(...[0, 1, 2].map(i => Object.assign(document.createElement('span'), { textContent: '★', className: i < lastResult.stars ? 'on' : '' })));
   const level = LEVELS[run.level - 1];
-  overlayCopy.textContent = `Süre ${renderer.formatTime(lastResult.time)} (hedef ${renderer.formatTime(level.par)}) · Kristal ${lastResult.gems}/${level.gems.length} · Ölüm ${lastResult.deaths}${newRecord ? ' · Yeni rekor!' : ''}${lastResult.stars > previousStars && previousStars ? ' · Yeni yıldız!' : ''}`;
-  overlayButton.textContent = last ? 'Haritaya dön' : 'Sonraki bölüm';
-  overlayButton.dataset.action = last ? 'map' : 'next';
-  overlayRetry.hidden = false;
-  overlaySettings.hidden = true;
-  showOverlay();
+  cardStage.show({
+    kind: 'result', kicker: last ? 'VOLKANA ULAŞTIN' : `${levelCode(run.level)} TAMAMLANDI`,
+    title: last ? 'Zirvedesin, Zıpkın!' : lastResult.stars === 3 ? 'Kusursuz!' : lastResult.stars === 2 ? 'Harika!' : 'Başardın!',
+    stars: lastResult.stars, record: Boolean(previousBest) && newRecord,
+    copy: lastResult.stars > previousStars && previousStars ? 'Yeni yıldız kazandın!' : '',
+    stats: [['Süre', renderer.formatTime(lastResult.time)], ['Hedef', renderer.formatTime(level.par)], ['Kristal', `${lastResult.gems}/${level.gems.length}`], ['Ölüm', lastResult.deaths]],
+    actions: [
+      last ? { label: 'Haritaya dön', primary: true, onClick: showMap } : { label: 'Sonraki bölüm', primary: true, onClick: nextLevel },
+      { label: 'Tekrar oyna', onClick: () => startLevel(run?.level || selectedLevel) },
+      ...(last ? [] : [{ label: 'Bölüm haritası', onClick: showMap }])
+    ]
+  });
   statusLine.textContent = `${lastResult.stars} yıldız · ${lastResult.score.toLocaleString('tr-TR')} puan`;
 }
 
-function showOverlay() { overlay.classList.remove('hidden'); requestAnimationFrame(() => overlayButton.focus({ preventScroll: true })); }
-function hideOverlay() { overlay.classList.add('hidden'); }
+function hideOverlay() { cardStage.hide(); }
 
 function pause() {
   if (!run || (run.status !== 'playing' && run.status !== 'dying')) return;
   run.pausedFrom = run.status; run.status = 'paused';
   pauseButton.setAttribute('aria-pressed', 'true'); pauseButton.textContent = 'Devam et';
-  overlayKicker.textContent = 'OYUN DURAKLATILDI'; overlayTitle.textContent = 'Mola';
-  overlayStars.hidden = true;
-  overlayCopy.textContent = `${levelCode(run.level)} · ${LEVELS[run.level - 1].title} · ${renderer.formatTime(run.time)}`;
-  overlayButton.textContent = 'Devam et'; overlayButton.dataset.action = 'resume';
-  overlayRetry.hidden = false; overlaySettings.hidden = false;
-  showOverlay();
+  settingsNode.hidden = false;
+  cardStage.show({
+    kind: 'pause', kicker: 'OYUN DURAKLATILDI', title: 'Mola',
+    copy: `${levelCode(run.level)} · ${LEVELS[run.level - 1].title} · ${renderer.formatTime(run.time)}`,
+    extra: settingsNode,
+    actions: [{ label: 'Devam et', primary: true, onClick: resume }, { label: 'Tekrar oyna', onClick: () => startLevel(run?.level || selectedLevel) }, { label: 'Bölüm haritası', onClick: showMap }]
+  });
   clearPressed();
 }
 
@@ -273,9 +274,9 @@ function typingTarget(event) { return event.target instanceof HTMLElement && eve
 
 window.addEventListener('keydown', event => {
   if (typingTarget(event)) return;
-  const onOverlay = !overlay.classList.contains('hidden');
+  const onOverlay = cardStage.visible;
   if (!run) {
-    if (event.key === 'Enter' && !mapPanel.hidden && document.activeElement === document.body) startLevel(selectedLevel);
+    if (event.key === 'Enter' && flow.current === 'menu' && document.activeElement === document.body) startLevel(selectedLevel);
     return;
   }
   const action = KEYMAP[event.key];
@@ -286,7 +287,7 @@ window.addEventListener('keydown', event => {
   }
   if ((event.key === 'r' || event.key === 'R') && !event.repeat) { startLevel(run.level); return; }
   if (onOverlay) {
-    if (event.key === 'Enter' && run.status === 'complete' && lastResult) { event.preventDefault(); overlayButton.click(); }
+    if (event.key === 'Enter' && run.status === 'complete' && lastResult) { event.preventDefault(); cardStage.card.querySelector('.play-new')?.click(); }
     return;
   }
   if (event.repeat) return;
@@ -352,22 +353,14 @@ document.querySelectorAll('.world-tabs [data-world]').forEach(button => button.a
 startButton.addEventListener('click', () => startLevel(selectedLevel));
 $('#restart-button').addEventListener('click', () => startLevel(run?.level || selectedLevel));
 pauseButton.addEventListener('click', () => { if (!run) return; if (run.status === 'paused') resume(); else pause(); });
-overlayButton.addEventListener('click', () => {
-  const action = overlayButton.dataset.action;
-  if (action === 'resume') resume();
-  else if (action === 'next') nextLevel();
-  else showMap();
-});
-overlayRetry.addEventListener('click', () => startLevel(run?.level || selectedLevel));
-mapButton.addEventListener('click', showMap);
 
 function renderSettings() {
-  const sound = $('#sound-toggle'); const motion = $('#reduced-motion-toggle');
+  const sound = soundToggle; const motion = motionToggle;
   sound.setAttribute('aria-pressed', String(settings.sound)); sound.textContent = settings.sound ? 'Ses açık' : 'Ses kapalı';
   motion.setAttribute('aria-pressed', String(settings.reducedMotion)); motion.textContent = settings.reducedMotion ? 'Az hareket açık' : 'Az hareket kapalı';
 }
-$('#sound-toggle').addEventListener('click', () => { settings.sound = !settings.sound; renderSettings(); persist(false); audio.play('click'); });
-$('#reduced-motion-toggle').addEventListener('click', () => { settings.reducedMotion = !settings.reducedMotion; renderSettings(); persist(false); });
+soundToggle.addEventListener('click', () => { settings.sound = !settings.sound; renderSettings(); persist(false); audio.play('click'); });
+motionToggle.addEventListener('click', () => { settings.reducedMotion = !settings.reducedMotion; renderSettings(); persist(false); });
 
 window.addEventListener('blur', () => { clearPressed(); if (run?.status === 'playing') pause(); });
 document.addEventListener('visibilitychange', () => { if (document.hidden && run?.status === 'playing') pause(); });

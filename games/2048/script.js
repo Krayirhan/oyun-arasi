@@ -1,5 +1,6 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
-import { confirmDialog } from '../../game-dialog.js?v=sahne7';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
 
 (() => {
   'use strict';
@@ -14,12 +15,9 @@ import { confirmDialog } from '../../game-dialog.js?v=sahne7';
   const statusElement = document.querySelector('#status');
   const undoButton = document.querySelector('#undo-button');
   const newGameButton = document.querySelector('#new-game-button');
-  const overlay = document.querySelector('#game-overlay');
-  const overlayKicker = document.querySelector('#overlay-kicker');
-  const overlayTitle = document.querySelector('#overlay-title');
-  const overlayCopy = document.querySelector('#overlay-copy');
-  const continueButton = document.querySelector('#continue-button');
-  const overlayNewButton = document.querySelector('#overlay-new-button');
+  // Kazanma ve oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
+  const stage = createStage();
+  let stageKey = '';
   const saveState = document.querySelector('#save-state');
   const scoreGain = document.querySelector('#score-gain');
   const tileProgress = document.querySelector('#tile-progress');
@@ -195,23 +193,24 @@ import { confirmDialog } from '../../game-dialog.js?v=sahne7';
 
   function updateOverlay() {
     const showWon = state.won && !state.continued;
+    const key = showWon ? `won-${state.score}` : state.over ? `over-${state.score}` : '';
+    if (key === stageKey) return;
+    stageKey = key;
+    const stats = [['Skor', state.score.toLocaleString('tr-TR')], ['En iyi', state.best.toLocaleString('tr-TR')], ['En büyük taş', largestElement.textContent]];
     if (showWon) {
-      overlay.classList.remove('hidden');
-      overlayKicker.textContent = 'HEDEFE ULAŞTIN';
-      overlayTitle.textContent = '2048! Harika iş.';
-      overlayCopy.textContent = 'İstersen burada bırakabilir veya daha büyük taşlar için devam edebilirsin.';
-      continueButton.classList.remove('hidden');
-      return;
-    }
-    if (state.over) {
-      overlay.classList.remove('hidden');
-      overlayKicker.textContent = 'OYUN BİTTİ';
-      overlayTitle.textContent = 'Güzel denemeydi!';
-      overlayCopy.textContent = `Skorun ${state.score}. Yeni bir tahtada tekrar deneyebilirsin.`;
-      continueButton.classList.add('hidden');
-      return;
-    }
-    overlay.classList.add('hidden');
+      stage.show({
+        kind: 'result', kicker: 'HEDEFE ULAŞTIN', title: '2048! Harika iş.', stats,
+        copy: 'İstersen burada bırakabilir ya da daha büyük taşlar için devam edebilirsin.',
+        actions: [{ label: 'Devam et', primary: true, onClick: continueGame }, { label: 'Yeni oyun', onClick: () => newGame(true) }]
+      });
+    } else if (state.over) {
+      stage.show({
+        kind: 'result', kicker: 'OYUN BİTTİ', title: 'Güzel denemeydi!', stats, dismissible: true,
+        record: state.score > 0 && state.score >= state.best,
+        copy: 'Hamle kalmadı. Yeni bir tahtada tekrar dene.',
+        actions: [{ label: 'Yeni oyun', primary: true, onClick: () => newGame(true) }]
+      });
+    } else stage.hide();
   }
 
   function persistAndRender() {
@@ -315,8 +314,6 @@ import { confirmDialog } from '../../game-dialog.js?v=sahne7';
   boardElement.addEventListener('contextmenu', event => event.preventDefault());
   undoButton.addEventListener('click', undo);
   newGameButton.addEventListener('click', () => newGame());
-  overlayNewButton.addEventListener('click', () => newGame(true));
-  continueButton.addEventListener('click', continueGame);
   window.addEventListener('storage', event => {
     if (event.key !== STORAGE_KEY || !event.newValue) return;
     try {

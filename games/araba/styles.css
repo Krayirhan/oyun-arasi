@@ -4,9 +4,6 @@ body[data-game='araba'] { --frame: #d6362b; --title: #d6362b; --title-shadow: #9
 .board-frame { display: grid; justify-items: center; gap: 12px; }
 .road-wrap { position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 20px rgb(0 0 0 / .2); }
 .road { display: block; width: 360px; height: 560px; touch-action: none; user-select: none; -webkit-user-select: none; cursor: pointer; }
-.road-wrap .game-overlay { border-radius: 14px; }
-.road-wrap .overlay-card { padding: 22px 18px; }
-.road-wrap .overlay-card h2 { font-size: 26px; }
 
 .steer-pad { display: none; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; max-width: 420px; }
 .steer-pad button { height: 60px; padding: 0; border: 0; border-radius: 16px; background: rgb(255 255 255 / .2); color: #fff; font: 700 30px 'Fredoka', sans-serif; touch-action: manipulation; user-select: none; -webkit-user-select: none; cursor: pointer; }

@@ -7,16 +7,16 @@
     <meta name="description" content="Zıpkın'ı Orman'dan Saat Kulesi'ne, oradan volkanın zirvesine ulaştır! Koş, zıpla, duvardan sek, dash at: 24 bölümlük hız macerası Oyun Arası'nda." />
     <title>Zıpkın: Volkana Yolculuk | Oyun Arası</title>
     <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
-    <link rel="stylesheet" href="../../account.css?v=sahne7" />
-    <link rel="stylesheet" href="../../site-header.css?v=sahne7" />
-    <link rel="stylesheet" href="../../game-shell.css?v=sahne7" />
-    <link rel="stylesheet" href="../../play-page.css?v=sahne7" />
-    <link rel="stylesheet" href="styles.css?v=sahne7" />
-    <script type="module" src="../../account.js?v=sahne7"></script>
-    <script type="module" src="script.js?v=sahne7"></script>
-    <script defer src="../../catalog.js?v=sahne7"></script>
-    <script defer src="../../library.js?v=sahne7"></script>
-    <script defer src="../../game-shell.js?v=sahne7"></script>
+    <link rel="stylesheet" href="../../account.css?v=sahne13" />
+    <link rel="stylesheet" href="../../site-header.css?v=sahne13" />
+    <link rel="stylesheet" href="../../game-shell.css?v=sahne13" />
+    <link rel="stylesheet" href="../../play-page.css?v=sahne13" />
+    <link rel="stylesheet" href="styles.css?v=sahne13" />
+    <script type="module" src="../../account.js?v=sahne13"></script>
+    <script type="module" src="script.js?v=sahne13"></script>
+    <script defer src="../../catalog.js?v=sahne13"></script>
+    <script defer src="../../library.js?v=sahne13"></script>
+    <script defer src="../../game-shell.js?v=sahne13"></script>
   </head>
   <body class="game-page" data-game="platform-macera">
     <header class="site-header">
@@ -83,28 +83,15 @@
             </div>
           </div>
           <div class="board-frame">
-            <div class="game-stage" id="game-stage" hidden>
+            <div class="game-stage" id="game-stage">
               <canvas id="board" width="960" height="540" role="img" aria-label="Zıpkın oyun alanı" aria-describedby="board-help"></canvas>
-              <div class="game-overlay hidden" id="game-overlay" aria-live="polite">
-                <div class="overlay-card">
-                  <p class="overlay-kicker" id="overlay-kicker">OYUN DURAKLATILDI</p>
-                  <h2 id="overlay-title">Mola</h2>
-                  <p class="overlay-stars" id="overlay-stars" hidden></p>
-                  <p id="overlay-copy">Hazır olunca devam et.</p>
-                  <div class="overlay-actions">
-                    <button class="play-button play-new" id="overlay-button" type="button">Devam et</button>
-                    <button class="play-button play-undo" id="overlay-retry" type="button" hidden>Tekrar oyna</button>
-                    <button class="play-button play-undo" id="map-button" type="button">Bölüm haritası</button>
-                  </div>
-                  <div class="overlay-settings" id="overlay-settings">
-                    <button type="button" id="sound-toggle" aria-pressed="true">Ses açık</button>
-                    <button type="button" id="reduced-motion-toggle" aria-pressed="false">Az hareket kapalı</button>
-                  </div>
-                </div>
+              <div class="stage-settings" id="overlay-settings" hidden>
+                <button type="button" id="sound-toggle" aria-pressed="true">Ses açık</button>
+                <button type="button" id="reduced-motion-toggle" aria-pressed="false">Az hareket kapalı</button>
               </div>
             </div>
             <section class="level-map" id="level-map" aria-labelledby="map-title">
-              <div class="map-heading"><div><p class="overlay-kicker">ZIPKIN · VOLKANA YOLCULUK</p><h2 id="map-title">Yolculuğa devam et</h2><p class="map-story">Zıpkın volkanın zirvesine ulaşmak için yola çıktı. Üç dünya, 24 bölüm: ilk durak Orman.</p></div><p class="map-total" id="map-total">★ 0 / 72</p></div>
+              <div class="map-heading"><div><p class="map-kicker">ZIPKIN · VOLKANA YOLCULUK</p><h2 id="map-title">Yolculuğa devam et</h2><p class="map-story">Zıpkın volkanın zirvesine ulaşmak için yola çıktı. Üç dünya, 24 bölüm: ilk durak Orman.</p></div><p class="map-total" id="map-total">★ 0 / 72</p></div>
               <div class="world-tabs" role="tablist" aria-label="Dünyalar">
                 <button type="button" role="tab" data-world="0" aria-selected="true">🌿 Orman</button>
                 <button type="button" role="tab" data-world="1" aria-selected="false">⚙️ Saat Kulesi</button>

@@ -9,7 +9,7 @@ const read = path => readFileSync(new URL(`../${path}`, import.meta.url), 'utf8'
 const games = readdirSync(new URL('../games/', import.meta.url), { withFileTypes: true }).filter(entry => entry.isDirectory()).map(entry => entry.name);
 
 // Şablona henüz taşınmamış oyunlar (taşındıkça listeden çıkar; hedef: boş liste).
-const PENDING = new Set(['2048', 'araba', 'balon-patlat', 'mahjong', 'platform-macera', 'sekil', 'soliter', 'tetris', 'hafiza', 'kelime-avi', 'mayin-tarlasi', 'sudoku', 'xox', 'kelime-merdiveni', 'harfane']);
+const PENDING = new Set(['hafiza', 'kelime-avi', 'mayin-tarlasi', 'sudoku', 'xox', 'kelime-merdiveni', 'harfane']);
 
 test('her oyun ortak sahne modülünü kullanıyor', () => {
   for (const id of games.filter(id => !PENDING.has(id))) {

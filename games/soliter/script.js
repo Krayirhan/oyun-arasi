@@ -1,6 +1,7 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne7';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne7';
-import { confirmDialog } from '../../game-dialog.js?v=sahne7';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=sahne13';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne13';
+import { confirmDialog } from '../../game-dialog.js?v=sahne13';
+import { createStage } from '../../game-stage.js?v=sahne13';
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');
@@ -11,7 +12,9 @@ const drawPicker = document.querySelector('#draw-mode');
 const timerElement = document.querySelector('#timer');
 const undoButton = document.querySelector('#undo-button');
 const autoButton = document.querySelector('#auto-button');
-const overlay = document.querySelector('#game-overlay');
+// Kazanma kartı ortak sahne şablonundan (game-stage.js) gelir.
+const stage = createStage();
+let stageKey = '';
 
 const emptyRecord = () => ({ bestMs: null, bestMoves: null });
 let records = { 1: emptyRecord(), 3: emptyRecord(), wins: 0 };
@@ -156,9 +159,17 @@ function render() {
   autoButton.hidden = !canAutoComplete(game) || Boolean(autoTimer);
   const record = records[game.draw];
   document.querySelector('#best').textContent = `${DRAW_MODES[game.draw].label} rekoru: ${record.bestMs == null ? '—' : `${formatTime(record.bestMs)} · ${record.bestMoves} hamle`}`;
-  overlay.classList.toggle('hidden', game.status !== 'won');
-  if (game.status === 'won') {
-    document.querySelector('#overlay-copy').textContent = `${formatTime(game.elapsedMs)} sürede, ${game.moves} hamlede bitirdin.${record.bestMs === game.elapsedMs ? ' Yeni rekor!' : ''}`;
+  const key = game.status === 'won' ? `won-${game.elapsedMs}-${game.moves}` : '';
+  if (key !== stageKey) {
+    stageKey = key;
+    if (game.status === 'won') {
+      stage.show({
+        kind: 'result', kicker: 'KAZANDIN', title: 'Tebrikler!', record: record.bestMs === game.elapsedMs,
+        copy: 'Bütün kartları yerine dizdin.',
+        stats: [['Süre', formatTime(game.elapsedMs)], ['Hamle', game.moves], ['Mod', DRAW_MODES[game.draw].label]],
+        actions: [{ label: 'Yeni oyun', primary: true, onClick: () => startNew(drawPicker.value) }], dismissible: true
+      });
+    } else stage.hide();
   }
 }
 
@@ -347,7 +358,6 @@ async function startNew(draw) {
 buildTable();
 stockElement.addEventListener('click', draw);
 document.querySelector('#new-game').addEventListener('click', () => startNew(drawPicker.value));
-document.querySelector('#overlay-new-button').addEventListener('click', () => startNew(drawPicker.value));
 drawPicker.addEventListener('change', () => startNew(drawPicker.value));
 undoButton.addEventListener('click', () => { if (!autoTimer) apply(undo(game), 'Son hamle geri alındı.'); });
 autoButton.addEventListener('click', autoComplete);

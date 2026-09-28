@@ -98,10 +98,12 @@ export function createStage({ frame = document.querySelector('.play-panel .board
       layer.classList.remove('is-offstage');
       layer.inert = false;
       setStageInert(true);
-      // Odak: kullanıcı başka bir yerde (ör. arama kutusunda) yazıyorsa kart odağı çalmaz.
+      // Odak: sayfa kayıtlı bir oyunla açıldıysa (kullanıcı henüz dokunmadıysa) ya da başka bir yerde yazıyorsa
+      // kart odağı çalmaz.
       const focused = document.activeElement;
       const panel = frame.closest('.play-panel');
-      if (wasHidden && options.focus !== false && (!focused || focused === document.body || panel?.contains(focused))) {
+      const interacted = navigator.userActivation ? navigator.userActivation.hasBeenActive : true;
+      if (wasHidden && interacted && options.focus !== false && (!focused || focused === document.body || panel?.contains(focused))) {
         card.querySelector('.play-new, .play-button')?.focus({ preventScroll: true });
       }
     },
