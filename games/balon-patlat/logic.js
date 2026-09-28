@@ -1,10 +1,14 @@
 export const WIDTH = 600;
-export const HEIGHT = 900;
+export const HEIGHT = 800;
 export const ROUND_SECONDS = 60;
 export const MAX_ESCAPES = 3;
-export const BALLOON_RADIUS = 48;
+export const BALLOON_RADIUS = 50;
 export const LAUNCH_X = WIDTH / 2;
 export const LAUNCH_Y = HEIGHT - 54;
+// Dart elden (ekranın altından) fırlar ve nişan alınan noktaya bu sürede ulaşır; balonlar yükseldiği için
+// oyuncunun biraz önden nişan alması gerekir.
+export const FLIGHT_TIME = 0.34;
+export const HAND_Y = HEIGHT + 30;
 
 const COLUMNS = [62, 181, 300, 419, 538];
 const LEVELS = [
@@ -86,7 +90,7 @@ function equation(game) {
 export function createGame(seed = Math.floor(Math.random() * 4294967296)) {
   const game = {
     status: 'ready', elapsed: 0, score: 0, target: 0, combo: 0, bestCombo: 0,
-    correctHits: 0, wrongHits: 0, dartsFired: 0, escapes: 0,
+    correctHits: 0, wrongHits: 0, dartsFired: 0, misses: 0, escapes: 0, events: [],
     balloons: [], darts: [], aim: { x: LAUNCH_X, y: 180 },
     spawnTimer: 0, shotCooldown: 0, nextBalloonId: 1,
     rng: seed >>> 0,
@@ -114,27 +118,26 @@ export function aimAt(game, x, y) {
   return { ...game, aim: { x: Math.max(0, Math.min(WIDTH, x)), y: Math.max(40, Math.min(LAUNCH_Y - 20, y)) } };
 }
 
+// Elde tek dart vardır: önceki dart hedefe varmadan yenisi atılamaz.
 export function fireDart(game) {
-  if (game.status !== 'playing' || game.shotCooldown > 0) return game;
-  const dx = game.aim.x - LAUNCH_X;
-  const dy = Math.min(game.aim.y, LAUNCH_Y - 20) - LAUNCH_Y;
-  const length = Math.hypot(dx, dy) || 1;
+  if (game.status !== 'playing' || game.darts.length || game.shotCooldown > 0) return game;
   return {
     ...game,
     dartsFired: game.dartsFired + 1,
-    shotCooldown: 0.32,
-    darts: [...game.darts, { x: LAUNCH_X, y: LAUNCH_Y, vx: dx / length * 1120, vy: dy / length * 1120, life: 1.4 }]
+    darts: [{ sx: LAUNCH_X, sy: HAND_Y, tx: game.aim.x, ty: game.aim.y, t: 0 }]
   };
 }
 
-function segmentHit(dart, end, balloon) {
-  const dx = end.x - dart.x;
-  const dy = end.y - dart.y;
-  const length2 = dx * dx + dy * dy || 1;
-  const t = Math.max(0, Math.min(1, ((balloon.x - dart.x) * dx + (balloon.y - dart.y) * dy) / length2));
-  const x = dart.x + dx * t;
-  const y = dart.y + dy * t;
-  return (balloon.x - x) ** 2 + (balloon.y - y) ** 2 <= (balloon.radius + 5) ** 2 ? t : null;
+// Dart vardığı noktada bir balonun içindeyse (yükseklik biraz daha geniş elips) o balon patlar.
+function balloonAt(balloons, x, y) {
+  let best = null;
+  for (const balloon of balloons) {
+    const dx = (x - balloon.x) / (balloon.radius * 1.02);
+    const dy = (y - balloon.y) / (balloon.radius * 1.12);
+    const distance = dx * dx + dy * dy;
+    if (distance <= 1 && (!best || distance < best.distance)) best = { balloon, distance };
+  }
+  return best?.balloon || null;
 }
 
 function recordHit(game, balloon) {
@@ -162,24 +165,24 @@ function advanceSlice(game, dt) {
     spawnTimer: game.spawnTimer + dt,
     balloons: game.balloons.map(balloon => ({ ...balloon, y: balloon.y - LEVELS[stageFor(game.correctHits) - 1].speed * dt, wobble: balloon.wobble + dt * 2 })),
     darts: [],
+    events: game.events,
     lastHit: game.lastHit && game.lastHit.time > 0 ? { ...game.lastHit, time: game.lastHit.time - dt } : null
   };
 
   const remainingDarts = [];
   for (const dart of game.darts) {
-    const end = { x: dart.x + dart.vx * dt, y: dart.y + dart.vy * dt };
-    let hit = null;
-    for (const balloon of next.balloons) {
-      const t = segmentHit(dart, end, balloon);
-      if (t !== null && (!hit || t < hit.t)) hit = { balloon, t };
-    }
+    const t = dart.t + dt / FLIGHT_TIME;
+    if (t < 1) { remainingDarts.push({ ...dart, t }); continue; }
+    const hit = balloonAt(next.balloons, dart.tx, dart.ty);
     if (hit) {
-      next.balloons = next.balloons.filter(balloon => balloon.id !== hit.balloon.id);
-      recordHit(next, hit.balloon);
-      if (next.lastHit) next.lastHit.time = 0.8;
-    } else if (dart.life - dt > 0 && end.y > -40 && end.x > -80 && end.x < WIDTH + 80) {
-      remainingDarts.push({ ...dart, ...end, life: dart.life - dt });
+      next.balloons = next.balloons.filter(balloon => balloon.id !== hit.id);
+      recordHit(next, hit);
+      next.events.push({ type: 'pop', correct: hit.result === game.target, x: hit.x, y: hit.y, a: hit.a, b: hit.b, result: hit.result, color: hit.color });
+    } else {
+      next.misses += 1;
+      next.events.push({ type: 'miss', x: dart.tx, y: dart.ty });
     }
+    next.shotCooldown = 0.08;
   }
   next.darts = remainingDarts;
 
@@ -207,7 +210,7 @@ function advanceSlice(game, dt) {
 }
 
 export function advance(game, seconds) {
-  let current = game;
+  let current = { ...game, events: [] };
   let remaining = Math.max(0, Math.min(seconds, 0.25));
   while (remaining > 0 && current.status === 'playing') {
     const dt = Math.min(remaining, 0.05);

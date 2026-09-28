@@ -1,6 +1,6 @@
-import { PUZZLES } from './puzzles.js?v=202609280150';
-import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=202609280150';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609280150';
+import { PUZZLES } from './puzzles.js?v=balon6';
+import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=balon6';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon6';
 
 const $ = selector => document.querySelector(selector);
 const DICTIONARY = new Set(prepareDictionary(window.HARFANE_WORDS || []));

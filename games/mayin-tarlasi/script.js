@@ -1,6 +1,6 @@
-import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=202609280150';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202609280150';
-import { confirmDialog } from '../../game-dialog.js?v=202609280150';
+import { DIFFICULTIES, createGame, revealCell, toggleFlag, elapsedMilliseconds, isValidGame } from './logic.js?v=balon6';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon6';
+import { confirmDialog } from '../../game-dialog.js?v=balon6';
 
 const KEY = 'oyunarasi-mayin-tarlasi-v1';
 const boardElement = document.querySelector('#board');

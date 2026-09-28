@@ -1,12 +1,12 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
-import { HEIGHT, LAUNCH_X, LAUNCH_Y, MAX_ESCAPES, ROUND_SECONDS, advance, aimAt, createGame, fireDart, isValidGame, pauseGame, stageFor, startGame } from './logic.js';
+import { FLIGHT_TIME, HEIGHT, LAUNCH_X, LAUNCH_Y, MAX_ESCAPES, ROUND_SECONDS, advance, aimAt, createGame, fireDart, isValidGame, pauseGame, stageFor, startGame } from './logic.js';
 
 function shootAt(game, balloon) {
-  const target = { ...balloon, x: LAUNCH_X, y: LAUNCH_Y - 90 };
+  const target = { ...balloon, x: LAUNCH_X, y: 420 };
   const setup = { ...game, balloons: [target] };
-  const aimed = aimAt(setup, target.x, target.y);
-  return advance(advance(fireDart(aimed), 0.25), 0.1);
+  const aimed = aimAt(setup, target.x, target.y - 8);
+  return advance(advance(fireDart(aimed), 0.25), 0.2);
 }
 
 test('seeded game starts with a target that appears on a valid rising equation balloon', () => {
@@ -104,4 +104,28 @@ test('aim and fire obey status, cooldown and board bounds', () => {
   assert.equal(fired.dartsFired, 1);
   assert.equal(fireDart(fired).dartsFired, 1);
   assert.equal(LAUNCH_X, 300);
+});
+
+test('dart atıldığı noktaya uçuş süresi sonunda varır; o sırada elde yeni dart yoktur', () => {
+  let game = startGame(createGame(12));
+  const balloon = { ...game.balloons.find(item => item.result === game.target), x: 150, y: 400 };
+  game = aimAt({ ...game, balloons: [balloon] }, 150, 392);
+  game = fireDart(game);
+  assert.equal(game.darts.length, 1);
+  assert.equal(fireDart(game).dartsFired, 1, 'uçuştaki dart varken ikinci dart atılamaz');
+  game = advance(game, FLIGHT_TIME * .6);
+  assert.equal(game.correctHits, 0, 'dart henüz varmadı');
+  game = advance(game, FLIGHT_TIME * .6);
+  assert.equal(game.correctHits, 1);
+  assert.deepEqual(game.events.map(event => event.type), ['pop']);
+});
+
+test('boşluğa atılan dart ıskalar, balon patlamaz ve kombo bozulmaz', () => {
+  let game = startGame(createGame(15));
+  const balloon = { ...game.balloons[0], x: 480, y: 400 };
+  game = { ...aimAt({ ...game, balloons: [balloon] }, 120, 300), combo: 4 };
+  game = advance(advance(fireDart(game), 0.25), 0.2);
+  assert.equal(game.misses, 1);
+  assert.equal(game.combo, 4);
+  assert.ok(game.balloons.some(item => item.id === balloon.id));
 });
