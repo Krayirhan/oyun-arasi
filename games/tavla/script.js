@@ -1,11 +1,11 @@
 import {
   createGame, openingRoll, roll, legalMoves, applyMove, undoMove, endTurn, turnDone, nextGame,
   pipCount, isValidGame, chooseSequence
-} from './logic.js?v=mantik2';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik2';
-import { confirmDialog } from '../../game-dialog.js?v=mantik2';
-import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=mantik2';
-import { rollDie } from '../../rng.js?v=mantik2';
+} from './logic.js?v=mantik3';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik3';
+import { confirmDialog } from '../../game-dialog.js?v=mantik3';
+import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=mantik3';
+import { rollDie } from '../../rng.js?v=mantik3';
 
 const KEY = 'oyunarasi-tavla-v1';
 const LEVEL_NAMES = { easy: 'Kolay', medium: 'Orta', hard: 'Zor' };

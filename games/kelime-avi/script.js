@@ -1,7 +1,7 @@
-import { LEVELS, THEMES, createGame, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik2';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik2';
-import { confirmDialog } from '../../game-dialog.js?v=mantik2';
-import { createStage } from '../../game-stage.js?v=mantik2';
+import { LEVELS, THEMES, createGame, mergeRecords, snapLine, lineCells, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik3';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik3';
+import { confirmDialog } from '../../game-dialog.js?v=mantik3';
+import { createStage } from '../../game-stage.js?v=mantik3';
 // Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
 const stage = createStage();
 let stageKey = '';
@@ -226,20 +226,12 @@ const cloudSync = syncGameOnAccountChange('kelime-avi', {
   read: () => ({ game: pauseGame(game), records }),
   write: incoming => { game = resumeGame(incoming.game); records = mergeRecords(records, incoming.records); anchor = -1; selection = []; buildGrid(); render(); },
   isValid: incoming => Boolean(incoming && isValidGame(incoming.game) && incoming.records && typeof incoming.records === 'object'),
-  merge: (local, remote) => ({ game: remote.game, records: mergeRecords(local.records, remote.records) }),
+  // Sözleşme (firebase-client.js): merge(a, b) → b'nin aktif oyunu + ikisinin birleşik rekorları. Hangisinin b olacağını
+  // eşitleme katmanı zaman damgasına göre seçer; burada oyun seçimi yapılmaz.
+  merge: (first, second) => ({ game: second.game, records: mergeRecords(first.records, second.records) }),
   getStats: current => ({ easy: { bestMs: current.records.easy }, medium: { bestMs: current.records.medium }, hard: { bestMs: current.records.hard } }),
   onStatus: message => { saveElement.textContent = message; }
 });
-
-function mergeRecords(local, remote) {
-  const merged = {};
-  for (const level of Object.keys(LEVELS)) {
-    const left = Number.isFinite(local?.[level]) ? local[level] : null;
-    const right = Number.isFinite(remote?.[level]) ? remote[level] : null;
-    merged[level] = left == null ? right : right == null ? left : Math.min(left, right);
-  }
-  return merged;
-}
 
 buildGrid();
 render();

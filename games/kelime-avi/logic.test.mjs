@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LEVELS, THEMES, generatePuzzle, createGame, lineCells, snapLine, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js';
+import { LEVELS, THEMES, generatePuzzle, createGame, lineCells, snapLine, submitSelection, giveHint, elapsedMilliseconds, pauseGame, resumeGame, isValidGame, mergeRecords } from './logic.js';
 
 function seeded(seed) {
   return () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
@@ -101,4 +101,48 @@ test('isValidGame accepts saved games and rejects broken ones', () => {
   const tampered = [...game.grid]; tampered[game.words[0].cells[0]] = tampered[game.words[0].cells[0]] === 'A' ? 'B' : 'A';
   assert.ok(!isValidGame({ ...game, grid: tampered }), 'words must still read along their cells');
   assert.ok(!isValidGame(null));
+});
+
+test('her seviyede 300 bulmaca: kelimeler bulunur, ters de kabul edilir, aynı kelime ikinci kez sayılmaz', () => {
+  for (const level of Object.keys(LEVELS)) {
+    for (let seed = 1; seed <= 300; seed += 1) {
+      let game = createGame(level, seeded(seed * 7919 + level.length), 0);
+      assert.equal(game.words.length, LEVELS[level].words, `${level} #${seed}`);
+      assert.equal(isValidGame(game), true);
+      const [first, ...rest] = game.words;
+      const reversed = submitSelection(game, [...first.cells].reverse(), 0);
+      assert.ok(reversed, `${level} #${seed} ters seçim`);
+      assert.equal(submitSelection(reversed.game, first.cells, 0), null, 'bulunan kelime tekrar sayılmaz');
+      game = reversed.game;
+      for (const entry of rest) game = submitSelection(game, entry.cells, 1000).game;
+      assert.equal(game.status, 'won', `${level} #${seed} bütün kelimeler bulunca biter`);
+    }
+  }
+});
+
+test('dolgu harfi kelimenin ikinci kopyasını üretse bile hangi kopya seçilirse seçilsin bulunur', () => {
+  let checked = 0;
+  for (let seed = 1; seed <= 400 && checked < 5; seed += 1) {
+    const game = createGame('hard', seeded(seed), 0);
+    for (const entry of game.words) {
+      const L = [...entry.word].length;
+      for (let start = 0; start < game.grid.length; start += 1) for (const [dr, dc] of LEVELS.hard.directions) {
+        const r1 = Math.floor(start / game.size) + dr * (L - 1); const c1 = (start % game.size) + dc * (L - 1);
+        if (r1 < 0 || r1 >= game.size || c1 < 0 || c1 >= game.size) continue;
+        const cells = Array.from({ length: L }, (_, k) => (Math.floor(start / game.size) + dr * k) * game.size + (start % game.size) + dc * k);
+        if (cells.map(cell => game.grid[cell]).join('') !== entry.word || cells.join() === entry.cells.join()) continue;
+        const result = submitSelection(game, cells, 0);
+        assert.ok(result, `${entry.word} ikinci kopya`);
+        assert.equal(result.word.word, entry.word);
+        checked += 1;
+      }
+    }
+  }
+  assert.ok(checked > 0, 'örnek ikinci kopya bulundu');
+});
+
+test('rekor birleştirme her seviyede en kısa süreyi tutar ve boş rekoru ezmez', () => {
+  assert.deepEqual(mergeRecords({ easy: 50000, medium: null, hard: 90000 }, { easy: 40000, medium: 70000, hard: null }), { easy: 40000, medium: 70000, hard: 90000 });
+  assert.deepEqual(mergeRecords(null, undefined), { easy: null, medium: null, hard: null });
+  assert.deepEqual(mergeRecords({ easy: 'x' }, { easy: 12 }), { easy: 12, medium: null, hard: null });
 });

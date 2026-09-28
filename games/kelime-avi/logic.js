@@ -159,3 +159,14 @@ export function isValidGame(game) {
     && ['playing', 'won'].includes(game.status)
     && Number.isFinite(game.startedAt) && Number.isFinite(game.elapsedMs) && game.elapsedMs >= 0;
 }
+
+// Bulut eşitlemesi için rekorlar: her seviyede en kısa süre kalır (null = henüz rekor yok).
+export function mergeRecords(first, second) {
+  const merged = {};
+  for (const level of Object.keys(LEVELS)) {
+    const left = Number.isFinite(first?.[level]) ? first[level] : null;
+    const right = Number.isFinite(second?.[level]) ? second[level] : null;
+    merged[level] = left == null ? right : right == null ? left : Math.min(left, right);
+  }
+  return merged;
+}
