@@ -62,10 +62,11 @@ body[data-game='dort-tas'] .play-panel::before { position: absolute; z-index: -1
 .connect-token { color: #ed3d45; text-shadow: 0 3px 0 #951d2b; }
 .connect-token:nth-child(2), .connect-token:nth-child(4) { color: #ffc333; text-shadow: 0 3px 0 #a25b0c; }
 .play-panel.is-fullscreen { background: radial-gradient(ellipse at 50% 42%, #344c87 0%, #1b2c5b 58%, #111b3b 100%); }
-.play-panel.is-fullscreen .board-frame { width: min(100%, 1450px); height: 100%; min-height: 0; margin-inline: auto; padding: 18px 24px; align-content: center; }
+.play-panel.is-fullscreen .board-frame { width: min(100%, 1450px); min-height: 0; margin-inline: auto; padding: 18px 24px; align-content: center; }
 .play-panel.is-fullscreen .play-panel-head { width: 100%; max-width: 1450px; margin-inline: auto; }
-.play-panel.is-fullscreen .connect-game { height: 100%; min-height: 0; align-content: center; gap: clamp(8px, 1.5vh, 18px); }
-.play-panel.is-fullscreen .board-wrap { width: min(100%, 94vh, 1450px); min-width: 0; }
+.play-panel.is-fullscreen .connect-game { min-height: 0; align-content: center; gap: clamp(8px, 1.5vh, 18px); }
+/* Tahta genişliği ekran yüksekliğinden türer (durum + tahta + açıklama + başlık/alt çubuk ekrana sığar). */
+.play-panel.is-fullscreen .board-wrap { width: min(100%, calc(100vh - 275px), 1450px); min-width: 0; }
 .play-panel.is-fullscreen .connect-board { gap: clamp(7px, 1.25vh, 14px); padding: clamp(12px, 1.8vh, 20px); }
 .play-panel.is-fullscreen .connect-cell { border-width: clamp(3px, .42vh, 5px); }
 .play-panel.is-fullscreen .column-controls { margin-bottom: clamp(9px, 1.4vh, 16px); padding: clamp(8px, 1.2vh, 13px); }
@@ -97,10 +98,15 @@ body[data-game='dort-tas'] .play-panel::before { position: absolute; z-index: -1
   .board-wrap { width: min(100%, 92vw, 78vh); }
   .connect-board { gap: 3px; }
 }
+/* Yatay kısa tam ekran: durum ve açıklama tahtanın soluna geçer; tahta yüksekliğe göre boyutlanır, sığdırma kaydırmaya düşmez. */
 @media (max-height: 480px) and (orientation: landscape) {
-  .play-panel.is-fullscreen .board-wrap { width: min(74vh, 90vw); }
-  .play-panel.is-fullscreen .board-frame { grid-template-columns: 1fr auto; grid-template-rows: auto 1fr auto; align-items: center; gap: 5px 18px; }
-  .play-panel.is-fullscreen .game-status { grid-column: 1 / -1; }
-  .play-panel.is-fullscreen .board-legend { grid-column: 1 / -1; }
+  .play-panel.is-fullscreen .board-frame { padding: 8px 16px; }
+  .play-panel.is-fullscreen .connect-game { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: 1fr auto auto 1fr; column-gap: 22px; row-gap: 8px; }
+  .play-panel.is-fullscreen .board-wrap { grid-column: 2; grid-row: 1 / -1; align-self: center; width: min(calc(100vh - 122px), 46vw); padding: 6px; border-width: 4px; border-radius: 16px; }
+  .play-panel.is-fullscreen .connect-board { gap: 4px; padding: 8px; }
+  .play-panel.is-fullscreen .column-controls { margin-bottom: 5px; padding: 4px; }
+  .play-panel.is-fullscreen .column-drop { min-height: 24px; }
+  .play-panel.is-fullscreen .game-status { grid-column: 1; grid-row: 2; align-self: end; }
+  .play-panel.is-fullscreen .board-legend { grid-column: 1; grid-row: 3; align-self: start; flex-direction: column; align-items: center; gap: 6px; }
 }
 @media (prefers-reduced-motion: reduce) { .mode-choice, .start-game, .connect-cell, .column-drop { transition: none; } .connect-cell.is-winning::before { animation: none; } }

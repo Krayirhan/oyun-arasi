@@ -1,7 +1,7 @@
-import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=mantik18';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik18';
-import { confirmDialog } from '../../game-dialog.js?v=mantik18';
-import { createStage } from '../../game-stage.js?v=mantik18';
+import { createGame, flipCard, settleMismatch, elapsedMilliseconds, isValidGame } from './logic.js?v=mantik23';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik23';
+import { confirmDialog } from '../../game-dialog.js?v=mantik23';
+import { createStage } from '../../game-stage.js?v=mantik23';
 // Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
 const stage = createStage();
 let stageKey = '';
