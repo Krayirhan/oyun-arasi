@@ -1,7 +1,11 @@
-import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik28';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik28';
-import { confirmDialog } from '../../game-dialog.js?v=mantik28';
-import { createStage } from '../../game-stage.js?v=mantik28';
+import { LEVELS, createGame, placeValue, clearCell, toggleNote, undo, giveHint, conflicts, noteValues, rowOf, colOf, boxOf, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik29';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik29';
+import { confirmDialog } from '../../game-dialog.js?v=mantik29';
+import { createStage } from '../../game-stage.js?v=mantik29';
+
+// Sekme gizliyken süre işlemez: gizlendiği an dondurulur, dönünce kaldığı yerden sürer (telefon kilidi de dahil).
+let hiddenAt = null;
+const clockNow = () => hiddenAt ?? Date.now();
 // Oyun sonu kartı ortak sahne şablonundan (game-stage.js) gelir.
 const stage = createStage();
 let stageKey = '';
@@ -33,7 +37,7 @@ function loadGame() {
 }
 
 function saveGame() {
-  const stored = { game: pauseGame(game), records };
+  const stored = { game: pauseGame(game, clockNow()), records };
   try { localStorage.setItem(KEY, JSON.stringify(stored)); saveElement.textContent = 'Oyun bu cihazda saklanıyor.'; }
   catch { saveElement.textContent = 'Kayıt kullanılamıyor; bu oturumda oynamaya devam edebilirsin.'; }
   cloudSync.save(stored);
@@ -229,14 +233,14 @@ hintButton.addEventListener('click', () => {
   apply(result.game, 'İpucu kullandın. İpucuyla çözülen bulmacalar rekora sayılmaz.');
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) saveGame();
-  else { game = resumeGame(pauseGame(game)); render(); }
+  if (document.hidden) { hiddenAt = Date.now(); game = pauseGame(game, hiddenAt); saveGame(); }
+  else { hiddenAt = null; game = resumeGame(game); render(); }
 });
 window.addEventListener('pagehide', saveGame);
 setInterval(() => { if (game.status === 'playing') timerElement.textContent = formatTime(elapsedMilliseconds(game)); }, 500);
 
 const cloudSync = syncGameOnAccountChange('sudoku', {
-  read: () => ({ game: pauseGame(game), records }),
+  read: () => ({ game: pauseGame(game, clockNow()), records }),
   write: incoming => { game = resumeGame(incoming.game); records = mergeRecords(records, incoming.records); selected = game.board.indexOf(0); render(); },
   isValid: incoming => Boolean(incoming && isValidGame(incoming.game) && incoming.records && typeof incoming.records === 'object'),
   merge: (local, remote) => ({ game: remote.game, records: mergeRecords(local.records, remote.records) }),

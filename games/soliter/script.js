@@ -1,7 +1,11 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik28';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik28';
-import { confirmDialog } from '../../game-dialog.js?v=mantik28';
-import { createStage } from '../../game-stage.js?v=mantik28';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik29';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik29';
+import { confirmDialog } from '../../game-dialog.js?v=mantik29';
+import { createStage } from '../../game-stage.js?v=mantik29';
+
+// Sekme gizliyken süre işlemez: gizlendiği an dondurulur, dönünce kaldığı yerden sürer (telefon kilidi de dahil).
+let hiddenAt = null;
+const clockNow = () => hiddenAt ?? Date.now();
 
 const KEY = 'oyunarasi-soliter-v1';
 const tableElement = document.querySelector('#board');
@@ -34,7 +38,7 @@ function loadGame() {
 }
 
 function saveGame() {
-  const stored = { game: pauseGame(game), records };
+  const stored = { game: pauseGame(game, clockNow()), records };
   try { localStorage.setItem(KEY, JSON.stringify(stored)); saveElement.textContent = 'Oyun bu cihazda saklanıyor.'; }
   catch { saveElement.textContent = 'Kayıt kullanılamıyor; bu oturumda oynamaya devam edebilirsin.'; }
   cloudSync.save(cloudState());
@@ -373,8 +377,8 @@ document.addEventListener('keydown', event => {
 });
 
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden) saveGame();
-  else { game = resumeGame(pauseGame(game)); render(); }
+  if (document.hidden) { hiddenAt = Date.now(); game = pauseGame(game, hiddenAt); saveGame(); }
+  else { hiddenAt = null; game = resumeGame(game); render(); }
 });
 window.addEventListener('pagehide', saveGame);
 setInterval(() => { if (game.status === 'playing') timerElement.textContent = formatTime(elapsedMilliseconds(game)); }, 500);
@@ -391,7 +395,7 @@ window.addEventListener('game:fullscreenfit', remeasure);
 
 // Firestore cannot store arrays inside arrays (the columns), so the cloud copy keeps the game as JSON text.
 function cloudState() {
-  return { gameJson: JSON.stringify(pauseGame(game)), records };
+  return { gameJson: JSON.stringify(pauseGame(game, clockNow())), records };
 }
 
 function parseCloudGame(incoming) {
