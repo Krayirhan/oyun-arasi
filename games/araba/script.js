@@ -1,6 +1,6 @@
-import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=mantik1';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik1';
-import { createStage } from '../../game-stage.js?v=mantik1';
+import { LANES, VIEW, PLAYER_Y, CAR_LENGTH, CAR_WIDTH, createGame, startGame, pauseGame, steer, advance, score } from './logic.js?v=mantik2';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik2';
+import { createStage } from '../../game-stage.js?v=mantik2';
 
 const KEY = 'oyunarasi-araba-v1';
 const canvas = document.querySelector('#board');

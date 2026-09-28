@@ -1,3 +1,8 @@
+import {
+  MAX_TRIES, WORD_LENGTH, answerForDay, applyDailyResult, attemptsForMode as attemptsFor, dayKey, defaultStats, normalizePool as cleanPool,
+  normalizeSeries as cleanSeries, normalizeStats, previousDayKey, puzzleNumberFor, readJson, scoreGuess as scoreWord, shuffled, streakForDisplay, writeJson
+} from './logic.js?v=mantik2';
+
 const ANSWERS = window.HARFANE_ANSWERS;
 const VALID_WORDS = new Set(window.HARFANE_WORDS);
 
@@ -20,8 +25,6 @@ const KEY_ROWS = [
   ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ş', 'i'],
   ['enter', 'z', 'c', 'v', 'b', 'n', 'm', 'ö', 'ç', 'backspace']
 ];
-const MAX_TRIES = 6;
-const WORD_LENGTH = 5;
 const STORAGE_KEY = 'harfane-state-v1';
 const LEGACY_STATS_STORAGE_KEY = 'harfane-stats-v1';
 const STORAGE_V2 = 'harfane-state-v2';
@@ -62,30 +65,16 @@ let cloudSaveQueue = Promise.resolve();
 let authRevision = 0;
 let modeLoadRevision = 0;
 
-function todayKey() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
-}
-
-function yesterdayKey() {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 1);
-  return `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, '0')}-${String(yesterday.getDate()).padStart(2, '0')}`;
-}
-
-function puzzleNumber() {
-  const start = new Date(2024, 0, 1);
-  const today = new Date();
-  start.setHours(0, 0, 0, 0); today.setHours(0, 0, 0, 0);
-  return Math.max(1, Math.floor((today - start) / 86400000) + 1);
-}
+const todayKey = () => dayKey();
+const yesterdayKey = () => previousDayKey();
+const puzzleNumber = () => puzzleNumberFor();
 
 function progressDocumentId(mode) {
   return mode === 'daily' ? `daily-${todayKey()}` : mode;
 }
 
 function answerForMode(mode) {
-  if (mode === 'daily') return ANSWERS[(puzzleNumber() - 1) % ANSWERS.length];
+  if (mode === 'daily') return answerForDay(ANSWERS, puzzleNumber());
   if (mode === 'series') return state.series.order[state.series.level - 1] || '';
   return '';
 }
@@ -95,19 +84,11 @@ function seriesLabel() {
 }
 
 function shuffleAnswers() {
-  const shuffled = [...ANSWERS];
-  for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const target = Math.floor(Math.random() * (index + 1));
-    [shuffled[index], shuffled[target]] = [shuffled[target], shuffled[index]];
-  }
-  return shuffled;
+  return shuffled(ANSWERS);
 }
 
 function attemptsForMode(mode = state.mode, level = state.series.level) {
-  if (mode !== 'series') return MAX_TRIES;
-  if (level <= 20) return 6;
-  if (level <= 45) return 5;
-  return 4;
+  return attemptsFor(mode, level);
 }
 
 function newSeriesProgress() {
@@ -115,16 +96,12 @@ function newSeriesProgress() {
     completedRuns: state.series.completedRuns, order: shuffleAnswers() };
 }
 
-function defaultStats() {
-  return { played: 0, wins: 0, streak: 0, best: 0, distribution: [0, 0, 0, 0, 0, 0], lastPlayedDate: '' };
-}
-
 function loadState() {
-  const savedStats = JSON.parse(localStorage.getItem(STATS_STORAGE_KEY) || 'null');
+  const savedStats = readJson(localStorage, STATS_STORAGE_KEY);
   state.stats = normalizeStats(savedStats?.daily || defaultStats());
   state.legacyStats = defaultStats();
-  const savedSeries = JSON.parse(localStorage.getItem(SERIES_STORAGE_KEY) || 'null');
-  const oldProgress = JSON.parse(localStorage.getItem(`${STORAGE_KEY}-series-progress`) || 'null');
+  const savedSeries = readJson(localStorage, SERIES_STORAGE_KEY);
+  const oldProgress = readJson(localStorage, `${STORAGE_KEY}-series-progress`);
   if (savedSeries) state.series = normalizeSeries(savedSeries);
   else if (oldProgress) {
     const oldWins = Number(oldProgress.wins) || 0;
@@ -137,47 +114,31 @@ function loadState() {
       order: LEGACY_SERIES_LEVELS
     });
   } else state.series = { ...state.series, order: shuffleAnswers() };
-  state.practicePool = normalizePool(JSON.parse(localStorage.getItem(PRACTICE_POOL_STORAGE_KEY) || 'null'));
+  state.practicePool = normalizePool(readJson(localStorage, PRACTICE_POOL_STORAGE_KEY));
 }
 
+// Depolama yazılamıyorsa (kota dolu, özel sekme) oyun sürer; oyuncuya bir kez haber verilir.
+let storageWarned = false;
 function saveState() {
-  localStorage.setItem(STATS_STORAGE_KEY, JSON.stringify({ daily: state.stats, legacy: state.legacyStats }));
-  localStorage.setItem(SERIES_STORAGE_KEY, JSON.stringify(state.series));
-  localStorage.setItem(PRACTICE_POOL_STORAGE_KEY, JSON.stringify(state.practicePool));
-  if (state.mode !== 'home') localStorage.setItem(`${STORAGE_V2}-${state.mode}`, JSON.stringify({
-    date: todayKey(), answer: state.answer, guesses: state.guesses, current: state.current,
+  const results = [
+    writeJson(localStorage, STATS_STORAGE_KEY, { daily: state.stats, legacy: state.legacyStats }),
+    writeJson(localStorage, SERIES_STORAGE_KEY, state.series),
+    writeJson(localStorage, PRACTICE_POOL_STORAGE_KEY, state.practicePool)
+  ];
+  if (state.mode !== 'home') results.push(writeJson(localStorage, `${STORAGE_V2}-${state.mode}`, {
+    date: state.mode === 'daily' && state.dailyDate ? state.dailyDate : todayKey(), answer: state.answer, guesses: state.guesses, current: state.current,
     gameOver: state.gameOver, won: state.won, keyStates: state.keyStates, level: state.series.level,
     levelCounted: Boolean(state.levelCounted)
   }));
-}
-
-function normalizeStats(stats = {}) {
-  return {
-    played: Number(stats.played) || 0,
-    wins: Number(stats.wins) || 0,
-    streak: Number(stats.streak) || 0,
-    best: Number(stats.best) || 0,
-    distribution: Array.isArray(stats.distribution) && stats.distribution.length === 6
-      ? stats.distribution.map(value => Number(value) || 0)
-      : [0, 0, 0, 0, 0, 0],
-    lastPlayedDate: stats.lastPlayedDate || ''
-  };
+  if (results.includes(false) && !storageWarned) { storageWarned = true; showToast('Bu cihazda kayıt yapılamıyor; oyun bu oturumda devam eder.'); }
 }
 
 function normalizeSeries(progress = {}) {
-  const order = Array.isArray(progress.order) && progress.order.length === SERIES_TOTAL
-    && progress.order.every(word => ANSWERS.includes(word)) ? [...progress.order] : shuffleAnswers();
-  return {
-    level: Math.max(1, Math.min(SERIES_TOTAL, Number(progress.level) || 1)),
-    wins: Math.max(0, Math.min(SERIES_TOTAL, Number(progress.wins) || 0)),
-    best: Math.max(0, Math.min(SERIES_TOTAL, Number(progress.best) || 0)),
-    completed: Boolean(progress.completed),
-    completedRuns: Math.max(0, Number(progress.completedRuns) || 0), order
-  };
+  return cleanSeries(progress, ANSWERS);
 }
 
 function normalizePool(pool) {
-  return Array.isArray(pool) ? [...new Set(pool.filter(word => ANSWERS.includes(word)))] : [];
+  return cleanPool(pool, ANSWERS);
 }
 
 function drawPracticeAnswer() {
@@ -320,6 +281,10 @@ function setScores(labelA, valueA, labelB, valueB) {
   scoreB.label.textContent = labelB; scoreB.value.textContent = valueB;
 }
 
+function displayedStreak() {
+  return streakForDisplay(state.stats, todayKey(), yesterdayKey());
+}
+
 function seriesProgressText() {
   return state.series.completed ? `${SERIES_TOTAL} / ${SERIES_TOTAL} ✓` : `${state.series.level} / ${SERIES_TOTAL}`;
 }
@@ -330,7 +295,7 @@ function refreshModeChrome() {
   const remaining = Math.max(0, state.tryLimit - state.guesses.length);
   menuButton.hidden = home;
   if (home) {
-    setScores('GÜNLÜK SERİ', `${state.stats.streak}`, 'SEFER', seriesProgressText());
+    setScores('GÜNLÜK SERİ', `${displayedStreak()}`, 'SEFER', seriesProgressText());
     statusElement.textContent = 'Bir oyun modu seç.';
   } else if (state.mode === 'daily') {
     setScores('GÜNLÜK SERİ', `${state.stats.streak}`, 'YENİ BULMACA', countdownText());
@@ -398,7 +363,7 @@ function updateHomeMetadata() {
     ? 'Tamamlandı · yeni sefer ↗' : `${state.series.level} / ${SERIES_TOTAL} seviyeye başla ↗`;
   let dailyDone = false;
   try {
-    const saved = JSON.parse(localStorage.getItem(`${STORAGE_V2}-daily`) || 'null');
+    const saved = readJson(localStorage, `${STORAGE_V2}-daily`);
     dailyDone = Boolean(saved && saved.date === todayKey() && saved.gameOver);
   } catch { dailyDone = false; }
   dailyCardAction.textContent = dailyDone ? 'Bugün çözüldü ✓ · sonucu gör ↗' : `#${String(puzzleNumber()).padStart(3, '0')} · başla ↗`;
@@ -416,19 +381,7 @@ function renderBoard() {
   });
 }
 
-function scoreGuess(guess) {
-  const result = Array(WORD_LENGTH).fill('absent');
-  const remaining = {};
-  [...state.answer].forEach(letter => { remaining[letter] = (remaining[letter] || 0) + 1; });
-  [...guess].forEach((letter, index) => {
-    if (letter === [...state.answer][index]) { result[index] = 'correct'; remaining[letter] -= 1; }
-  });
-  [...guess].forEach((letter, index) => {
-    if (result[index] === 'correct') return;
-    if (remaining[letter] > 0) { result[index] = 'present'; remaining[letter] -= 1; }
-  });
-  return result;
-}
+const scoreGuess = guess => scoreWord(guess, state.answer);
 
 function renderKeyboard() {
   keyboard.innerHTML = '';
@@ -453,9 +406,10 @@ function startMode(mode) {
   state.cloudReadyMode = '';
   state.mode = mode;
   state.invalidGuess = false;
-  const savedV2 = localStorage.getItem(`${STORAGE_V2}-${mode}`);
-  const saved = JSON.parse(savedV2 || localStorage.getItem(`${STORAGE_KEY}-${mode}`) || 'null');
+  const savedV2 = readJson(localStorage, `${STORAGE_V2}-${mode}`);
+  const saved = savedV2 || readJson(localStorage, `${STORAGE_KEY}-${mode}`);
   const legacyGame = !savedV2 && Boolean(saved);
+  state.dailyDate = mode === 'daily' ? todayKey() : '';
   if (mode === 'daily') state.answer = answerForMode(mode);
   else if (mode === 'series') state.answer = answerForMode(mode);
   else if (saved && !saved.gameOver && saved.answer && ANSWERS.includes(saved.answer)) state.answer = saved.answer;
@@ -565,16 +519,10 @@ function updateKeyState(letter, status) {
 function finishGame(won) {
   state.gameOver = true; state.won = won;
   creditSeriesWin();
-  if (state.mode === 'daily' && state.stats.lastPlayedDate !== todayKey()) {
-    const previousDate = state.stats.lastPlayedDate;
-    state.stats.lastPlayedDate = todayKey(); state.stats.played += 1;
-    if (won) {
-      const attempts = state.guesses.length;
-      state.stats.wins += 1;
-      state.stats.streak = previousDate === yesterdayKey() ? state.stats.streak + 1 : 1;
-      state.stats.best = Math.max(state.stats.best, state.stats.streak);
-      state.stats.distribution[attempts - 1] += 1;
-    } else state.stats.streak = 0;
+  if (state.mode === 'daily') {
+    const day = state.dailyDate || todayKey();
+    const before = new Date(`${day}T12:00:00`);
+    state.stats = applyDailyResult(state.stats, { won, attempts: state.guesses.length, today: day, yesterday: previousDayKey(before) });
   }
   if (won) {
     const attempts = state.guesses.length;
@@ -662,7 +610,7 @@ function openModal(type) {
     const rows = state.stats.distribution.map((count, i) => `<div class="distribution-row"><b>${i + 1}</b><span class="distribution-bar" style="width:${Math.max(9, (count / max) * 100)}%">${count}</span></div>`).join('');
     const seferPosition = state.series.completed ? SERIES_TOTAL : Math.max(0, state.series.level - 1);
     content.innerHTML = `<h2 id="modal-title">İstatistikler</h2>
-      <h3>Günlük</h3><div class="stats-grid"><div class="stat"><strong>${state.stats.played}</strong><span>Oynanan</span></div><div class="stat"><strong>${dailyWinRate}%</strong><span>Kazanma</span></div><div class="stat"><strong>${state.stats.streak}</strong><span>Günlük seri</span></div></div>
+      <h3>Günlük</h3><div class="stats-grid"><div class="stat"><strong>${state.stats.played}</strong><span>Oynanan</span></div><div class="stat"><strong>${dailyWinRate}%</strong><span>Kazanma</span></div><div class="stat"><strong>${displayedStreak()}</strong><span>Günlük seri</span></div></div>
       <p>En iyi günlük seri: <strong>${state.stats.best}</strong> gün</p><h3>Günlük tahmin dağılımı</h3><div class="distribution">${rows}</div>
       <h3>Sefer</h3><div class="stats-grid"><div class="stat"><strong>${state.series.completed ? '✓' : `${state.series.level}/${SERIES_TOTAL}`}</strong><span>İlerleme</span></div><div class="stat"><strong>${state.series.best}</strong><span>Rekor seviye</span></div><div class="stat"><strong>${state.series.completedRuns}</strong><span>Tamamlanan</span></div></div>
       <p>${state.series.completed ? 'Son Sefer tamamlandı.' : `${seferPosition} / ${SERIES_TOTAL} seviye geçildi.`}</p>
@@ -680,6 +628,12 @@ function shareResult() {
 
 function updateCountdown() {
   if (state.mode !== 'daily') return;
+  // Sayfa gece yarısını aştıysa açık oyun dünün bulmacasıdır; yeni günün bulmacası menüden açılır.
+  if (state.dailyDate && state.dailyDate !== todayKey()) {
+    returnHome();
+    showToast('Yeni günlük bulmaca hazır!');
+    return;
+  }
   scoreB.value.textContent = countdownText();
   if (state.gameOver) renderResult();
 }

@@ -1,7 +1,7 @@
-import { PUZZLES } from './puzzles.js?v=mantik1';
-import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=mantik1';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik1';
-import { createFlow, createStage } from '../../game-stage.js?v=mantik1';
+import { PUZZLES } from './puzzles.js?v=mantik2';
+import { createGame, submitWord, giveHint, isValidGame, dailyPuzzle, dateKey, scoreStars, prepareDictionary } from './logic.js?v=mantik2';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik2';
+import { createFlow, createStage } from '../../game-stage.js?v=mantik2';
 
 const $ = selector => document.querySelector(selector);
 // Ortak sahne şablonu (game-stage.js): menü, merdivenin üstünde açılan katmandır; sonuç da aynı kart katmanıdır.
