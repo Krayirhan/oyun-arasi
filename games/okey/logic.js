@@ -37,7 +37,8 @@ function validRun(tiles, wilds) {
   if (new Set(numbers).size !== numbers.length) return false;
   const starts = [];
   for (let start = 1; start + tiles.length - 1 <= 13; start += 1) starts.push(start);
-  if (tiles.length === 3) starts.push(12); // Türk Okey'inde 12–13–1 de geçerlidir.
+  // Türk Okey'inde 1, 13'ün ardından da gelebilir (12–13–1, 11–12–13–1 ...); 13–1–2 gibi başa saran dizi geçersizdir.
+  starts.push(15 - tiles.length);
   return starts.some(start => {
     const sequence = Array.from({ length: tiles.length }, (_, i) => ((start - 1 + i) % 13) + 1);
     return numbers.every(number => sequence.includes(number));
@@ -149,7 +150,10 @@ function shuffledSet(random) {
 
 export function createRound(random = Math.random, dealer = 0) {
   const wall = shuffledSet(random);
-  const indicator = wall.pop();
+  // Gösterge sahte okey olamaz (okey yüzü belirsiz kalırdı): sondan ilk gerçek taş gösterge olur.
+  let indicatorAt = wall.length - 1;
+  while (wall[indicatorAt].fake) indicatorAt -= 1;
+  const [indicator] = wall.splice(indicatorAt, 1);
   const hands = [[], [], [], []];
   // Dealer seat gets 15; each other seat gets 14. Dealer makes the first discard.
   for (let round = 0; round < 15; round += 1) {

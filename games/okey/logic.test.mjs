@@ -128,3 +128,30 @@ test('beşinci el galibiyeti maçı bitirir', () => {
   assert.equal(result.matchWinner, 0);
   assert.equal(result.wins[0], 5);
 });
+
+test("1, 13 taşından sonra gelebilir: 12-13-1 ve 11-12-13-1 geçerli, 13-1-2 ve 12-13-1-2 geçersiz", () => {
+  const indicator = tile(3, 5); // okey siyah 6; aşağıdaki taşlarla karışmaz
+  const covered = numbers => bestArrangement(numbers.map(number => tile(0, number)), indicator).covered;
+  assert.equal(covered([12, 13, 1]), 3);
+  assert.equal(covered([11, 12, 13, 1]), 4);
+  assert.equal(covered([10, 11, 12, 13, 1]), 5);
+  assert.equal(covered([13, 1, 2]), 0);
+  assert.equal(covered([12, 13, 1, 2]), 3, '2 dizinin devamı olamaz, dışarıda kalır');
+  assert.equal(covered([1, 2, 3, 4]), 4);
+  // okey (siyah 6) 11-12-13-1 dizisinde boşluğu doldurur
+  const withWild = [tile(0, 11), tile(0, 12), tile(3, 6), tile(0, 1)];
+  assert.equal(bestArrangement(withWild, indicator).covered, 4);
+});
+
+test('gösterge hiçbir zaman sahte okey olmaz ve okey yüzü her zaman belirlidir', () => {
+  // random hep ~1: karıştırma taş sırasını değiştirmez, eski kodda sondaki sahte okey gösterge olurdu
+  const identity = createRound(() => 0.999999);
+  assert.equal(identity.indicator.fake, false);
+  assert.notEqual(identity.joker.color, null);
+  assert.equal(isValidRound(identity), true);
+  for (let n = 0; n < 3000; n += 1) {
+    const round = createRound();
+    assert.equal(round.indicator.fake, false);
+    assert.ok(Number.isInteger(round.joker.color) && round.joker.number >= 1 && round.joker.number <= 13);
+  }
+});
