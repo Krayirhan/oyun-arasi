@@ -19,7 +19,7 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 .avatar-chip { display: grid; width: 30px; height: 30px; place-items: center; border: 2px solid #fff2c9; border-radius: 50%; background: linear-gradient(145deg, #ff744a, #df3e37); color: white; font: 900 14px 'Fredoka', sans-serif; box-shadow: 0 2px 5px rgb(0 0 0 / .2); }
 .human-badge .avatar-chip { background: linear-gradient(145deg, #ffc94d, #ed8e28); color: #56341f; }
 .captured-score { margin-left: 8px; padding: 5px 9px; border-radius: 999px; background: rgb(255 255 255 / .1); color: #fff4ce; font: 700 11px 'Fredoka', sans-serif; }
-.bot-hand { display: flex; justify-content: center; min-height: 46px; }
+.bot-hand { display: flex; justify-content: center; min-height: 48px; }
 .bot-hand .playing-card { width: 34px; height: 48px; margin-inline: -5px; border-radius: 6px; }
 .table-center { display: grid; align-items: center; width: 100%; min-height: 194px; }
 .middle-play { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: clamp(8px, 2vw, 22px); width: min(100%, 590px); margin-inline: auto; }
@@ -56,7 +56,7 @@ body[data-game='pisti'] { --accent: #d65338; --accent-deep: #963a29; --accent-so
 .turn-prompt.is-your-turn { border-color: rgb(255 218 117 / .75); background: rgb(123 78 19 / .36); box-shadow: 0 0 20px rgb(255 193 79 / .12); }
 .turn-prompt.is-your-turn .turn-dot { animation: turn-pulse 1.4s ease-in-out infinite; }
 .table-message.is-pisti { animation: pisti-pop .65s cubic-bezier(.16,.9,.2,1.2) both; color: #ffe071; text-shadow: 0 2px 12px #ff9d39, 0 0 20px rgb(255 235 133 / .7); }
-.human-hand { display: flex; justify-content: center; align-items: end; min-height: calc(var(--card-h) + 16px); padding: 3px 4px 9px; }
+.human-hand { display: flex; justify-content: center; align-items: end; min-height: calc(clamp(64px, 9vw, 94px) * 1.4 + 12px); padding: 3px 4px 9px; }
 .playing-card { position: relative; flex: none; display: block; width: var(--card-w); height: var(--card-h); padding: 0; overflow: visible; border: 0; border-radius: 10px; background: #f9f2df; box-shadow: 0 4px 8px rgb(0 0 0 / .24), 0 13px 20px rgb(0 0 0 / .16); }
 .face-art, .back-art { display: block; width: 100%; height: 100%; overflow: visible; }
 .face-art { filter: drop-shadow(0 1px 0 rgb(255 255 255 / .35)); }

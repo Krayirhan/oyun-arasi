@@ -63,3 +63,8 @@ body[data-game='tavla'] { --frame: #4a2c19; --title: #b5462f; --title-shadow: #6
 
 /* Tam ekran: tahta çerçeve genişliğinden boyutlanır; game-shell.js çerçeveyi ekrana sığdırır. */
 .play-panel.is-fullscreen .tavla-table { width: 100%; }
+
+/* Sahne kısaysa (telefonda basık tahta) henüz açılmayan Online kartı menüde yer kaplamaz. */
+@container flow-layer (max-height: 640px) {
+  .game-mode[data-mode='online']:disabled { display: none; }
+}

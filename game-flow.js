@@ -1,12 +1,32 @@
-// Panel içi oyun akışı (menü → oyun → sonuç). Ekranlar aynı .board-frame içinde değişir; tam ekrandayken
-// game-shell.js tahtayı yeni ekrana göre yeniden sığdırır.
-export function createFlow(screens) {
+// Panel içi oyun akışı (menü → oyun → sonuç), tüm oyunlarda aynı sahne standardıyla:
+// oyun ekranı (stage) hep yerinde durur; menü ve sonuç onun ÜSTÜNDE, perdeli birer katman olarak açılır.
+// Çerçevenin boyunu yalnızca oyun sahnesi belirler; katmanlar sahnenin üstüne mutlak konumla oturur
+// (play-page.css, [data-flow]). Böylece ekran değişince oyun çerçevesi büyüyüp küçülmez.
+export function createFlow(screens, { stage = 'game' } = {}) {
   let current = null;
+  for (const [key, element] of Object.entries(screens)) {
+    if (!element) continue;
+    element.classList.remove('hidden');
+    element.dataset.flow = key === stage ? 'stage' : 'overlay';
+    // Katmanın içeriği tek bir kutuda durur; katmanın kendisi sahneyi kaplayan perdedir.
+    if (key !== stage && !element.querySelector(':scope > .flow-card')) {
+      const card = document.createElement('div');
+      card.className = 'flow-card';
+      card.append(...element.childNodes);
+      element.append(card);
+    }
+  }
   return {
     get current() { return current; },
     show(name) {
       current = name;
-      for (const [key, element] of Object.entries(screens)) element?.classList.toggle('hidden', key !== name);
+      for (const [key, element] of Object.entries(screens)) {
+        if (!element) continue;
+        const onStage = key === stage;
+        element.classList.toggle('is-offstage', !onStage && key !== name);
+        // Katman açıkken alttaki oyun ekranı klavyeyle de seçilemez.
+        element.inert = onStage ? name !== stage : key !== name;
+      }
       window.dispatchEvent(new Event('game:layoutchange'));
     }
   };

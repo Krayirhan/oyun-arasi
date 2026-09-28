@@ -163,5 +163,19 @@ body[data-game='harfane'] .play-panel.is-fullscreen .keyboard, body[data-game='h
 /* Yeşil panel üzerinde alt çubuk etiketleri okunur kalsın (telefon düzeni vurgu rengini kullanır). */
 body[data-game='harfane'] .play-panel-footer .score-card > span { color: rgb(255 255 255 / .8) !important; }
 /* Tam ekranda mod menüsü sığdırılmaz: tam genişlikte durur, sığmazsa kendi içinde kayar. */
-body[data-game='harfane'] .play-panel.is-fullscreen > .board-frame:has(> .harfle-menu:not(.hidden)) { width: 100% !important; }
 body[data-game='harfane'] .play-panel.is-fullscreen .harfle-menu { max-height: calc(100dvh - 150px); overflow: auto; overscroll-behavior: contain; }
+
+/* Sahne kısaysa mod menüsü sığacak kadar sıkılaşır (ortak sahne standardı, play-page.css flow-layer). */
+@container flow-layer (max-height: 640px) {
+  .harfle-menu { padding: 6px 4px; }
+  .harfle-menu-copy { display: none; }
+  .harfle-menu h2 { font-size: 26px; }
+  .mode-grid { gap: 8px; margin-top: 12px; }
+  .mode-card { min-height: 0; padding: 11px 14px; }
+  .mode-card::after { display: none; }
+  .mode-icon { width: 30px; height: 30px; margin-bottom: 6px; border-radius: 10px; font-size: 16px; }
+  .mode-card strong { font-size: 18px; }
+  .mode-card small { margin-top: 3px; font-size: 11.5px; line-height: 1.3; }
+  .mode-card i { padding-top: 6px; font-size: 12px; }
+  .home-account { margin-top: 10px; padding-top: 10px; }
+}

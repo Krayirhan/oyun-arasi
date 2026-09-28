@@ -469,19 +469,29 @@ function startMode(mode) {
     state.levelCounted = true;
   }
   if (mode === 'series' && legacyGame && validSavedGame) creditSeriesWin();
-  homeScreen.classList.add('hidden');
-  gameScreen.classList.remove('hidden');
+  showScreen('game');
   buildBoard(); renderKeyboard(); showSavedResult(); refreshModeChrome(); saveState();
   window.dispatchEvent(new Event('game:layoutchange'));
   loadCloudMode(mode);
+}
+
+// Ortak sahne standardı (play-page.css, [data-flow]): oyun tahtası hep yerinde durur, mod menüsü onun üstünde
+// perdeli bir katman olarak açılır; böylece menü ile oyun arasında geçerken çerçevenin boyu değişmez.
+function showScreen(name) {
+  homeScreen.dataset.flow = 'overlay';
+  gameScreen.dataset.flow = 'stage';
+  homeScreen.classList.remove('hidden');
+  gameScreen.classList.remove('hidden');
+  homeScreen.classList.toggle('is-offstage', name !== 'home');
+  homeScreen.inert = name !== 'home';
+  gameScreen.inert = name === 'home';
 }
 
 function returnHome() {
   modeLoadRevision += 1;
   state.cloudReadyMode = '';
   state.mode = 'home';
-  homeScreen.classList.remove('hidden');
-  gameScreen.classList.add('hidden');
+  showScreen('home');
   refreshModeChrome();
   saveState();
   window.dispatchEvent(new Event('game:layoutchange'));
@@ -752,7 +762,6 @@ window.addEventListener('firebase-ready', event => connectFirebase(event.detail)
 if (window.firebaseBridge) connectFirebase(window.firebaseBridge);
 
 loadState();
-homeScreen.classList.remove('hidden');
-gameScreen.classList.add('hidden');
+showScreen('home');
 buildBoard(); renderKeyboard(); refreshModeChrome();
 setInterval(updateCountdown, 1000);

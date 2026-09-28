@@ -181,7 +181,7 @@ button.corner { cursor: default; touch-action: none; }
   .deck-count { right: -10px; bottom: -8px; min-width: 20px; height: 20px; font-size: 11px; }
   .rack-button { min-height: 38px; padding: 0 12px; font-size: 14px; }
   .okey-tools .play-button { min-height: 40px; padding: 0 14px; font-size: 16px; }
-  .tools-hint { flex-basis: 100%; order: 5; text-align: center; }
+  .tools-hint { flex-basis: 100%; order: 5; min-height: 1.3em; text-align: center; }
 }
 /* Telefonda ıstaka 3 kat × 10 yuva olur; taşlar okunur büyüklükte kalır. */
 @media (max-width: 560px) {

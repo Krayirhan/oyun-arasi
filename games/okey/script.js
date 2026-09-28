@@ -1,6 +1,6 @@
-import { createRound, nextRound, drawFromWall, drawDiscard, discardTile, botTurn, canFinish, sortHand, bestArrangement, isValidRound } from './logic.js?v=balon17';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon17';
-import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=balon17';
+import { createRound, nextRound, drawFromWall, drawDiscard, discardTile, botTurn, canFinish, sortHand, bestArrangement, isValidRound } from './logic.js?v=sahne6';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne6';
+import { createFlow, botDelay, bindChoices } from '../../game-flow.js?v=sahne6';
 
 const KEY = 'oyunarasi-okey-v1';
 const LEVEL_NAMES = { easy: 'Kolay', medium: 'Orta', hard: 'Zor' };
@@ -489,4 +489,6 @@ if (game) {
   $('#continue-card').hidden = false;
   $('#continue-copy').textContent = `${game.wins[0]}–${game.wins.slice(1).reduce((a, b) => a + b, 0)} el galibiyeti · ${LEVEL_NAMES[saved.level]}`;
 }
+// Oyun başlamadan da ıstaka yuvaları çizilir; sahne ilk açılışta tam boyuyla durur.
+if (game) render(); else rack.replaceChildren(...Array.from({ length: SLOTS }, () => Object.assign(document.createElement('div'), { className: 'slot' })));
 flow.show('menu');

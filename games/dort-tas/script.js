@@ -1,7 +1,7 @@
-import { createGame, playMove, botMove, newRound, isValidGame, landingRow, winningLine, COLS, ROWS } from './logic.js?v=balon17';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=balon17';
-import { confirmDialog } from '../../game-dialog.js?v=balon17';
-import { createFlow, botDelay } from '../../game-flow.js?v=balon17';
+import { createGame, playMove, botMove, newRound, isValidGame, landingRow, winningLine, COLS, ROWS } from './logic.js?v=sahne6';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=sahne6';
+import { confirmDialog } from '../../game-dialog.js?v=sahne6';
+import { createFlow, botDelay } from '../../game-flow.js?v=sahne6';
 
 const $ = selector => document.querySelector(selector);
 const KEY = 'oyunarasi-dort-tas-v1';
@@ -149,6 +149,16 @@ function render() {
   persist();
 }
 
+// Oyun başlamadan da boş tahta çizilir; sahne ilk açılışta tam boyuyla durur, menü onun üstünde açılır.
+function renderIdleBoard() {
+  $('#column-controls').replaceChildren(...Array.from({ length: COLS }, (_, column) => Object.assign(document.createElement('button'), {
+    type: 'button', className: 'column-drop', disabled: true, tabIndex: -1, innerHTML: `<strong>${column + 1}</strong><span aria-hidden="true">↓</span>`
+  })));
+  $('#board').replaceChildren(...Array.from({ length: ROWS * COLS }, () => Object.assign(document.createElement('button'), {
+    type: 'button', className: 'connect-cell', disabled: true, tabIndex: -1
+  })));
+}
+
 function announceResult(before) {
   if (game.status === 'playing') return;
   $('#round-button').hidden = true;
@@ -183,7 +193,7 @@ async function attachRoom(roomInfo) {
   $('#room-code').value = roomInfo.code;
   $('#room-feedback').textContent = roomInfo.seat === 0 ? `Oda ${roomInfo.code} hazır. Rakibin katılması bekleniyor.` : 'Odaya katıldın; tahta eşitleniyor.';
   flow.show('game'); render(); persist();
-  const rooms = await import('./rooms.js?v=balon17');
+  const rooms = await import('./rooms.js?v=sahne6');
   stopWatchingRoom = rooms.watchRoom(roomInfo.code, room => {
     roomStatus = room.status; roomVersion = room.version;
     if (room.status === 'waiting') {
@@ -220,7 +230,7 @@ function playColumn(column) {
   if (game.mode === 'online') {
     const room = saved.room;
     if (!room || roomStatus !== 'playing' || game.current !== room.seat) return;
-    import('./rooms.js?v=balon17').then(({ playRoomMove }) => playRoomMove(room.code, room.seat, column, roomVersion))
+    import('./rooms.js?v=sahne6').then(({ playRoomMove }) => playRoomMove(room.code, room.seat, column, roomVersion))
       .catch(error => { $('#status').textContent = error?.message || 'Hamle eşitlenemedi.'; });
     return;
   }
@@ -308,8 +318,8 @@ const cloudSync = syncGameOnAccountChange('dort-tas', {
   onStatus: message => { $('#save-state').textContent = message; }
 });
 
-$('#create-room').addEventListener('click', () => withRoomAction(async () => { const { createRoom } = await import('./rooms.js?v=balon17'); await attachRoom(await createRoom()); }));
-$('#join-room').addEventListener('click', () => withRoomAction(async () => { const { joinRoom } = await import('./rooms.js?v=balon17'); await attachRoom(await joinRoom($('#room-code').value)); }));
+$('#create-room').addEventListener('click', () => withRoomAction(async () => { const { createRoom } = await import('./rooms.js?v=sahne6'); await attachRoom(await createRoom()); }));
+$('#join-room').addEventListener('click', () => withRoomAction(async () => { const { joinRoom } = await import('./rooms.js?v=sahne6'); await attachRoom(await joinRoom($('#room-code').value)); }));
 $('#room-code').addEventListener('input', event => { event.target.value = event.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 6); });
 $('#room-code').addEventListener('keydown', event => { if (event.key === 'Enter') $('#join-room').click(); });
 $('#copy-room-link').addEventListener('click', async () => {
@@ -322,4 +332,4 @@ $('#leave-room').addEventListener('click', () => { stopWatchingRoom?.(); stopWat
 
 const roomFromLink = new URLSearchParams(location.search).get('oda');
 if (roomFromLink) { setMode('online'); $('#room-code').value = roomFromLink.toUpperCase(); }
-setMode(selectedMode); setLevel(selectedLevel); updateContinue(); updateLabels(); flow.show('menu');
+setMode(selectedMode); setLevel(selectedLevel); updateContinue(); updateLabels(); renderIdleBoard(); flow.show('menu');
