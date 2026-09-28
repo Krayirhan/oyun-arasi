@@ -1,6 +1,6 @@
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik9';
-import { confirmDialog } from '../../game-dialog.js?v=mantik9';
-import { createStage } from '../../game-stage.js?v=mantik9';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik18';
+import { confirmDialog } from '../../game-dialog.js?v=mantik18';
+import { createStage } from '../../game-stage.js?v=mantik18';
 
 (() => {
   'use strict';

@@ -1,7 +1,7 @@
 import {
   MAX_TRIES, WORD_LENGTH, answerForDay, applyDailyResult, attemptsForMode as attemptsFor, dayKey, defaultStats, normalizePool as cleanPool,
   normalizeSeries as cleanSeries, normalizeStats, previousDayKey, puzzleNumberFor, readJson, scoreGuess as scoreWord, shuffled, streakForDisplay, writeJson
-} from './logic.js?v=mantik9';
+} from './logic.js?v=mantik18';
 
 const ANSWERS = window.HARFANE_ANSWERS;
 const VALID_WORDS = new Set(window.HARFANE_WORDS);
