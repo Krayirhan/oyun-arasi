@@ -1,7 +1,7 @@
-import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=mantik31';
-import { syncGameOnAccountChange } from '../../cloud-sync.js?v=mantik31';
-import { confirmDialog } from '../../game-dialog.js?v=mantik31';
-import { createStage } from '../../game-stage.js?v=mantik31';
+import { SUITS, RANKS, DRAW_MODES, createGame, drawCards, moveCards, bestTarget, undo, canAutoComplete, autoStep, pickCards, suitOf, rankOf, isRed, cardName, elapsedMilliseconds, pauseGame, resumeGame, isValidGame } from './logic.js?v=202610212038';
+import { syncGameOnAccountChange } from '../../cloud-sync.js?v=202610212038';
+import { confirmDialog } from '../../game-dialog.js?v=202610212038';
+import { createStage } from '../../game-stage.js?v=202610212038';
 
 // Sekme gizliyken süre işlemez: gizlendiği an dondurulur, dönünce kaldığı yerden sürer (telefon kilidi de dahil).
 let hiddenAt = null;

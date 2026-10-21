@@ -1,0 +1,21 @@
+.ad-area { box-sizing: border-box; width: calc(100% - 32px); max-width: 1100px; margin: 24px auto; padding: 12px; border: 1px solid #d8d4cb; border-radius: 12px; background: #f8f4ec; color: #555; }
+.ad-area-game { margin-top: 160px; }
+.ad-label { display: block; margin-bottom: 8px; font: 12px/1.4 system-ui, sans-serif; text-align: center; }
+.ad-content { min-height: 100px; width: 100%; }
+.ad-area[data-state="preview"] .ad-content { display: grid; place-items: center; padding: 16px; box-sizing: border-box; background: #eee9df; border: 1px dashed #aaa; text-align: center; font: 14px/1.5 system-ui, sans-serif; }
+.ads-fullscreen .ad-area { visibility: hidden; pointer-events: none; }
+.ad-rail { display: none; }
+@media (min-width: 1800px) {
+  body.has-ad-rails { position: relative; padding-left: 200px; padding-right: 200px; }
+  .ad-rail { display: block; position: absolute; top: 160px; width: 186px; max-width: 186px; margin: 0; }
+  .ad-rail-left { left: 7px; }
+  .ad-rail-right { right: 7px; }
+  .ad-rail .ad-content { width: 160px; min-height: 600px; }
+}
+.privacy-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 16px; padding: 24px 16px; font: 14px/1.6 system-ui, sans-serif; }
+.privacy-links a, .privacy-links button { color: #0d1b4c; text-decoration: underline; }
+.privacy-links button { padding: 0; border: 0; background: none; font: inherit; cursor: pointer; }
+.privacy-links [role="status"] { flex-basis: 100%; text-align: center; }
+.privacy-document { max-width: 760px; padding: 24px; margin: 24px auto; font: 16px/1.75 system-ui, sans-serif; color: #17213b; }
+.privacy-document a { text-decoration: underline; }
+@media (max-width: 767px) { .ad-content { min-height: 120px; } }
